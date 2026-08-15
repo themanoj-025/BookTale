@@ -39,6 +39,9 @@ logs/
 data/
 backups/
 
+# Generated ML benchmark outputs (recommendation_ml_comparison.py)
+data/generated/
+
 # OS
 .DS_Store
 Thumbs.db
