@@ -2,7 +2,27 @@
 
 A full-featured library management system — catalog, lending, reservations, fines, reading challenges, a social feed, realtime notifications, and book recommendations — built with Flask + SQLAlchemy + a bundled esbuild frontend.
 
-> **Honesty first:** this README describes what the code actually does today, verified against a green test suite. Where something is planned but not built, it says so explicitly. See [What's real vs. aspirational](#whats-real-vs-aspirational).
+> **Honesty first:** this README describes what the code actually does today, verified against a green test suite. Where something is planned but not built, it says so explicitly — see **What's real vs. aspirational** below.
+
+---
+
+## 📋 Table of Contents
+
+- [Status](#status)
+- [✨ Features](#-features)
+- [🏗️ Architecture](#️-architecture)
+- [🧰 Tech stack](#-tech-stack)
+- [🚀 Getting started](#-getting-started)
+- [🔌 API surface](#-api-surface)
+- [🤖 AI / Recommendations](#-ai--recommendations)
+- [📁 Project structure](#-project-structure)
+- [📚 Documentation](#-documentation)
+- [🧭 Roadmap / what's next](#-roadmap--whats-next)
+- [License](#️-license)
+
+---
+
+> 📸 **Screenshot placeholder:** Add a screenshot of the catalog search and a book detail page.
 
 ---
 
@@ -35,7 +55,7 @@ A full-featured library management system — catalog, lending, reservations, fi
 - **Communities**, **book series** tracking, personal reading **diary**
 - **Notifications** — in-app + realtime via Socket.IO
 - **Gamification**: badges, streaks, reading goals
-- **Book recommendations** — rule-based "for you" (reading history + category affinity) and trending; see [AI / Recommendations](#ai--recommendations) for the honest picture
+- **Book recommendations** — rule-based "for you" (reading history + category affinity) and trending; see [AI / Recommendations](#-ai--recommendations) for the honest picture
 - **AI Reading Companion** chat (`/api/ai/chat`) — keyword-intent assistant; see the same section
 
 ### Accounts & administration
@@ -168,7 +188,7 @@ python web_app.py       # http://localhost:5000
 docker compose up --build
 ```
 
-brings up the app + PostgreSQL + Redis (+ worker/nginx services — see [What's real vs. aspirational](#whats-real-vs-aspirational) for the parts that are still scaffolding).
+brings up the app + PostgreSQL + Redis (+ worker/nginx services — see **What's real vs. aspirational** for the parts that are still scaffolding).
 
 ### Run the tests
 
