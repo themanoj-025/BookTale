@@ -81,17 +81,15 @@ class ReadingProgress:
                 "started": False,
                 "finished": False,
                 "time_spent_minutes": 0,
-                "estimated_minutes_remaining": total_pages * AVG_MINUTES_PER_PAGE
-                if total_pages
-                else 0,
+                "estimated_minutes_remaining": (
+                    total_pages * AVG_MINUTES_PER_PAGE if total_pages else 0
+                ),
                 "notes": "",
                 "updated_at": "",
             }
 
         entry = data[key]
-        total_pages = (
-            book.pages if book and book.pages > 0 else entry.get("total_pages", 0)
-        )
+        total_pages = book.pages if book and book.pages > 0 else entry.get("total_pages", 0)
         current = entry.get("current_page", 0)
         percentage = round(current / total_pages * 100, 1) if total_pages > 0 else 0
         time_spent = entry.get("time_spent_minutes", 0)
@@ -140,18 +138,16 @@ class ReadingProgress:
             data[key]["current_page"] = max(0, int(current_page))
             data[key]["started"] = True
         if time_spent_minutes is not None:
-            data[key]["time_spent_minutes"] = data[key].get(
-                "time_spent_minutes", 0
-            ) + int(time_spent_minutes)
+            data[key]["time_spent_minutes"] = data[key].get("time_spent_minutes", 0) + int(
+                time_spent_minutes
+            )
         if notes is not None:
             data[key]["notes"] = notes
         if finished is not None:
             data[key]["finished"] = finished
             if finished:
                 total_pages = (
-                    book.pages
-                    if book and book.pages > 0
-                    else data[key].get("total_pages", 0)
+                    book.pages if book and book.pages > 0 else data[key].get("total_pages", 0)
                 )
                 data[key]["current_page"] = total_pages
 
@@ -189,15 +185,9 @@ class ReadingProgress:
                 book = books.get(book_id)
                 # total_pages is required by the progress dict below — derive it
                 # from the book or the stored entry (prevents NameError).
-                total_pages = (
-                    book.pages
-                    if book and book.pages > 0
-                    else entry.get("total_pages", 0)
-                )
+                total_pages = book.pages if book and book.pages > 0 else entry.get("total_pages", 0)
                 current = entry.get("current_page", 0)
-                percentage = (
-                    round(current / total_pages * 100, 1) if total_pages > 0 else 0
-                )
+                percentage = round(current / total_pages * 100, 1) if total_pages > 0 else 0
                 progress = {
                     **entry,
                     "book_title": book.title if book else "Unknown",
@@ -260,11 +250,7 @@ class ReadingProgress:
     def get_book_bookmarks(self, user_id: str, book_id: str) -> list[dict]:
         """Get all bookmarks for a specific book and user."""
         bookmarks = self._load_bookmarks()
-        return [
-            bm
-            for bm in bookmarks
-            if bm["user_id"] == user_id and bm["book_id"] == book_id
-        ]
+        return [bm for bm in bookmarks if bm["user_id"] == user_id and bm["book_id"] == book_id]
 
     def get_user_bookmarks(self, user_id: str) -> list[dict]:
         """Get all bookmarks for a user."""
@@ -303,9 +289,7 @@ class ReadingProgress:
                 try:
                     updated = datetime.fromisoformat(entry.get("updated_at", ""))
                     month_key = updated.strftime("%Y-%m")
-                    pages_by_month[month_key] = (
-                        pages_by_month.get(month_key, 0) + current
-                    )
+                    pages_by_month[month_key] = pages_by_month.get(month_key, 0) + current
                 except Exception:
                     pass
 
@@ -316,7 +300,7 @@ class ReadingProgress:
             "books_finished": books_finished,
             "completion_rate": round(books_finished / max(1, books_started) * 100, 1),
             "pages_by_month": pages_by_month,
-            "avg_time_per_book": round(total_time / max(1, books_finished), 1)
-            if books_finished
-            else 0,
+            "avg_time_per_book": (
+                round(total_time / max(1, books_finished), 1) if books_finished else 0
+            ),
         }

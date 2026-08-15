@@ -11,9 +11,7 @@ import zlib
 from datetime import datetime
 from functools import wraps
 
-sys.path.insert(
-    0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-)
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 if sys.platform == "win32":
     # Reconfigure stdout/stderr in place for UTF-8 support.
     # Do NOT replace the objects: creating new TextIOWrappers closes the
@@ -60,9 +58,7 @@ from app.services.social.gamification import Gamification
 # Project root (three levels up from app/routes/web_app.py). Flask's default
 # root_path would resolve templates/static against the package root; we pin
 # them explicitly to the canonical app/templates + app/static locations.
-_PROJECT_ROOT = os.path.dirname(
-    os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-)
+_PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 app = Flask(
     __name__,
     template_folder=os.path.join(_PROJECT_ROOT, "app", "templates"),
@@ -95,9 +91,12 @@ except ImportError:
 # RATELIMIT_ENABLED is read at init_app() time (Limiter.enabled is captured
 # from config then), so the flag must be set in app.config BEFORE init_app.
 # Tests set RATELIMIT_ENABLED=0 so the suite never trips per-IP auth limits.
-app.config["RATELIMIT_ENABLED"] = os.getenv(
-    "RATELIMIT_ENABLED", "1"
-).strip().lower() in ("1", "true", "yes", "on")
+app.config["RATELIMIT_ENABLED"] = os.getenv("RATELIMIT_ENABLED", "1").strip().lower() in (
+    "1",
+    "true",
+    "yes",
+    "on",
+)
 
 
 def _limiter_storage_uri() -> str:
@@ -186,8 +185,7 @@ def _audit_log(admin_id, action, target="", old_value=None, new_value=None):
             )
     except Exception as e:
         log(
-            f"audit write failed (admin={admin_id}, action={action}, "
-            f"target={target}): {e}",
+            f"audit write failed (admin={admin_id}, action={action}, " f"target={target}): {e}",
             "audit",
         )
 
@@ -411,26 +409,20 @@ def _library_stats():
     avail_copies = sum(b.available_copies for b in all_books)
     issued_copies = total_copies - avail_copies
     avail_rate = (avail_copies / total_copies * 100) if total_copies else 0
-    new_books_month = sum(
-        1 for b in all_books if datetime.fromisoformat(b.added_on) >= tms
-    )
+    new_books_month = sum(1 for b in all_books if datetime.fromisoformat(b.added_on) >= tms)
     total_users = len(users)
     active_users = sum(1 for u in users.values() if u.membership_status == "Active")
     blocked_users = sum(1 for u in users.values() if u.membership_status == "Blocked")
     new_users_month = sum(
         1
         for u in users.values()
-        if hasattr(u, "added_on")
-        and u.added_on
-        and datetime.fromisoformat(u.added_on) >= tms
+        if hasattr(u, "added_on") and u.added_on and datetime.fromisoformat(u.added_on) >= tms
     )
     issues = [t for t in txns if t["type"] == "issue"]
     returns = [t for t in txns if t["type"] == "return"]
     active_issues = [t for t in issues if t.get("return_date") is None]
     total_txns = len(txns)
-    month_txns = sum(
-        1 for t in txns if datetime.fromisoformat(t.get("issue_date", "")) >= tms
-    )
+    month_txns = sum(1 for t in txns if datetime.fromisoformat(t.get("issue_date", "")) >= tms)
     unique_borrowers = len(set(t["user_id"] for t in issues))
     fines = storage.load_fines()
     total_fines = sum(f.get("amount", 0) for f in fines)
@@ -473,9 +465,9 @@ def _book_borrowing_history(book_id):
                     **t,
                     "user_name": u.name if u else t["user_id"],
                     "issue_date_fmt": t.get("issue_date", "")[:19],
-                    "return_date_fmt": t.get("return_date", "")[:19]
-                    if t.get("return_date")
-                    else None,
+                    "return_date_fmt": (
+                        t.get("return_date", "")[:19] if t.get("return_date") else None
+                    ),
                 }
             )
     return sorted(history, key=lambda x: x.get("issue_date", ""), reverse=True)
@@ -627,17 +619,18 @@ _ERROR_PAGES = {
 # /api/docs is a browser page (Swagger UI), so it stays on the HTML path.
 def _error_response(status: int, message: str) -> tuple:
     if request.path.startswith("/api/") and request.path != "/api/docs":
-        return jsonify(
-            {"data": None, "error": {"code": status, "message": message}}
-        ), status
+        return jsonify({"data": None, "error": {"code": status, "message": message}}), status
     _code, _title, _icon, _msg = _ERROR_PAGES.get(status, _ERROR_PAGES[500])
-    return render_template(
-        "errors/error_page.html",
-        title=f"{_code} {_title}",
-        error_title=_title,
-        error_message=_msg,
-        icon=_icon,
-    ), status
+    return (
+        render_template(
+            "errors/error_page.html",
+            title=f"{_code} {_title}",
+            error_title=_title,
+            error_message=_msg,
+            icon=_icon,
+        ),
+        status,
+    )
 
 
 # 404/500 get their own explicit handlers below (they need special logging
@@ -680,9 +673,7 @@ def render_auth_page(title, content, **kw):
     """Render an auth page using the split-screen auth_base.html template."""
     from flask import render_template
 
-    return render_template(
-        "auth_base.html", title=title, auth_content=content, session={}, **kw
-    )
+    return render_template("auth_base.html", title=title, auth_content=content, session={}, **kw)
 
 
 # ──────────────────────────────────────────────────────────────────────────
@@ -735,7 +726,8 @@ def api_openapi_json():
 @app.route("/api/docs")
 def api_docs():
     """Swagger UI for the BookTale API (pinned CDN, matches the CSP)."""
-    return render_template_string("""<!DOCTYPE html>
+    return render_template_string(
+        """<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -759,7 +751,8 @@ def api_docs():
   };
 </script>
 </body>
-</html>""")
+</html>"""
+    )
 
 
 @app.route("/security")
@@ -860,9 +853,7 @@ def login_page():
     if request.method == "GET":
         # Phase 3: real Jinja2 template (autoescape ON). The hero-stats fetch
         # lives in auth_base.html already, so no hero_script needed here.
-        return render_template(
-            "auth/login.html", title="Login", form_aria_label="Login form"
-        )
+        return render_template("auth/login.html", title="Login", form_aria_label="Login form")
 
     from app.core.exceptions import AuthenticationError
 
@@ -886,8 +877,7 @@ def login_page():
 # Split limit (Phase 4): page loads must never consume the anti-spam budget.
 # GET /register is exempt (mirrors the login route's GET-exempt pattern);
 # only POSTs count against the 5/min budget, so refreshing the form is free.
-@_rate_limit("5 per minute", methods=["POST"],
-             exempt_when=lambda: request.method == "GET")
+@_rate_limit("5 per minute", methods=["POST"], exempt_when=lambda: request.method == "GET")
 def register_page():
     if request.method == "GET":
         # Phase 3: real Jinja2 template (autoescape ON).
@@ -937,16 +927,10 @@ def register_page():
             form_aria_label="Registration form",
         )
 
-    from app.services.auth.auth import (
-        generate_verify_token as _gvt,
-    )
-    from app.services.auth.auth import (
-        hash_password as _hp,
-    )
+    from app.services.auth.auth import generate_verify_token as _gvt
+    from app.services.auth.auth import hash_password as _hp
 
-    lib.register_user(
-        user_id, name, email, "", role, _hp(password), actor="registration"
-    )
+    lib.register_user(user_id, name, email, "", role, _hp(password), actor="registration")
 
     # Send welcome email with verification link
     if email:
@@ -982,8 +966,7 @@ def register_page():
 @app.route("/forgot-password", methods=["GET", "POST"])
 # Split limit (Phase 4): page loads must never consume the anti-spam budget.
 # GET /forgot-password is exempt; only POSTs count against the 5/min budget.
-@_rate_limit("5 per minute", methods=["POST"],
-             exempt_when=lambda: request.method == "GET")
+@_rate_limit("5 per minute", methods=["POST"], exempt_when=lambda: request.method == "GET")
 def forgot_password_page():
     if request.method == "GET":
         # Phase 3: real Jinja2 template (autoescape ON).
@@ -1009,9 +992,7 @@ def forgot_password_page():
                 from app.services.email.email_notifier import send_email
 
                 token = _grt(target_user.user_id)
-                reset_url = (
-                    request.host_url.rstrip("/") + "/reset-password?token=" + token
-                )
+                reset_url = request.host_url.rstrip("/") + "/reset-password?token=" + token
                 send_email(
                     target_user.email,
                     "Reset your BookTale password",
@@ -1086,8 +1067,7 @@ def verify_email_page():
 @app.route("/reset-password", methods=["GET", "POST"])
 # Split limit (Phase 4): page loads must never consume the anti-spam budget.
 # GET /reset-password (valid or invalid token) is exempt; only POSTs count.
-@_rate_limit("5 per minute", methods=["POST"],
-             exempt_when=lambda: request.method == "GET")
+@_rate_limit("5 per minute", methods=["POST"], exempt_when=lambda: request.method == "GET")
 def reset_password_page():
     if request.method == "GET":
         token = request.args.get("token", "")
@@ -1131,8 +1111,7 @@ def reset_password_page():
         if _gen_csrf is not None:
             try:
                 _csrf_hidden = (
-                    '<input type="hidden" name="csrf_token" '
-                    'value="' + _gen_csrf() + '">'
+                    '<input type="hidden" name="csrf_token" ' 'value="' + _gen_csrf() + '">'
                 )
             except (ImportError, RuntimeError):
                 _csrf_hidden = ""
@@ -1287,9 +1266,7 @@ def help_page():
     # Need Help
     CONTENT += '<div class="glass-card p-4">'
     CONTENT += '<h5 class="fw-bold mb-3"><i class="bi bi-envelope-fill text-success me-2"></i>Need Help?</h5>'
-    CONTENT += (
-        '<p style="font-size:.9rem;">If you encounter any issues or have questions:</p>'
-    )
+    CONTENT += '<p style="font-size:.9rem;">If you encounter any issues or have questions:</p>'
     CONTENT += '<ul class="list-unstyled" style="font-size:.9rem;">'
     CONTENT += '<li class="mb-2"><i class="bi bi-envelope-fill text-success me-2"></i> Contact the library staff for assistance</li>'
     CONTENT += '<li class="mb-2"><i class="bi bi-chat-dots-fill text-success me-2"></i> Post in the community for peer support</li>'
@@ -1579,9 +1556,7 @@ def settings_page():
     CONTENT = CONTENT.replace("LOC_V", loc_v).replace("BIO_V", bio_v)
     CONTENT = CONTENT.replace("NOTIF_HTML", n_html).replace("PRIV_HTML", p_html)
     CONTENT = CONTENT.replace("VIS_OPTS", vis_opts)
-    CONTENT = CONTENT.replace("RATING_OPTS", rating_opts).replace(
-        "GOAL_OPTS", goal_opts
-    )
+    CONTENT = CONTENT.replace("RATING_OPTS", rating_opts).replace("GOAL_OPTS", goal_opts)
     CONTENT = CONTENT.replace("GOAL_VAL", str(user.reading_default_goal or 12))
 
     # Theme/font button styling
@@ -1795,7 +1770,7 @@ def api_save_settings():
             pass
 
     # Password change
-    if "new_password" in data and data["new_password"]:
+    if data.get("new_password"):
         from app.services.auth.auth import hash_password as _hp
         from app.services.auth.auth import verify_password as _vp
 
@@ -1808,9 +1783,7 @@ def api_save_settings():
         # Phase 4 (P1): the same >=12 policy enforced on the web forms applies
         # here — the settings API is a server-side password-change surface.
         if len(data["new_password"]) < 12:
-            return jsonify(
-                {"success": False, "error": "Password must be at least 12 characters"}
-            )
+            return jsonify({"success": False, "error": "Password must be at least 12 characters"})
         user.password_hash = _hp(data["new_password"])
         log("Password changed via settings", uid)
 
@@ -2268,22 +2241,20 @@ def api_ai_chat():
                 )
             else:
                 # Fallback to trending
-                trending = (
-                    recommender.recommend_trending(top_n=3) if recommender else []
-                )
+                trending = recommender.recommend_trending(top_n=3) if recommender else []
                 if trending:
                     titles = [r.get("title", "Unknown") for r in trending]
                     response = (
-                        "Here are some trending books you might enjoy: "
-                        + ", ".join(titles)
-                        + "."
+                        "Here are some trending books you might enjoy: " + ", ".join(titles) + "."
                     )
                 else:
                     response = "I'd recommend checking out our Explore page for trending books!"
         except:
             response = "I'm having trouble finding recommendations right now. Try browsing the Explore page!"
     elif "similar" in msg_lower or "like" in msg_lower:
-        response = "Try searching for a book and checking the 'Similar Books' section on its detail page!"
+        response = (
+            "Try searching for a book and checking the 'Similar Books' section on its detail page!"
+        )
     elif "summary" in msg_lower or "summarize" in msg_lower:
         response = "To get a summary, go to a book's detail page and check the description section!"
     elif "genre" in msg_lower or "category" in msg_lower:
@@ -2304,11 +2275,7 @@ def api_reading_streak():
     """Calculate reading streak based on diary entries."""
     uid = session["user_id"]
     try:
-        entries, _ = (
-            diary_mgr.get_user_diary(uid, page=1, per_page=500)
-            if diary_mgr
-            else ([], 0)
-        )
+        entries, _ = diary_mgr.get_user_diary(uid, page=1, per_page=500) if diary_mgr else ([], 0)
         dates = sorted(
             set(e.get("date_read", "")[:10] for e in entries if e.get("date_read")),
             reverse=True,
@@ -2381,12 +2348,8 @@ def api_analytics_activity():
     txns = storage.load_transactions()
     from collections import Counter
 
-    user_counts = Counter(
-        t.get("user_id", "") for t in txns if t.get("type") == "issue"
-    )
-    return jsonify(
-        [{"user": uid, "count": cnt} for uid, cnt in user_counts.most_common(10)]
-    )
+    user_counts = Counter(t.get("user_id", "") for t in txns if t.get("type") == "issue")
+    return jsonify([{"user": uid, "count": cnt} for uid, cnt in user_counts.most_common(10)])
 
 
 @app.route("/api/books")
@@ -2402,9 +2365,7 @@ def api_books_search():
         all_books = [
             b
             for b in all_books
-            if ql in b.title.lower()
-            or ql in b.author.lower()
-            or ql in (b.isbn or "").lower()
+            if ql in b.title.lower() or ql in b.author.lower() or ql in (b.isbn or "").lower()
         ]
     if sort == "popular":
         all_books.sort(key=lambda b: b.issue_count, reverse=True)
@@ -2463,7 +2424,9 @@ def admin_fines_page():
             f.get("created_at", "")[:10],
         )
     if not rows:
-        rows = '<tr><td colspan="5" class="text-center text-muted py-4">No fines recorded.</td></tr>'
+        rows = (
+            '<tr><td colspan="5" class="text-center text-muted py-4">No fines recorded.</td></tr>'
+        )
 
     CONTENT = """<div class="animate-in">
     <div class="glass-card p-0 mb-3" style="overflow:hidden;">
@@ -2482,7 +2445,11 @@ def admin_fines_page():
             <th>Status</th><th>User</th><th>Amount</th><th>Reason</th><th>Date</th>
         </tr></thead><tbody>ROWS_HTML</tbody></table>
     </div>
-</div>""" % (len(fines), pending, paid)
+</div>""" % (
+        len(fines),
+        pending,
+        paid,
+    )
     CONTENT = CONTENT.replace("ROWS_HTML", rows)
     return render_page("Fines Management", CONTENT)
 

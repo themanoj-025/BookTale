@@ -28,17 +28,13 @@ def is_smtp_configured() -> bool:
     return bool(Config.SMTP_HOST and Config.SMTP_USER and Config.SMTP_PASSWORD)
 
 
-def send_email(
-    to_email: str, subject: str, html_body: str, text_body: str | None = None
-) -> bool:
+def send_email(to_email: str, subject: str, html_body: str, text_body: str | None = None) -> bool:
     """
     Send an email via SMTP. Returns True if sent successfully, False otherwise.
     Gracefully fails if SMTP is not configured.
     """
     if not is_smtp_configured():
-        print(
-            f"  [EMAIL SKIPPED] SMTP not configured. Would send to {to_email}: {subject}"
-        )
+        print(f"  [EMAIL SKIPPED] SMTP not configured. Would send to {to_email}: {subject}")
         return False
 
     try:
@@ -107,7 +103,8 @@ def _overdue_email_html(
     book_id: str,
 ) -> str:
     """Generate HTML for an overdue book notification."""
-    return _base_html(f"""
+    return _base_html(
+        f"""
 <h2 style="margin-top:0;">⏰ Book Overdue Notice</h2>
 <p>Dear <strong>{user_name}</strong>,</p>
 <p>This is a reminder that the following book is <strong>overdue</strong> and needs to be returned immediately.</p>
@@ -122,12 +119,14 @@ def _overdue_email_html(
 <p><strong>What to do:</strong> Please return the book at your earliest convenience to avoid additional fines. The fine accrues at <strong>₹{Config.FINE_PER_DAY:.0f}/day</strong>.</p>
 <p style="text-align:center;"><a href="#" class="btn">View My Account</a></p>
 <p class="text-muted" style="font-size:.8rem;color:#6b7280;">Book ID: {book_id}</p>
-""")
+"""
+    )
 
 
 def _reservation_email_html(user_name: str, book_title: str, book_id: str) -> str:
     """Generate HTML for a reservation available notification."""
-    return _base_html(f"""
+    return _base_html(
+        f"""
 <h2 style="margin-top:0;">📢 Book Available for Pickup</h2>
 <p>Dear <strong>{user_name}</strong>,</p>
 <p>Great news! The book you reserved is now <strong>available</strong> for borrowing.</p>
@@ -137,14 +136,14 @@ def _reservation_email_html(user_name: str, book_title: str, book_id: str) -> st
 </div>
 <p>Please visit the library to borrow this book. If not collected within <strong>3 days</strong>, the reservation may be offered to the next person in queue.</p>
 <p style="text-align:center;"><a href="#" class="btn">View Book Details</a></p>
-""")
+"""
+    )
 
 
-def _fine_email_html(
-    user_name: str, fine_amount: float, book_title: str, reason: str
-) -> str:
+def _fine_email_html(user_name: str, fine_amount: float, book_title: str, reason: str) -> str:
     """Generate HTML for a fine notification."""
-    return _base_html(f"""
+    return _base_html(
+        f"""
 <h2 style="margin-top:0;">💰 Fine Notice</h2>
 <p>Dear <strong>{user_name}</strong>,</p>
 <p>A fine has been applied to your account:</p>
@@ -154,7 +153,8 @@ def _fine_email_html(
 <tr><td style="border:none;padding:4px 8px;"><strong>Reason:</strong></td><td style="border:none;">{reason}</td></tr></table>
 </div>
 <p>Please clear your outstanding fines at the library counter or through your account portal.</p>
-""")
+"""
+    )
 
 
 # ──
@@ -171,9 +171,7 @@ def notify_overdue(
 ) -> bool:
     """Send an overdue book notification via email."""
     subject = f"⏰ Overdue Notice: '{book_title}' — {days_overdue} day(s) late"
-    html = _overdue_email_html(
-        user_name, book_title, days_overdue, accrued_fine, due_date, book_id
-    )
+    html = _overdue_email_html(user_name, book_title, days_overdue, accrued_fine, due_date, book_id)
     text = (
         f"Dear {user_name},\n\n"
         f"The book '{book_title}' is OVERDUE by {days_overdue} day(s).\n"

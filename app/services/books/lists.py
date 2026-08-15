@@ -102,9 +102,7 @@ class BookLists:
         lists = self._load_lists()
         for lst in lists:
             if lst["list_id"] == list_id:
-                if lst["owner_id"] != user_id and user_id not in lst.get(
-                    "collaborators", []
-                ):
+                if lst["owner_id"] != user_id and user_id not in lst.get("collaborators", []):
                     return False, "You don't have permission to edit this list"
                 if name is not None:
                     lst["name"] = name.strip()
@@ -136,9 +134,7 @@ class BookLists:
         lists = self._load_lists()
         for lst in lists:
             if lst["list_id"] == list_id:
-                if lst["owner_id"] != user_id and user_id not in lst.get(
-                    "collaborators", []
-                ):
+                if lst["owner_id"] != user_id and user_id not in lst.get("collaborators", []):
                     return False, "Permission denied"
                 if any(b["book_id"] == book_id for b in lst["books"]):
                     return False, "Book already in list"
@@ -162,15 +158,11 @@ class BookLists:
                 return True, "Book added to list!"
         return False, "List not found"
 
-    def remove_book_from_list(
-        self, list_id: str, book_id: str, user_id: str
-    ) -> tuple[bool, str]:
+    def remove_book_from_list(self, list_id: str, book_id: str, user_id: str) -> tuple[bool, str]:
         lists = self._load_lists()
         for lst in lists:
             if lst["list_id"] == list_id:
-                if lst["owner_id"] != user_id and user_id not in lst.get(
-                    "collaborators", []
-                ):
+                if lst["owner_id"] != user_id and user_id not in lst.get("collaborators", []):
                     return False, "Permission denied"
                 lst["books"] = [b for b in lst["books"] if b["book_id"] != book_id]
                 lst["updated_at"] = datetime.now().isoformat()
@@ -178,9 +170,7 @@ class BookLists:
                 return True, "Book removed from list!"
         return False, "List not found"
 
-    def reorder_list(
-        self, list_id: str, user_id: str, book_ids: list[str]
-    ) -> tuple[bool, str]:
+    def reorder_list(self, list_id: str, user_id: str, book_ids: list[str]) -> tuple[bool, str]:
         lists = self._load_lists()
         for lst in lists:
             if lst["list_id"] == list_id and lst["owner_id"] == user_id:
@@ -219,9 +209,7 @@ class BookLists:
         lists = self._load_lists()
         for lst in lists:
             if lst["list_id"] == list_id and lst["owner_id"] == owner_id:
-                lst["collaborators"] = [
-                    c for c in lst["collaborators"] if c != collaborator_id
-                ]
+                lst["collaborators"] = [c for c in lst["collaborators"] if c != collaborator_id]
                 self._save_lists(lists)
                 return True, "Collaborator removed!"
         return False, "List not found"
@@ -276,14 +264,10 @@ class BookLists:
         result.sort(key=lambda l: l["updated_at"], reverse=True)
         return result
 
-    def get_public_lists(
-        self, page: int = 1, per_page: int = 20
-    ) -> tuple[list[dict], int]:
+    def get_public_lists(self, page: int = 1, per_page: int = 20) -> tuple[list[dict], int]:
         lists = self._load_lists()
         public = [lst for lst in lists if lst["is_public"]]
-        public.sort(
-            key=lambda l: (l.get("upvotes", 0), len(l["followers"])), reverse=True
-        )
+        public.sort(key=lambda l: (l.get("upvotes", 0), len(l["followers"])), reverse=True)
         total = len(public)
         start = (page - 1) * per_page
         end = start + per_page
@@ -293,9 +277,7 @@ class BookLists:
         lists = self._load_lists()
         public = [lst for lst in lists if lst["is_public"]]
         public.sort(
-            key=lambda l: (
-                l.get("upvotes", 0) * 3 + len(l["followers"]) * 2 + len(l["books"])
-            ),
+            key=lambda l: (l.get("upvotes", 0) * 3 + len(l["followers"]) * 2 + len(l["books"])),
             reverse=True,
         )
         return public[:limit]
@@ -359,8 +341,7 @@ class BookLists:
         result = [
             lst
             for lst in lists
-            if lst["is_public"]
-            and (q in lst["name"].lower() or q in lst["description"].lower())
+            if lst["is_public"] and (q in lst["name"].lower() or q in lst["description"].lower())
         ]
         result.sort(key=lambda l: l.get("upvotes", 0), reverse=True)
         return result[:20]

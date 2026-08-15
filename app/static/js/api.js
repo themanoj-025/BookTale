@@ -5,16 +5,16 @@
    ═══════════════════════════════════════════════════════════════════ */
 
 (function () {
-  'use strict';
+  "use strict";
 
   /**
    * Convenience: ensure toast.js is loaded (showToast global)
    */
   function _showErrorToast(msg) {
-    if (typeof showToast === 'function') {
-      showToast(msg, 'error', 5000);
+    if (typeof showToast === "function") {
+      showToast(msg, "error", 5000);
     } else {
-      console.error('[BookTale API]', msg);
+      console.error("[BookTale API]", msg);
     }
   }
 
@@ -27,9 +27,13 @@
       var args = arguments;
       var ctx = this;
       clearTimeout(timer);
-      timer = setTimeout(function () { fn.apply(ctx, args); }, ms);
+      timer = setTimeout(function () {
+        fn.apply(ctx, args);
+      }, ms);
     };
-    debounced.cancel = function () { clearTimeout(timer); };
+    debounced.cancel = function () {
+      clearTimeout(timer);
+    };
     return debounced;
   }
 
@@ -48,18 +52,18 @@
     var silent = cfg.silent || false;
 
     var defaultHeaders = {
-      'Accept': 'application/json',
-      'X-Requested-With': 'XMLHttpRequest',
+      Accept: "application/json",
+      "X-Requested-With": "XMLHttpRequest",
     };
 
     var body = opts.body;
-    if (body && typeof body === 'object' && !(body instanceof FormData)) {
-      defaultHeaders['Content-Type'] = 'application/json';
+    if (body && typeof body === "object" && !(body instanceof FormData)) {
+      defaultHeaders["Content-Type"] = "application/json";
       body = JSON.stringify(body);
     }
 
     var mergedOpts = {
-      credentials: 'same-origin',
+      credentials: "same-origin",
     };
     // Copy opts properties
     for (var key in opts) {
@@ -71,11 +75,13 @@
     // Merge headers
     mergedOpts.headers = {};
     for (var hk in defaultHeaders) {
-      if (defaultHeaders.hasOwnProperty(hk)) mergedOpts.headers[hk] = defaultHeaders[hk];
+      if (defaultHeaders.hasOwnProperty(hk))
+        mergedOpts.headers[hk] = defaultHeaders[hk];
     }
     if (opts.headers) {
       for (var ohk in opts.headers) {
-        if (opts.headers.hasOwnProperty(ohk)) mergedOpts.headers[ohk] = opts.headers[ohk];
+        if (opts.headers.hasOwnProperty(ohk))
+          mergedOpts.headers[ohk] = opts.headers[ohk];
       }
     }
 
@@ -84,21 +90,24 @@
     for (var attempt = 0; attempt <= retries; attempt++) {
       try {
         var res = await fetch(url, mergedOpts);
-        var ct = (res.headers.get('content-type') || '').toLowerCase();
+        var ct = (res.headers.get("content-type") || "").toLowerCase();
         var payload;
 
-        if (ct.indexOf('application/json') !== -1) {
+        if (ct.indexOf("application/json") !== -1) {
           payload = await res.json();
         } else {
           var text = await res.text();
           if (!res.ok) {
-            throw new Error(text.slice(0, 200) || 'HTTP ' + res.status);
+            throw new Error(text.slice(0, 200) || "HTTP " + res.status);
           }
           return text;
         }
 
         if (!res.ok || payload.success === false) {
-          var errMsg = payload.error || payload.message || 'Request failed (' + res.status + ')';
+          var errMsg =
+            payload.error ||
+            payload.message ||
+            "Request failed (" + res.status + ")";
           if (!silent) _showErrorToast(errMsg);
           throw new Error(errMsg);
         }
@@ -107,21 +116,23 @@
       } catch (err) {
         lastErr = err;
         if (attempt < retries) {
-          var msg = err.message || '';
+          var msg = err.message || "";
           var isRetryable =
-            msg.indexOf('503') !== -1 ||
-            msg.indexOf('Service Unavailable') !== -1 ||
-            msg.indexOf('Failed to fetch') !== -1 ||
-            msg.indexOf('NetworkError') !== -1;
+            msg.indexOf("503") !== -1 ||
+            msg.indexOf("Service Unavailable") !== -1 ||
+            msg.indexOf("Failed to fetch") !== -1 ||
+            msg.indexOf("NetworkError") !== -1;
           if (isRetryable) {
-            await new Promise(function (r) { setTimeout(r, 600 * (attempt + 1)); });
+            await new Promise(function (r) {
+              setTimeout(r, 600 * (attempt + 1));
+            });
             continue;
           }
         }
       }
     }
 
-    if (!lastErr) lastErr = new Error('Request failed');
+    if (!lastErr) lastErr = new Error("Request failed");
     if (!silent) _showErrorToast(lastErr.message);
     throw lastErr;
   }
@@ -129,13 +140,21 @@
   /**
    * Shorthand helpers.
    */
-  function get(url, cfg) { return api(url, { method: 'GET' }, cfg); }
+  function get(url, cfg) {
+    return api(url, { method: "GET" }, cfg);
+  }
 
-  function post(url, data, cfg) { return api(url, { method: 'POST', body: data }, cfg); }
+  function post(url, data, cfg) {
+    return api(url, { method: "POST", body: data }, cfg);
+  }
 
-  function put(url, data, cfg) { return api(url, { method: 'PUT', body: data }, cfg); }
+  function put(url, data, cfg) {
+    return api(url, { method: "PUT", body: data }, cfg);
+  }
 
-  function del(url, cfg) { return api(url, { method: 'DELETE' }, cfg); }
+  function del(url, cfg) {
+    return api(url, { method: "DELETE" }, cfg);
+  }
 
   // ── Expose globally ──────────────────────────────────────────────
   window.BookTale = window.BookTale || {};
@@ -151,5 +170,4 @@
   // Also expose individual helpers for inline use
   window.api = api;
   window.debounce = debounce;
-
 })();

@@ -205,12 +205,8 @@ class DiaryManager:
                     "book_title": book.title if book else "Unknown Book",
                     "book_author": book.author if book else "",
                     "book_category": book.category if book else "",
-                    "book_cover": book.cover_url or book.cover_image or ""
-                    if book
-                    else "",
-                    "rating_badge": rating_badge_html(
-                        e.get("rating_label", "timepass")
-                    ),
+                    "book_cover": book.cover_url or book.cover_image or "" if book else "",
+                    "rating_badge": rating_badge_html(e.get("rating_label", "timepass")),
                     "star_html": star_rating_html(e.get("star_rating")),
                     "vibe_tags": e.get("vibe_tags", []),
                 }
@@ -299,9 +295,7 @@ class DiaryManager:
                     **e,
                     "user_name": user.name if user else "Unknown",
                     "user_avatar": e["user_id"][:2].upper(),
-                    "rating_badge": rating_badge_html(
-                        e.get("rating_label", "timepass")
-                    ),
+                    "rating_badge": rating_badge_html(e.get("rating_label", "timepass")),
                 }
             )
 
@@ -351,8 +345,7 @@ class DiaryManager:
 
         # Average rating (by score)
         total_score = sum(
-            RATING_SCORES.get(e.get("rating_label", "timepass"), 0)
-            for e in user_entries
+            RATING_SCORES.get(e.get("rating_label", "timepass"), 0) for e in user_entries
         )
         avg_score = total_score / len(user_entries) if user_entries else 0
         if avg_score >= 3.5:

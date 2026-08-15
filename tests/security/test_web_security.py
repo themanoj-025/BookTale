@@ -84,9 +84,9 @@ class TestPrivilegeEscalation:
         assert resp.status_code == 200
         users = storage.load_users()
         assert "MEM-9001" in users
-        assert users["MEM-9001"].role == "user", (
-            "self-registration must never create an admin account"
-        )
+        assert (
+            users["MEM-9001"].role == "user"
+        ), "self-registration must never create an admin account"
 
     def test_register_with_librarian_role_downgraded(self, client):
         """role=librarian from a public form must also be downgraded."""
@@ -235,9 +235,9 @@ class TestSettingsOverride:
             with open(override_path, "w", encoding="utf-8") as f:
                 json.dump({"FINE_PER_DAY": 12.5}, f)
             _load_settings_overrides()
-            assert Config.FINE_PER_DAY == 12.5, (
-                "settings_override.json values must be applied (was NameError dead code)"
-            )
+            assert (
+                Config.FINE_PER_DAY == 12.5
+            ), "settings_override.json values must be applied (was NameError dead code)"
         finally:
             if os.path.exists(override_path):
                 os.remove(override_path)
@@ -258,9 +258,7 @@ class TestCrashSiteRoutes:
         # hits the duplicate-ISBN guard (would fail `assert ok` and error
         # the test). Kept purely numeric in case ISBN validation is added.
         isbn = "978" + str(uuid.uuid4().int)[:10]
-        ok, bid = lib.add_book(
-            "Regression Book", "Frank Herbert", isbn, "Fiction", 2, actor="test"
-        )
+        ok, bid = lib.add_book("Regression Book", "Frank Herbert", isbn, "Fiction", 2, actor="test")
         assert ok
         # Give the admin a favorite so the profile page exercises the
         # _render_fav_grid favorites path (regression: social_routes.py:151
@@ -298,11 +296,7 @@ class TestCrashSiteRoutes:
         closes the gap permanently.
         """
         books = storage.load_books()
-        bids = [
-            bid
-            for bid, b in books.items()
-            if getattr(b, "title", "") == "Regression Book"
-        ]
+        bids = [bid for bid, b in books.items() if getattr(b, "title", "") == "Regression Book"]
         assert bids, "fixture should have seeded a Regression Book"
         resp = client.get(f"/books/{bids[0]}")
         body = resp.get_data(as_text=True)
@@ -555,12 +549,10 @@ class TestCSRFProtection:
         """When CSRF is ON, a POST without a valid token is rejected (400)."""
         app.config["WTF_CSRF_ENABLED"] = True  # suite opted out; force it on
         try:
-            resp = client.post(
-                "/login", data={"user_id": "ADMIN001", "password": "TestAdmin123"}
-            )
-            assert resp.status_code == 400, (
-                "tokenless state-changing POST must be rejected when CSRF is on"
-            )
+            resp = client.post("/login", data={"user_id": "ADMIN001", "password": "TestAdmin123"})
+            assert (
+                resp.status_code == 400
+            ), "tokenless state-changing POST must be rejected when CSRF is on"
         finally:
             app.config["WTF_CSRF_ENABLED"] = False
 
@@ -572,9 +564,7 @@ class TestCSRFProtection:
         try:
             page = client.get("/login")
             assert page.status_code == 200
-            m = re.search(
-                r'name="csrf_token"[^>]*value="([^"]+)"', page.get_data(as_text=True)
-            )
+            m = re.search(r'name="csrf_token"[^>]*value="([^"]+)"', page.get_data(as_text=True))
             assert m, "login form must render a csrf_token hidden input"
             resp = client.post(
                 "/login",
@@ -618,9 +608,9 @@ class TestCSRFProtection:
             cwd=PROJECT_ROOT,
             timeout=120,
         )
-        assert "ENABLED" in (r.stdout or ""), (
-            f"CSRF defaulted OFF! stdout={r.stdout!r} stderr={r.stderr!r}"
-        )
+        assert "ENABLED" in (
+            r.stdout or ""
+        ), f"CSRF defaulted OFF! stdout={r.stdout!r} stderr={r.stderr!r}"
 
 
 class TestReadyz:
@@ -665,9 +655,9 @@ class TestRateLimiting:
             forgot_password_page,
             reset_password_page,
         ):
-            assert hasattr(view, "__wrapper-limiter-instance"), (
-                f"{view.__name__} is missing a rate-limit decorator"
-            )
+            assert hasattr(
+                view, "__wrapper-limiter-instance"
+            ), f"{view.__name__} is missing a rate-limit decorator"
 
     def test_rate_limit_returns_429_after_breach(self):
         """The wired limiter returns 429 once a per-route limit is exceeded."""
@@ -762,9 +752,9 @@ class TestRateLimiting:
         global default)."""
         from web_app import api_save_settings
 
-        assert hasattr(api_save_settings, "__wrapper-limiter-instance"), (
-            "api_save_settings is missing an explicit rate-limit decorator"
-        )
+        assert hasattr(
+            api_save_settings, "__wrapper-limiter-instance"
+        ), "api_save_settings is missing an explicit rate-limit decorator"
 
     def _make_settings_save_probe(self):
         from flask import Flask, g, request
@@ -863,9 +853,9 @@ class TestRateLimiting:
         """api_save_admin_settings must carry a limiter decorator."""
         from web_app import api_save_admin_settings
 
-        assert hasattr(api_save_admin_settings, "__wrapper-limiter-instance"), (
-            "api_save_admin_settings is missing an explicit rate-limit decorator"
-        )
+        assert hasattr(
+            api_save_admin_settings, "__wrapper-limiter-instance"
+        ), "api_save_admin_settings is missing an explicit rate-limit decorator"
 
     def _make_admin_settings_probe(self):
         from flask import Flask, g, request
@@ -899,21 +889,15 @@ class TestRateLimiting:
         probe = self._make_admin_settings_probe()
         with probe.test_client() as c:
             for _ in range(6):  # 2x the limit — successes never 429
-                resp = c.post(
-                    "/api/admin/settings/save", json={"current_admin_password": "ok"}
-                )
+                resp = c.post("/api/admin/settings/save", json={"current_admin_password": "ok"})
                 assert resp.status_code == 200
                 assert resp.get_json()["success"] is True
             # Failure budget still full: 3 failures allowed, 4th is 429.
             for _ in range(3):
-                resp = c.post(
-                    "/api/admin/settings/save", json={"current_admin_password": "bad"}
-                )
+                resp = c.post("/api/admin/settings/save", json={"current_admin_password": "bad"})
                 assert resp.status_code == 200
                 assert resp.get_json()["success"] is False
-            resp = c.post(
-                "/api/admin/settings/save", json={"current_admin_password": "bad"}
-            )
+            resp = c.post("/api/admin/settings/save", json={"current_admin_password": "bad"})
             assert resp.status_code == 429
 
     def test_admin_settings_failed_verifications_breach_limit(self):
@@ -921,14 +905,10 @@ class TestRateLimiting:
         probe = self._make_admin_settings_probe()
         with probe.test_client() as c:
             for _ in range(3):
-                resp = c.post(
-                    "/api/admin/settings/save", json={"current_admin_password": "bad"}
-                )
+                resp = c.post("/api/admin/settings/save", json={"current_admin_password": "bad"})
                 assert resp.status_code == 200
                 assert resp.get_json()["success"] is False
-            resp = c.post(
-                "/api/admin/settings/save", json={"current_admin_password": "bad"}
-            )
+            resp = c.post("/api/admin/settings/save", json={"current_admin_password": "bad"})
             assert resp.status_code == 429
 
     # ── /api/profile/update (email = account-takeover vector) ──────────────
@@ -943,9 +923,9 @@ class TestRateLimiting:
 
         view = web_app.app.view_functions.get("api_profile_update")
         assert view is not None, "api_profile_update not registered"
-        assert hasattr(view, "__wrapper-limiter-instance"), (
-            "api_profile_update is missing an explicit rate-limit decorator"
-        )
+        assert hasattr(
+            view, "__wrapper-limiter-instance"
+        ), "api_profile_update is missing an explicit rate-limit decorator"
 
     def _make_profile_update_probe(self):
         from flask import Flask, g, request
@@ -1001,27 +981,27 @@ class TestRateLimiting:
 
         view = web_app.app.view_functions.get("api_upload")
         assert view is not None, "api_upload not registered"
-        assert hasattr(view, "__wrapper-limiter-instance"), (
-            "api_upload is missing an explicit rate-limit decorator"
-        )
+        assert hasattr(
+            view, "__wrapper-limiter-instance"
+        ), "api_upload is missing an explicit rate-limit decorator"
 
     def test_series_delete_has_explicit_rate_limit(self):
         import web_app
 
         view = web_app.app.view_functions.get("api_series_delete")
         assert view is not None, "api_series_delete not registered"
-        assert hasattr(view, "__wrapper-limiter-instance"), (
-            "api_series_delete is missing an explicit rate-limit decorator"
-        )
+        assert hasattr(
+            view, "__wrapper-limiter-instance"
+        ), "api_series_delete is missing an explicit rate-limit decorator"
 
     def test_wishlist_moderate_has_explicit_rate_limit(self):
         import web_app
 
         view = web_app.app.view_functions.get("api_moderate_suggestion")
         assert view is not None, "api_moderate_suggestion not registered"
-        assert hasattr(view, "__wrapper-limiter-instance"), (
-            "api_moderate_suggestion is missing an explicit rate-limit decorator"
-        )
+        assert hasattr(
+            view, "__wrapper-limiter-instance"
+        ), "api_moderate_suggestion is missing an explicit rate-limit decorator"
 
     def test_upload_plain_limit_breaches_429(self):
         """A plain limit on uploads: 3 allowed, 4th -> 429."""
@@ -1093,12 +1073,7 @@ class TestRateLimiting:
                 resp = c.post("/api/settings/save", json={"current_password": "bad"})
                 assert resp.status_code == 200
                 assert resp.get_json()["success"] is False
-            assert (
-                c.post(
-                    "/api/settings/save", json={"current_password": "bad"}
-                ).status_code
-                == 429
-            )
+            assert c.post("/api/settings/save", json={"current_password": "bad"}).status_code == 429
             # User B, SAME IP (same test client), gets a full fresh budget.
             with c.session_transaction() as s:
                 s["user_id"] = "USER-B"
@@ -1106,12 +1081,7 @@ class TestRateLimiting:
                 resp = c.post("/api/settings/save", json={"current_password": "bad"})
                 assert resp.status_code == 200
                 assert resp.get_json()["success"] is False
-            assert (
-                c.post(
-                    "/api/settings/save", json={"current_password": "bad"}
-                ).status_code
-                == 429
-            )
+            assert c.post("/api/settings/save", json={"current_password": "bad"}).status_code == 429
 
     def test_password_change_per_user_successes_never_count(self):
         """Successful changes must not consume the per-account budget."""
@@ -1131,12 +1101,7 @@ class TestRateLimiting:
                 resp = c.post("/api/settings/save", json={"current_password": "bad"})
                 assert resp.status_code == 200
                 assert resp.get_json()["success"] is False
-            assert (
-                c.post(
-                    "/api/settings/save", json={"current_password": "bad"}
-                ).status_code
-                == 429
-            )
+            assert c.post("/api/settings/save", json={"current_password": "bad"}).status_code == 429
 
     def test_user_key_scopes_to_account_inside_request_context(self):
         """_user_key() must embed the session account id (distinct per user).
@@ -1188,9 +1153,9 @@ class TestRateLimiting:
         for name in names:
             view = web_app.app.view_functions.get(name)
             assert view is not None, f"{name} not registered"
-            assert hasattr(view, "__wrapper-limiter-instance"), (
-                f"{name} is missing an explicit rate-limit decorator"
-            )
+            assert hasattr(
+                view, "__wrapper-limiter-instance"
+            ), f"{name} is missing an explicit rate-limit decorator"
 
     def test_engagement_endpoints_have_rate_limits(self):
         """likes/votes/helpful/follows/upvotes: 60/min engagement ceiling."""
@@ -1209,9 +1174,9 @@ class TestRateLimiting:
         for name in names:
             view = web_app.app.view_functions.get(name)
             assert view is not None, f"{name} not registered"
-            assert hasattr(view, "__wrapper-limiter-instance"), (
-                f"{name} is missing an explicit rate-limit decorator"
-            )
+            assert hasattr(
+                view, "__wrapper-limiter-instance"
+            ), f"{name} is missing an explicit rate-limit decorator"
 
     def test_ai_chat_has_explicit_rate_limit(self):
         """api_ai_chat carries a 30/min ceiling (companion spam / load)."""
@@ -1219,9 +1184,9 @@ class TestRateLimiting:
 
         view = web_app.app.view_functions.get("api_ai_chat")
         assert view is not None, "api_ai_chat not registered"
-        assert hasattr(view, "__wrapper-limiter-instance"), (
-            "api_ai_chat is missing an explicit rate-limit decorator"
-        )
+        assert hasattr(
+            view, "__wrapper-limiter-instance"
+        ), "api_ai_chat is missing an explicit rate-limit decorator"
 
     def _make_shared_surface_probe(self):
         """Plain-limit probe mirroring the 30/min content endpoints."""
@@ -1350,12 +1315,12 @@ class TestRateLimiting:
             idx = src.index(marker)
             start = src.rindex("@app.route", 0, idx)
             block = src[start:idx]
-            assert '@_rate_limit("5 per minute", methods=["POST"],' in block, (
-                f"{marker} must scope its limit to POST"
-            )
-            assert 'exempt_when=lambda: request.method == "GET"' in block, (
-                f"{marker} must exempt GET page loads"
-            )
+            assert (
+                '@_rate_limit("5 per minute", methods=["POST"],' in block
+            ), f"{marker} must scope its limit to POST"
+            assert (
+                'exempt_when=lambda: request.method == "GET"' in block
+            ), f"{marker} must exempt GET page loads"
 
 
 class TestRedisLimiterStorage:
@@ -1372,9 +1337,7 @@ class TestRedisLimiterStorage:
         try:
             import redis as _redis_client
 
-            _r = _redis_client.Redis.from_url(
-                Config.REDIS_URL, socket_connect_timeout=1.0
-            )
+            _r = _redis_client.Redis.from_url(Config.REDIS_URL, socket_connect_timeout=1.0)
             return bool(_r.ping())
         except Exception:
             return False
@@ -1439,9 +1402,9 @@ class TestRedisLimiterStorage:
                 assert c_a.post("/limited").status_code == 200
             assert c_a.post("/limited").status_code == 429
             # Worker B, same Redis, sees the SAME exhausted budget.
-            assert c_b.post("/limited").status_code == 429, (
-                "budget must be shared across limiter instances (multi-worker)"
-            )
+            assert (
+                c_b.post("/limited").status_code == 429
+            ), "budget must be shared across limiter instances (multi-worker)"
         # Clean up the unique test keys so later runs start fresh.
         try:
             import redis as _redis_client
@@ -1796,18 +1759,16 @@ class TestXssClientSideSinks:
             resp = client.get(path)
             assert resp.status_code == 200, f"{path} did not render"
             html = resp.get_data(as_text=True)
-            assert "booktaleUtils.escapeHtml(b.title)" in html, (
-                f"{path}: title display not escaped"
-            )
-            assert "booktaleUtils.escapeHtml(b.author)" in html, (
-                f"{path}: author display not escaped"
-            )
-            assert "booktaleUtils.jsStr(b.title)" in html, (
-                f"{path}: onclick title not jsStr-escaped"
-            )
-            assert "booktaleUtils.jsStr(b.book_id)" in html, (
-                f"{path}: onclick book_id not jsStr-escaped"
-            )
+            assert "booktaleUtils.escapeHtml(b.title)" in html, f"{path}: title display not escaped"
+            assert (
+                "booktaleUtils.escapeHtml(b.author)" in html
+            ), f"{path}: author display not escaped"
+            assert (
+                "booktaleUtils.jsStr(b.title)" in html
+            ), f"{path}: onclick title not jsStr-escaped"
+            assert (
+                "booktaleUtils.jsStr(b.book_id)" in html
+            ), f"{path}: onclick book_id not jsStr-escaped"
 
     def test_bookmarks_list_escapes_note_and_title(self, client):
         """Reading-progress bookmarks interpolate book_title/note into innerHTML."""

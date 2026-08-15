@@ -330,8 +330,7 @@ def main() -> int:
     n_checkout = max(0, min(200, len(user_ids) - 20, len(book_ids) - 20))
     if n_checkout == 0:
         print(
-            "  pool too small for the checkout benchmark "
-            "(need at least 21 users and 21 books)"
+            "  pool too small for the checkout benchmark " "(need at least 21 users and 21 books)"
         )
         return 1
     checkout_i = 0
@@ -342,9 +341,9 @@ def main() -> int:
         # stay under the pool size (5k users / 10k books), so no modulo wrap
         # can ever re-issue an already-issued pair (which would 500 the op
         # with "User already has this book issued").
-        assert checkout_i < min(len(user_ids), len(book_ids)), (
-            "checkout pool exhausted: warmup + samples exceed users/books"
-        )
+        assert checkout_i < min(
+            len(user_ids), len(book_ids)
+        ), "checkout pool exhausted: warmup + samples exceed users/books"
         i = checkout_i
         checkout_i += 1
         ok, _ = svc.issue_book(user_ids[i], book_ids[i], actor="Librarian")

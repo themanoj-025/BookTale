@@ -14,9 +14,7 @@ from app.storage.storage import Storage
 
 # Email notifications (optional — gracefully skipped if SMTP not configured)
 try:
-    from app.services.email.email_notifier import (
-        notify_overdue as _email_overdue,
-    )
+    from app.services.email.email_notifier import notify_overdue as _email_overdue
     from app.services.email.email_notifier import (
         notify_reservation_available as _email_reserve,
     )
@@ -225,14 +223,15 @@ class Library:
                 by_isbn = q.replace("-", "") in b.isbn.replace("-", "")
                 by_category = q in b.category.lower()
                 by_id = q.upper() in b.book_id.upper()
-                if search_by == "title" and not by_title:
-                    continue
-                elif search_by == "author" and not by_author:
-                    continue
-                elif search_by == "isbn" and not by_isbn:
-                    continue
-                elif search_by == "all" and not any(
-                    [by_title, by_author, by_isbn, by_category, by_id]
+                if (
+                    search_by == "title"
+                    and not by_title
+                    or search_by == "author"
+                    and not by_author
+                    or search_by == "isbn"
+                    and not by_isbn
+                    or search_by == "all"
+                    and not any([by_title, by_author, by_isbn, by_category, by_id])
                 ):
                     continue
 
@@ -269,11 +268,7 @@ class Library:
         results = []
         for u in users.values():
             if q:
-                if not (
-                    q in u.name.lower()
-                    or q in u.user_id.lower()
-                    or q in u.email.lower()
-                ):
+                if not (q in u.name.lower() or q in u.user_id.lower() or q in u.email.lower()):
                     continue
             if role and u.role.lower() != role.lower():
                 continue
@@ -373,9 +368,7 @@ class Library:
     # ISSUE & RETURN
     # ═══════════════════════════════════════════════════════════
 
-    def issue_book(
-        self, user_id: str, book_id: str, actor: str = "Librarian"
-    ) -> tuple[bool, str]:
+    def issue_book(self, user_id: str, book_id: str, actor: str = "Librarian") -> tuple[bool, str]:
         if self._service is not None:
             return self._service.issue_book(user_id, book_id, actor)
         users = self.storage.load_users()
@@ -561,14 +554,8 @@ class Library:
                 book_id=book_id,
             )
 
-        log(
-            f"Returned book '{book.title}' from {user.name}", actor, f"Fine:₹{fine:.2f}"
-        )
-        msg = (
-            f"Book returned. Fine: ₹{fine:.2f}"
-            if fine > 0
-            else "Book returned successfully."
-        )
+        log(f"Returned book '{book.title}' from {user.name}", actor, f"Fine:₹{fine:.2f}")
+        msg = f"Book returned. Fine: ₹{fine:.2f}" if fine > 0 else "Book returned successfully."
         return True, msg + notify_msg, fine
 
     def pay_fine(self, user_id: str, amount: float, actor: str) -> tuple[bool, str]:
@@ -661,9 +648,7 @@ class Library:
         result: list[dict] = []
         for uid, cnt in ranked:
             u = users.get(uid)
-            result.append(
-                {"name": u.name if u else uid, "user_id": uid, "total_issues": cnt}
-            )
+            result.append({"name": u.name if u else uid, "user_id": uid, "total_issues": cnt})
         return result
 
     def report_issued_today(self) -> int:
@@ -672,8 +657,7 @@ class Library:
         return sum(
             1
             for t in txns
-            if t["type"] == "issue"
-            and datetime.fromisoformat(t["issue_date"]).date() == today
+            if t["type"] == "issue" and datetime.fromisoformat(t["issue_date"]).date() == today
         )
 
     def report_issued_this_month(self) -> int:

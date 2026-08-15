@@ -41,39 +41,17 @@ from typing import Any
 from sqlalchemy import delete, select
 
 from app.db.database import create_all, session_scope
-from app.db.models import (
-    Book as BookRow,
-)
-from app.db.models import (
-    Bookshelf as ShelfRow,
-)
-from app.db.models import (
-    Comment as CommentRow,
-)
-from app.db.models import (
-    Fine as FineRow,
-)
-from app.db.models import (
-    Follow as FollowRow,
-)
-from app.db.models import (
-    Notification as NotificationRow,
-)
-from app.db.models import (
-    Post as PostRow,
-)
-from app.db.models import (
-    Reservation as ReservationRow,
-)
-from app.db.models import (
-    Review as ReviewRow,
-)
-from app.db.models import (
-    Transaction as TransactionRow,
-)
-from app.db.models import (
-    User as UserRow,
-)
+from app.db.models import Book as BookRow
+from app.db.models import Bookshelf as ShelfRow
+from app.db.models import Comment as CommentRow
+from app.db.models import Fine as FineRow
+from app.db.models import Follow as FollowRow
+from app.db.models import Notification as NotificationRow
+from app.db.models import Post as PostRow
+from app.db.models import Reservation as ReservationRow
+from app.db.models import Review as ReviewRow
+from app.db.models import Transaction as TransactionRow
+from app.db.models import User as UserRow
 
 log = logging.getLogger("db.storage_adapter")
 
@@ -89,11 +67,7 @@ def _columns(model) -> set:
 
 def _plain(row, drop=()) -> dict:
     """ORM row -> plain dict of its columns (minus autoincrement `id` etc.)."""
-    return {
-        c.name: getattr(row, c.name)
-        for c in row.__table__.columns
-        if c.name not in drop
-    }
+    return {c.name: getattr(row, c.name) for c in row.__table__.columns if c.name not in drop}
 
 
 def _row(model, data: dict):
@@ -189,9 +163,7 @@ class DbStorage:
 
     def load_transactions(self, force: bool = False) -> list:
         with session_scope() as db:
-            rows = db.scalars(
-                select(TransactionRow).order_by(TransactionRow.issue_date)
-            ).all()
+            rows = db.scalars(select(TransactionRow).order_by(TransactionRow.issue_date)).all()
         return [_plain(r) for r in rows]
 
     def save_transactions(self, txns: list) -> None:
@@ -207,9 +179,7 @@ class DbStorage:
 
     def load_reservations(self, force: bool = False) -> dict:
         with session_scope() as db:
-            rows = db.scalars(
-                select(ReservationRow).order_by(ReservationRow.position)
-            ).all()
+            rows = db.scalars(select(ReservationRow).order_by(ReservationRow.position)).all()
         res: dict = {}
         for r in rows:
             res.setdefault(r.book_id, []).append(r.user_id)
@@ -248,9 +218,7 @@ class DbStorage:
 
     def load_notifications(self, force: bool = False) -> list:
         with session_scope() as db:
-            rows = db.scalars(
-                select(NotificationRow).order_by(NotificationRow.created_at)
-            ).all()
+            rows = db.scalars(select(NotificationRow).order_by(NotificationRow.created_at)).all()
         return [_plain(r) for r in rows]
 
     def save_notifications(self, notifs: list) -> None:

@@ -17,7 +17,7 @@ from app.storage.storage import Storage
 
 # Seed data integration for cold-start recommendations
 try:
-    import app.services.recommendations.seed_data as seed_data
+    from app.services.recommendations import seed_data
 
     _SEED_AVAILABLE = True
 except ImportError:
@@ -84,9 +84,7 @@ class Recommender:
             # Try seed data fallback if library book is missing
             if self._should_use_seed():
                 seed_recs = seed_data.recommend_seed_trending(top_n)
-                return [
-                    self._seed_result(b, "seed popular fallback") for b in seed_recs
-                ]
+                return [self._seed_result(b, "seed popular fallback") for b in seed_recs]
             return []
 
         scored: list[tuple[float, Book]] = []
@@ -226,9 +224,7 @@ class Recommender:
         # Cold-start: augment with seed bestsellers
         if len(result) < top_n and self._should_use_seed():
             seed_recs = seed_data.recommend_seed_trending(top_n=top_n - len(result))
-            result.extend(
-                self._seed_result(b, "bestseller from seed") for b in seed_recs
-            )
+            result.extend(self._seed_result(b, "bestseller from seed") for b in seed_recs)
 
         return result
 
@@ -317,9 +313,7 @@ class Recommender:
                 "category": b.category,
                 "score": round(s, 2),
                 "available": b.available_copies,
-                "reason": self._get_reason(
-                    s, fav_categories, fav_authors, similar_user_books, b
-                ),
+                "reason": self._get_reason(s, fav_categories, fav_authors, similar_user_books, b),
             }
             for s, b in scored[:top_n]
         ]
@@ -331,9 +325,7 @@ class Recommender:
             seed_recs = seed_data.recommend_seed_for_user(
                 fav_categories=top_cats, fav_authors=top_auth, top_n=top_n - len(result)
             )
-            result.extend(
-                self._seed_result(b, "personalized from seed") for b in seed_recs
-            )
+            result.extend(self._seed_result(b, "personalized from seed") for b in seed_recs)
 
         return result
 
@@ -362,9 +354,7 @@ class Recommender:
     # 4. "USERS WHO BORROWED X ALSO BORROWED Y"
     # ═══════════════════════════════════════════════════════════════
 
-    def recommend_frequently_bought_together(
-        self, book_id: str, top_n: int = 5
-    ) -> list[dict]:
+    def recommend_frequently_bought_together(self, book_id: str, top_n: int = 5) -> list[dict]:
         """
         Find books that are frequently borrowed together with the given book.
         Falls back to seed similar books if no co-borrowing data exists.
@@ -374,9 +364,7 @@ class Recommender:
 
         # Find all users who borrowed this book
         users_with_book = set(
-            t["user_id"]
-            for t in txns
-            if t["type"] == "issue" and t["book_id"] == book_id
+            t["user_id"] for t in txns if t["type"] == "issue" and t["book_id"] == book_id
         )
 
         if not users_with_book:
@@ -388,20 +376,13 @@ class Recommender:
                         title=target.title, author=target.author, top_n=top_n
                     )
                     if seed_recs:
-                        return [
-                            self._seed_result(b, "co-borrow from seed")
-                            for b in seed_recs
-                        ]
+                        return [self._seed_result(b, "co-borrow from seed") for b in seed_recs]
             return []
 
         # Find what else those users borrowed
         co_occurrence: Counter = Counter()
         for t in txns:
-            if (
-                t["type"] == "issue"
-                and t["user_id"] in users_with_book
-                and t["book_id"] != book_id
-            ):
+            if t["type"] == "issue" and t["user_id"] in users_with_book and t["book_id"] != book_id:
                 co_occurrence[t["book_id"]] += 1
 
         target = books.get(book_id)
@@ -500,9 +481,7 @@ class Recommender:
         """Get top books in a specific category. Falls back to seed data."""
         books = self.storage.load_books()
         matching = [
-            b
-            for b in books.values()
-            if b.category.lower() == category.lower() and not b.is_deleted
+            b for b in books.values() if b.category.lower() == category.lower() and not b.is_deleted
         ]
         matching.sort(key=lambda b: b.issue_count, reverse=True)
 
@@ -519,12 +498,8 @@ class Recommender:
 
         # Cold-start: augment with seed data only if library has very few books
         if len(result) < top_n and self._should_use_seed():
-            seed_recs = seed_data.recommend_seed_by_category(
-                category, top_n=top_n - len(result)
-            )
-            result.extend(
-                self._seed_result(b, f"{category} from seed") for b in seed_recs
-            )
+            seed_recs = seed_data.recommend_seed_by_category(category, top_n=top_n - len(result))
+            result.extend(self._seed_result(b, f"{category} from seed") for b in seed_recs)
 
         return result
 

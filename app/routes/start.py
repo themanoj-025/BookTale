@@ -40,12 +40,14 @@ def safe_print(text):
 
 def print_banner():
     """Display a clean launch banner."""
-    safe_print("""
+    safe_print(
+        """
   +=============================================+
   |     Library Management System v3.0          |
   |     Python + Flask + Bootstrap 5            |
   +=============================================+
-""")
+"""
+    )
 
 
 def launch_web():
@@ -134,9 +136,7 @@ def main():
         web_proc = launch_web()
         processes.append(("Web", web_proc))
         # Health check: wait for port to be ready before opening browser
-        print(
-            f"  [WAIT] Waiting for server on port {FLASK_PORT}...", end="", flush=True
-        )
+        print(f"  [WAIT] Waiting for server on port {FLASK_PORT}...", end="", flush=True)
         port_ready = False
         for attempt in range(30):  # Up to 60 seconds
             time.sleep(2)
@@ -152,12 +152,8 @@ def main():
             # Check if process crashed
             if web_proc.poll() is not None:
                 print()
-                safe_print(
-                    f"  [X] Server process exited early (code {web_proc.returncode})."
-                )
-                safe_print(
-                    "     Run 'python web_app.py' directly to see error details."
-                )
+                safe_print(f"  [X] Server process exited early (code {web_proc.returncode}).")
+                safe_print("     Run 'python web_app.py' directly to see error details.")
                 print()
                 return  # Exit without suggesting browser
             print(".", end="", flush=True)
@@ -172,13 +168,9 @@ def main():
         else:
             print()
             if web_proc.poll() is None:
-                safe_print(
-                    f"  [!] Server is running but port {FLASK_PORT} is not responding yet."
-                )
+                safe_print(f"  [!] Server is running but port {FLASK_PORT} is not responding yet.")
             safe_print(f"  [WEB] Open {FLASK_URL} manually in your browser.")
-            safe_print(
-                "  [AUTH] Admin login: ADMIN001 (password printed once on first boot)"
-            )
+            safe_print("  [AUTH] Admin login: ADMIN001 (password printed once on first boot)")
 
     if choice in ("2", "3"):
         cli_proc = launch_cli()

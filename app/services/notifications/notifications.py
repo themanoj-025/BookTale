@@ -57,9 +57,7 @@ class NotificationManager:
         self.storage.append_notification(notif)
         return notif_id
 
-    def notify_overdue(
-        self, user_id: str, book_title: str, days: int, fine: float
-    ) -> str:
+    def notify_overdue(self, user_id: str, book_title: str, days: int, fine: float) -> str:
         """Notify user about an overdue book."""
         return self.add_notification(
             user_id,

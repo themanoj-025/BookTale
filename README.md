@@ -9,7 +9,6 @@
   <img src="https://img.shields.io/github/actions/workflow/status/themanoj-025/BookTale/ci.yml?label=CI" alt="CI" />
 </p>
 
-
 A full-featured library management system — catalog, lending, reservations, fines, reading challenges, a social feed, realtime notifications, and book recommendations — built with Flask + SQLAlchemy + a bundled esbuild frontend.
 
 > **Honesty first:** this README describes what the code actually does today, verified against a green test suite. Where something is planned but not built, it says so explicitly — see **What's real vs. aspirational** below.
@@ -38,20 +37,21 @@ A full-featured library management system — catalog, lending, reservations, fi
 
 ## Status
 
-| Area | State |
-|---|---|
-| Tests | **202 passing** (`pytest tests/`; 2 skipped — Redis-dependent) |
-| Routes | **132** registered on the Flask app |
+| Area         | State                                                                  |
+| ------------ | ---------------------------------------------------------------------- |
+| Tests        | **202 passing** (`pytest tests/`; 2 skipped — Redis-dependent)         |
+| Routes       | **132** registered on the Flask app                                    |
 | Seed catalog | **11,127 books** (`app/services/recommendations/ml/Dataset/books.csv`) |
-| Storage | SQLAlchemy ORM (SQLite dev / PostgreSQL prod), Alembic migrations |
-| Frontend | Jinja2 templates + esbuild-bundled JS (content-hashed assets) |
-| CI | `.github/workflows/ci.yml` (lint, tests, security scans) |
+| Storage      | SQLAlchemy ORM (SQLite dev / PostgreSQL prod), Alembic migrations      |
+| Frontend     | Jinja2 templates + esbuild-bundled JS (content-hashed assets)          |
+| CI           | `.github/workflows/ci.yml` (lint, tests, security scans)               |
 
 ---
 
 ## ✨ Features
 
 ### Core library operations
+
 - Book catalog with **search and filtering** (category, availability, author, publisher, ISBN, date added, sort) and category/author browsing
 - **Issue / return / reserve** flows wrapped in DB transactions (concurrency-safe — no oversell of the last copy, tested with 20 racing threads)
 - **Borrow limits**, membership expiry, **fine calculation** for late returns
@@ -59,6 +59,7 @@ A full-featured library management system — catalog, lending, reservations, fi
 - **Reports & statistics** (issuance, returns, fines, active users)
 
 ### Reader & community features
+
 - Reading **progress tracking** (pages read, goal completion) + **reading challenges** with streaks
 - **Wishlist**, **reading lists**, book **reviews & ratings**
 - Social **feed** with posts, comments, likes, and **follows**
@@ -69,6 +70,7 @@ A full-featured library management system — catalog, lending, reservations, fi
 - **AI Reading Companion** chat (`/api/ai/chat`) — keyword-intent assistant; see the same section
 
 ### Accounts & administration
+
 - Registration/login/logout with **bcrypt password hashing** and `MEM-XXXX` IDs
 - Email **verification** and **password reset** with expiring tokens
 - **Role-based access**: `user`, `librarian`, `admin` — self-registration is hard-capped to `user` (privilege escalation is tested against)
@@ -77,6 +79,7 @@ A full-featured library management system — catalog, lending, reservations, fi
 - User **settings** (profile, notifications, privacy, theme, reading prefs)
 
 ### Security posture
+
 - **CSRF protection on by default** (Flask-WTF) across all state-changing endpoints, with a meta-tag + fetch interceptor covering every JS POST
 - **Rate limiting** (Flask-Limiter): login `10/min` (POST only — `deduct_when` counts just failed attempts; GET page loads are exempt), register/forgot/reset `5/min`, uploads `10/min`, admin delete/moderation actions `20/min`, plus a global `200/min` default. Password changes and admin-settings saves are `10/min` keyed per **account** (`key_func=_user_key`), so a distributed attacker can't evade the budget by spreading requests across IPs; `deduct_when` counts only failed attempts there too. Shared-surface & engagement POSTs get explicit ceilings so a compromised session can't flood the feed or stuff votes: content spam (posts, reposts, comments, replies, reviews, lists, shelves — `30/min`, GET comment fetches exempt), create-heavy surfaces (clubs, wishlist suggestions — `10/min`), AI companion chat `30/min`, and engagement manipulation (likes, votes, helpful, follows, upvotes, club joins — `60/min`) — all keyed per IP. Self-scoped writes (notifications read, bookshelves, favorites, diary, bookmarks, progress, post/club/shelf deletes) stay at the `200/min` default
 - **Fail-fast boot**: refuses to start with an unset/default `SECRET_KEY`
@@ -89,6 +92,7 @@ A full-featured library management system — catalog, lending, reservations, fi
 - **Regression tests** for every security fix (privilege escalation, CSRF rejection, default-secret boot, rate-limit presence + `deduct_when` behavior)
 
 ### Operations
+
 - **`/healthz`** (liveness) and **`/readyz`** (DB reachability, generic errors — no internal detail leakage) probes
 - **Background jobs** (Redis + RQ): cover/metadata fetch is enqueued off the request path; overdue-email reminders run on a real cron schedule (daily 09:00, overridable via `CRON_OVERDUE_EMAILS`); expired auth tokens are swept hourly (`CRON_TOKEN_PURGE`). A dedicated `worker` service (`python worker.py`) runs the RQ worker + cron scheduler. If Redis is unreachable the app degrades to a **bounded** thread pool (`COVER_FETCH_WORKERS`, default 4) instead of the old unbounded raw threads — see [ADR 0010](docs/decisions/0010-background-jobs-rq.md)
 - **Structured logging** with `RotatingFileHandler`, JSON-formatted lines, and per-request IDs for correlation
@@ -153,20 +157,20 @@ flowchart TB
 
 ## 🧰 Tech stack
 
-| Layer | Choice |
-|---|---|
-| Web framework | Flask |
-| ORM | SQLAlchemy 2.x |
-| Migrations | Alembic |
-| Templates | Jinja2 (autoescape ON, macro library in `templates/macros.html`) |
-| Frontend build | esbuild (`scripts/build_frontend.mjs` → `static/dist/` + `manifest.json`) |
-| Realtime | Flask-SocketIO |
-| Background jobs | RQ + Redis (worker service; bounded pool fallback) |
-| Auth | Session-based (signed cookies) + bcrypt hashing; CSRF via Flask-WTF |
-| Rate limiting | Flask-Limiter with Redis-backed storage (budgets survive restarts & are shared across gunicorn workers; in-memory fallback on Redis outage) |
-| Logging | stdlib `logging` + `RotatingFileHandler`, JSON formatter, request IDs |
-| Testing | pytest (unit + integration + security suites) |
-| Infra | Docker (multi-stage), docker-compose, GitHub Actions |
+| Layer           | Choice                                                                                                                                      |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| Web framework   | Flask                                                                                                                                       |
+| ORM             | SQLAlchemy 2.x                                                                                                                              |
+| Migrations      | Alembic                                                                                                                                     |
+| Templates       | Jinja2 (autoescape ON, macro library in `templates/macros.html`)                                                                            |
+| Frontend build  | esbuild (`scripts/build_frontend.mjs` → `static/dist/` + `manifest.json`)                                                                   |
+| Realtime        | Flask-SocketIO                                                                                                                              |
+| Background jobs | RQ + Redis (worker service; bounded pool fallback)                                                                                          |
+| Auth            | Session-based (signed cookies) + bcrypt hashing; CSRF via Flask-WTF                                                                         |
+| Rate limiting   | Flask-Limiter with Redis-backed storage (budgets survive restarts & are shared across gunicorn workers; in-memory fallback on Redis outage) |
+| Logging         | stdlib `logging` + `RotatingFileHandler`, JSON formatter, request IDs                                                                       |
+| Testing         | pytest (unit + integration + security suites)                                                                                               |
+| Infra           | Docker (multi-stage), docker-compose, GitHub Actions                                                                                        |
 
 ---
 
@@ -208,15 +212,15 @@ pytest tests/            # 202 tests: unit + integration + security
 
 Test suite composition (verified with `pytest --collect-only`):
 
-| File | Tests | Covers |
-|---|---|---|
-| `tests/security/test_web_security.py` | 90 | privilege escalation, CSRF, rate limiting, /readyz, XSS, secret-defaults, admin audit trail, upload magic-byte validation, centralized error handlers, password policy, OpenAPI docs |
-| `tests/test_auth_tokens.py` | 10 | DB-backed one-time tokens: round-trip, single-use, expiry, purge, cold-process restart survival |
-| `tests/test_jobs.py` | 16 | RQ background jobs: cover fetch, overdue-email batch, token purge, facade bounded-pool fallback, cron next-run helper, worker cold-start schema ensure |
-| `tests/test_db_wiring.py` | 18 | storage adapter ↔ DB round-trips, audit-log repository (search/pagination) |
-| `tests/test_library.py` | 53 | catalog, transactions, recommender, services |
-| `tests/test_db_layer.py` | 14 | concurrency (no oversell), atomicity, rollback |
-| `tests/test_reading_progress.py` | 2 | reading progress totals |
+| File                                  | Tests | Covers                                                                                                                                                                               |
+| ------------------------------------- | ----- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `tests/security/test_web_security.py` | 90    | privilege escalation, CSRF, rate limiting, /readyz, XSS, secret-defaults, admin audit trail, upload magic-byte validation, centralized error handlers, password policy, OpenAPI docs |
+| `tests/test_auth_tokens.py`           | 10    | DB-backed one-time tokens: round-trip, single-use, expiry, purge, cold-process restart survival                                                                                      |
+| `tests/test_jobs.py`                  | 16    | RQ background jobs: cover fetch, overdue-email batch, token purge, facade bounded-pool fallback, cron next-run helper, worker cold-start schema ensure                               |
+| `tests/test_db_wiring.py`             | 18    | storage adapter ↔ DB round-trips, audit-log repository (search/pagination)                                                                                                          |
+| `tests/test_library.py`               | 53    | catalog, transactions, recommender, services                                                                                                                                         |
+| `tests/test_db_layer.py`              | 14    | concurrency (no oversell), atomicity, rollback                                                                                                                                       |
+| `tests/test_reading_progress.py`      | 2     | reading progress totals                                                                                                                                                              |
 
 ---
 
@@ -303,8 +307,7 @@ MIT — see [LICENSE](LICENSE).
 
 ---
 
-*README accuracy is checked against the running code and test suite; if this document and the code ever disagree, the code wins and the README is wrong.*
----
+## _README accuracy is checked against the running code and test suite; if this document and the code ever disagree, the code wins and the README is wrong._
 
 ## ⭐ Star History
 

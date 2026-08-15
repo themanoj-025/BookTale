@@ -218,9 +218,7 @@ def build_openapi_spec() -> dict:
                 "get": {
                     "tags": ["Books"],
                     "summary": "Autocomplete suggestions (books/authors/users)",
-                    "parameters": [
-                        {"name": "q", "in": "query", "schema": {"type": "string"}}
-                    ],
+                    "parameters": [{"name": "q", "in": "query", "schema": {"type": "string"}}],
                     "responses": {"200": {"description": "Suggestion list"}},
                 }
             },
@@ -438,9 +436,7 @@ def build_openapi_spec() -> dict:
         "components": {
             "schemas": {
                 "ErrorResponse": _error_response_component(),
-                "SuccessEnvelope": _envelope_success(
-                    {"properties": {"data": {"type": "object"}}}
-                ),
+                "SuccessEnvelope": _envelope_success({"properties": {"data": {"type": "object"}}}),
             },
             "securitySchemes": {
                 "sessionCookie": {

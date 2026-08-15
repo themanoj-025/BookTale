@@ -54,25 +54,19 @@ def _library_stats():
     total_copies = sum(b.total_copies for b in all_books)
     avail_copies = sum(b.available_copies for b in all_books)
     avail_rate = (avail_copies / total_copies * 100) if total_copies else 0
-    new_books_month = sum(
-        1 for b in all_books if datetime.fromisoformat(b.added_on) >= tms
-    )
+    new_books_month = sum(1 for b in all_books if datetime.fromisoformat(b.added_on) >= tms)
     total_users = len(users)
     active_users = sum(1 for u in users.values() if u.membership_status == "Active")
     blocked_users = sum(1 for u in users.values() if u.membership_status == "Blocked")
     new_users_month = sum(
         1
         for u in users.values()
-        if hasattr(u, "added_on")
-        and u.added_on
-        and datetime.fromisoformat(u.added_on) >= tms
+        if hasattr(u, "added_on") and u.added_on and datetime.fromisoformat(u.added_on) >= tms
     )
     issues = [t for t in txns if t["type"] == "issue"]
     active_issues = [t for t in issues if t.get("return_date") is None]
     total_txns = len(txns)
-    month_txns = sum(
-        1 for t in txns if datetime.fromisoformat(t.get("issue_date", "")) >= tms
-    )
+    month_txns = sum(1 for t in txns if datetime.fromisoformat(t.get("issue_date", "")) >= tms)
     unique_borrowers = len(set(t["user_id"] for t in issues))
     fines = _storage.load_fines()
     total_fines = sum(f.get("amount", 0) for f in fines)
@@ -318,7 +312,9 @@ def init_page_routes(
                 avail,
             )
         if not trending_html:
-            trending_html = '<div class="col-12 text-center text-muted py-4">No books available yet.</div>'
+            trending_html = (
+                '<div class="col-12 text-center text-muted py-4">No books available yet.</div>'
+            )
 
         # Readers to follow
         users_data = _storage.load_users()
@@ -339,7 +335,12 @@ def init_page_routes(
                     <div class="fw-bold small mt-2">%s</div>
                     <small class="text-muted">@%s</small>
                     <button class="btn btn-primary btn-sm mt-2 w-100" onclick="followUser('%s',this)"><i class="bi bi-person-plus"></i> Follow</button>
-                </div></div>""" % (av, h(u.name), h(u.user_id), h(u.user_id))
+                </div></div>""" % (
+                av,
+                h(u.name),
+                h(u.user_id),
+                h(u.user_id),
+            )
         if not readers_html:
             readers_html = '<div class="col-12 text-center text-muted py-4">No readers to suggest right now.</div>'
 
@@ -496,9 +497,11 @@ def init_page_routes(
         CONTENT = CONTENT.replace("TRENDING_HTML", trending_html)
         CONTENT = CONTENT.replace(
             "FOR_YOU_HTML",
-            for_you_html
-            if for_you_html
-            else '<div class="col-12 text-center text-muted small py-3">Keep reading to get personalized recommendations!</div>',
+            (
+                for_you_html
+                if for_you_html
+                else '<div class="col-12 text-center text-muted small py-3">Keep reading to get personalized recommendations!</div>'
+            ),
         )
         CONTENT = CONTENT.replace("READERS_HTML", readers_html)
         CONTENT = CONTENT.replace("CLUBS_HTML", clubs_html)
@@ -575,8 +578,7 @@ def init_page_routes(
             session=session,
             notif_count=_notif_mgr.get_unread_count(uid) if _notif_mgr else 0,
             groups=[
-                (label, groups[label])
-                for label in ["Today", "Yesterday", "This Week", "Earlier"]
+                (label, groups[label]) for label in ["Today", "Yesterday", "This Week", "Earlier"]
             ],
             by_type=by_type.most_common() if by_type else [],
             notif_icons=notif_icons,
@@ -748,9 +750,16 @@ function createCustomShelf() {
                         <div style="width:30px;height:40px;border-radius:4px;background:linear-gradient(135deg,%s,%sdd);display:flex;align-items:center;justify-content:center;margin:0 auto .2rem;">
                             <i class="bi bi-book-fill" style="color:white;font-size:.6rem;"></i></div>
                         <div style="font-size:.55rem;font-weight:600;line-height:1.1;">%s</div>
-                    </div></div>""" % (h(b.book_id), cc, cc, h(b.title[:20]))
+                    </div></div>""" % (
+                    h(b.book_id),
+                    cc,
+                    cc,
+                    h(b.title[:20]),
+                )
             if not cs_books_html:
-                cs_books_html = '<div class="col-12 text-center text-muted small py-2">Empty shelf.</div>'
+                cs_books_html = (
+                    '<div class="col-12 text-center text-muted small py-2">Empty shelf.</div>'
+                )
             custom_html += """<div class="glass-card p-3 mb-2">
                 <div class="d-flex justify-content-between align-items-center mb-2">
                     <div class="section-title mb-0"><i class="bi bi-bookmark-fill" style="color:%s;"></i> %s (%d)</div>
@@ -794,15 +803,15 @@ function createCustomShelf() {
         # Personalized
         for_you = []
         try:
-            for_you = (
-                _recommender.recommend_for_user(uid, top_n=6) if _recommender else []
-            )
+            for_you = _recommender.recommend_for_user(uid, top_n=6) if _recommender else []
         except Exception:
             pass
 
         def render_book_grid(books, cols=6, show_ai=False):
             if not books:
-                return '<div class="text-center text-muted small py-3">No recommendations yet.</div>'
+                return (
+                    '<div class="text-center text-muted small py-3">No recommendations yet.</div>'
+                )
             html = ""
             for r in books:
                 cc = cat_color(r.get("category", ""))
@@ -857,9 +866,7 @@ function createCustomShelf() {
         # Bestsellers
         bestsellers = []
         try:
-            bestsellers = (
-                _recommender.recommend_all_time_best(top_n=8) if _recommender else []
-            )
+            bestsellers = _recommender.recommend_all_time_best(top_n=8) if _recommender else []
         except Exception:
             pass
         bestsellers_html = render_book_grid(bestsellers)
@@ -879,14 +886,25 @@ function createCustomShelf() {
                             <div style="width:30px;height:40px;border-radius:4px;background:linear-gradient(135deg,%s,%sdd);display:flex;align-items:center;justify-content:center;margin:0 auto .2rem;">
                                 <i class="bi bi-book-fill" style="color:white;font-size:.6rem;"></i></div>
                             <div style="font-size:.55rem;font-weight:600;line-height:1.1;">%s</div>
-                        </div></div>""" % (h(b.book_id), cc, cc, h(b.title[:20]))
+                        </div></div>""" % (
+                        h(b.book_id),
+                        cc,
+                        cc,
+                        h(b.title[:20]),
+                    )
                 genre_html += """<div class="glass-card p-3 mb-2">
                     <div class="section-title mb-2"><i class="bi bi-tag-fill" style="color:%s;"></i> %s</div>
                     <div class="row g-1">%s</div>
-                </div>""" % (cat_color(cat), h(cat), html)
+                </div>""" % (
+                    cat_color(cat),
+                    h(cat),
+                    html,
+                )
 
         if not genre_html:
-            genre_html = '<div class="text-center text-muted small py-3">No categories available.</div>'
+            genre_html = (
+                '<div class="text-center text-muted small py-3">No categories available.</div>'
+            )
 
         CONTENT = """<div class="animate-in">
     <style>
@@ -942,9 +960,8 @@ function createCustomShelf() {
         for c in clubs_data:
             member_count = len(c.get("members", []))
             is_member = uid in c.get("members", [])
-            btn = (
-                '<a href="/clubs/%s" class="btn btn-primary btn-sm w-100">View Club</a>'
-                % h(c["club_id"])
+            btn = '<a href="/clubs/%s" class="btn btn-primary btn-sm w-100">View Club</a>' % h(
+                c["club_id"]
             )
             if is_member:
                 btn = (
@@ -1058,9 +1075,7 @@ function submitCreateClub(){
         diary_entries = []
         try:
             all_entries, _ = (
-                _diary_mgr.get_user_diary(uid, page=1, per_page=5000)
-                if _diary_mgr
-                else ([], 0)
+                _diary_mgr.get_user_diary(uid, page=1, per_page=5000) if _diary_mgr else ([], 0)
             )
             diary_entries = all_entries
         except Exception:
@@ -1125,9 +1140,11 @@ function submitCreateClub(){
                 if d > today:
                     cls += " cal-future"
                 title = "%s - %d entries" % (ds, count) if count > 0 else ds
-                cells += (
-                    '<td class="%s" title="%s" onclick="showDayEntries(\'%s\')">%d</td>'
-                    % (cls, title, ds, d.day)
+                cells += '<td class="%s" title="%s" onclick="showDayEntries(\'%s\')">%d</td>' % (
+                    cls,
+                    title,
+                    ds,
+                    d.day,
                 )
                 if d.weekday() == 6:  # Sunday
                     cells += "</tr><tr>"
@@ -1154,9 +1171,10 @@ function submitCreateClub(){
 
         YEAR_SEL = ""
         for y in range(max(2024, year - 2), year + 1):
-            YEAR_SEL += (
-                '<a href="/reading-calendar?year=%d" class="btn %s btn-sm">%d</a> '
-                % (y, "btn-primary" if y == year else "btn-outline", y)
+            YEAR_SEL += '<a href="/reading-calendar?year=%d" class="btn %s btn-sm">%d</a> ' % (
+                y,
+                "btn-primary" if y == year else "btn-outline",
+                y,
             )
 
         CONTENT = """<div class="animate-in">
@@ -1211,11 +1229,7 @@ function showDayEntries(ds) {
             stats.get("total_books", 0),
             len(date_counts),
             stats.get("total_pages_read", 0),
-            round(
-                len(date_counts)
-                / max(1, (datetime.now() - datetime(year, 1, 1)).days)
-                * 100
-            ),
+            round(len(date_counts) / max(1, (datetime.now() - datetime(year, 1, 1)).days) * 100),
         )
 
         CONTENT = CONTENT.replace("YEAR_SEL", YEAR_SEL)
@@ -1234,12 +1248,8 @@ function showDayEntries(ds) {
 
         # Gather data
         diary_stats = _diary_mgr.get_stats(uid) if _diary_mgr else {}
-        progress_stats = (
-            _reading_progress.get_reading_stats(uid) if _reading_progress else {}
-        )
-        challenge_data = (
-            _challenge.get_goal(uid, datetime.now().year) if _challenge else {}
-        )
+        progress_stats = _reading_progress.get_reading_stats(uid) if _reading_progress else {}
+        challenge_data = _challenge.get_goal(uid, datetime.now().year) if _challenge else {}
         shelf_counts = _review_mgr.get_shelf_counts(uid) if _review_mgr else {}
         reading_stats = _review_mgr.get_user_reading_stats(uid) if _review_mgr else {}
 
@@ -1373,28 +1383,20 @@ function showDayEntries(ds) {
             user_list = [
                 u
                 for u in user_list
-                if q in u.name.lower()
-                or q in u.user_id.lower()
-                or q in (u.email or "").lower()
+                if q in u.name.lower() or q in u.user_id.lower() or q in (u.email or "").lower()
             ]
         if role_filter:
             user_list = [u for u in user_list if u.role == role_filter]
         if status_filter:
             user_list = [
-                u
-                for u in user_list
-                if (u.membership_status or "Active").lower() == status_filter
+                u for u in user_list if (u.membership_status or "Active").lower() == status_filter
             ]
 
         total = len(users_data)
         active = sum(
-            1
-            for u in users_data.values()
-            if (u.membership_status or "Active") == "Active"
+            1 for u in users_data.values() if (u.membership_status or "Active") == "Active"
         )
-        blocked = sum(
-            1 for u in users_data.values() if (u.membership_status or "") == "Blocked"
-        )
+        blocked = sum(1 for u in users_data.values() if (u.membership_status or "") == "Blocked")
 
         fines = _storage.load_fines() if hasattr(_storage, "load_fines") else []
         pending_fines = sum(f.get("amount", 0) for f in fines if not f.get("paid"))
@@ -1460,7 +1462,9 @@ function showDayEntries(ds) {
             )
 
         if not rows:
-            rows = '<tr><td colspan="7" class="text-center text-muted py-4">No users found.</td></tr>'
+            rows = (
+                '<tr><td colspan="7" class="text-center text-muted py-4">No users found.</td></tr>'
+            )
 
         q_esc = h(q) if q else ""
         CONTENT = """<div class="animate-in">
@@ -1623,10 +1627,7 @@ function showDayEntries(ds) {
             # attribute itself.
             from urllib.parse import urlencode
 
-            base_q = h(
-                "&"
-                + urlencode({"q": q, "admin_id": admin_filter, "action": action_filter})
-            )
+            base_q = h("&" + urlencode({"q": q, "admin_id": admin_filter, "action": action_filter}))
             pag_html = '<nav class="mt-3" aria-label="Audit log pages"><ul class="pagination pagination-sm justify-content-end">'
             if page > 1:
                 pag_html += (
@@ -1804,9 +1805,7 @@ function showDayEntries(ds) {
                 if lvl["name"] == level:
                     cur_lvl_min = lvl["min_points"]
                     break
-            level_pct = min(
-                100, int((points - cur_lvl_min) / max(1, next_lvl_pts) * 100)
-            )
+            level_pct = min(100, int((points - cur_lvl_min) / max(1, next_lvl_pts) * 100))
 
         level_icons = {
             "New Reader": "seedling",
@@ -1896,9 +1895,7 @@ function showDayEntries(ds) {
             + str(user_rank if user_rank > 0 else "-")
             + "</span>"
             '<span class="stat-label">Leaderboard</span>'
-            '<span class="stat-sub">of '
-            + str(max(len(leaderboard), 0))
-            + " readers</span></div>"
+            '<span class="stat-sub">of ' + str(max(len(leaderboard), 0)) + " readers</span></div>"
             "</div>"
         )
 
@@ -2023,9 +2020,7 @@ function showDayEntries(ds) {
             + "/"
             + str(total_ach)
             + "</small></div>"
-            '<div class="d-flex flex-wrap justify-content-center gap-1">'
-            + ACH_HTML
-            + "</div>"
+            '<div class="d-flex flex-wrap justify-content-center gap-1">' + ACH_HTML + "</div>"
             '<a href="/gamification" class="btn btn-sm btn-outline w-100 mt-2">View All Achievements</a>'
             "</div>"
         )
@@ -2076,9 +2071,7 @@ function showDayEntries(ds) {
         # Filter
         if q:
             ql = q.lower()
-            all_books = [
-                b for b in all_books if ql in b.title.lower() or ql in b.author.lower()
-            ]
+            all_books = [b for b in all_books if ql in b.title.lower() or ql in b.author.lower()]
         if cat_filter:
             all_books = [b for b in all_books if b.category == cat_filter]
 
@@ -2086,17 +2079,15 @@ function showDayEntries(ds) {
         available = sum(1 for b in all_books if b.available_copies > 0)
         checked_out = total - available
         cats = len(set(b.category for b in all_books))
-        categories = sorted(
-            set(b.category for b in books_data.values() if not b.is_deleted)
-        )
+        categories = sorted(set(b.category for b in books_data.values() if not b.is_deleted))
 
         return render_template(
             "books.html",
             title="Books",
             session=session,
-            notif_count=_notif_mgr.get_unread_count(session.get("user_id"))
-            if session.get("user_id")
-            else 0,
+            notif_count=(
+                _notif_mgr.get_unread_count(session.get("user_id")) if session.get("user_id") else 0
+            ),
             books=all_books[:24],
             categories=categories,
             q=q,
@@ -2119,9 +2110,9 @@ function showDayEntries(ds) {
             "reports.html",
             title="Reports & Analytics",
             session=session,
-            notif_count=_notif_mgr.get_unread_count(session.get("user_id"))
-            if session.get("user_id")
-            else 0,
+            notif_count=(
+                _notif_mgr.get_unread_count(session.get("user_id")) if session.get("user_id") else 0
+            ),
             s=s,
         )
 
@@ -2157,9 +2148,7 @@ function showDayEntries(ds) {
         # Reviews (enriched for the Jinja template)
         reviews = []
         try:
-            all_reviews = (
-                _storage.load_reviews() if hasattr(_storage, "load_reviews") else []
-            )
+            all_reviews = _storage.load_reviews() if hasattr(_storage, "load_reviews") else []
             book_reviews = [r for r in all_reviews if r.get("book_id") == book_id][:5]
             users_data = _storage.load_users()
             for r in book_reviews:
@@ -2179,11 +2168,7 @@ function showDayEntries(ds) {
         # Similar books (rendered by the Jinja template)
         similar = []
         try:
-            sim = (
-                _recommender.recommend_similar_books(book_id, top_n=4)
-                if _recommender
-                else []
-            )
+            sim = _recommender.recommend_similar_books(book_id, top_n=4) if _recommender else []
             similar = [
                 {
                     "book_id": r.get("book_id"),
@@ -2194,9 +2179,7 @@ function showDayEntries(ds) {
                 if r and r.get("book_id")
             ]
         except Exception as exc:
-            logger.warning(
-                "book detail %s: similar books unavailable: %s", book_id, exc
-            )
+            logger.warning("book detail %s: similar books unavailable: %s", book_id, exc)
             similar = []
 
         # Render via the Jinja template (autoescape ON)
@@ -2204,9 +2187,9 @@ function showDayEntries(ds) {
             "book_detail.html",
             title=book.title,
             session=session,
-            notif_count=_notif_mgr.get_unread_count(session.get("user_id"))
-            if session.get("user_id")
-            else 0,
+            notif_count=(
+                _notif_mgr.get_unread_count(session.get("user_id")) if session.get("user_id") else 0
+            ),
             author_url=quote(book.author or ""),
             book=book,
             cc=cc,
@@ -2238,17 +2221,16 @@ function showDayEntries(ds) {
         data = request.get_json(silent=True) or {}
         target = str(data.get("user_id") or session.get("user_id") or "").strip()
         role = session.get("role", "")
-        if (
-            target
-            and target != session.get("user_id")
-            and role not in ("admin", "librarian")
-        ):
-            return jsonify(
-                {
-                    "success": False,
-                    "error": "Only staff may issue on behalf of another user",
-                }
-            ), 403
+        if target and target != session.get("user_id") and role not in ("admin", "librarian"):
+            return (
+                jsonify(
+                    {
+                        "success": False,
+                        "error": "Only staff may issue on behalf of another user",
+                    }
+                ),
+                403,
+            )
         if not target:
             target = session.get("user_id")
         ok, msg = _lib.issue_book(target, book_id, actor=session.get("user_id"))
@@ -2262,23 +2244,20 @@ function showDayEntries(ds) {
         data = request.get_json(silent=True) or {}
         target = str(data.get("user_id") or session.get("user_id") or "").strip()
         role = session.get("role", "")
-        if (
-            target
-            and target != session.get("user_id")
-            and role not in ("admin", "librarian")
-        ):
-            return jsonify(
-                {
-                    "success": False,
-                    "error": "Only staff may return on behalf of another user",
-                }
-            ), 403
+        if target and target != session.get("user_id") and role not in ("admin", "librarian"):
+            return (
+                jsonify(
+                    {
+                        "success": False,
+                        "error": "Only staff may return on behalf of another user",
+                    }
+                ),
+                403,
+            )
         if not target:
             target = session.get("user_id")
         ok, msg, fine = _lib.return_book(target, book_id, actor=session.get("user_id"))
-        return jsonify(
-            {"success": ok, "message": msg, "fine": fine}
-        ), 200 if ok else 409
+        return jsonify({"success": ok, "message": msg, "fine": fine}), 200 if ok else 409
 
     # ════════════════════════════════════════════════════════════════
     # CLUB DETAIL PAGE (/clubs/<club_id>)
@@ -2439,9 +2418,11 @@ function leaveClub(cid) {
             cc,
             h(club.get("category", "General")),
             member_count,
-            '<span class="badge bg-success">Public</span>'
-            if club.get("is_public", True)
-            else '<span class="badge bg-secondary">Private</span>',
+            (
+                '<span class="badge bg-success">Public</span>'
+                if club.get("is_public", True)
+                else '<span class="badge bg-secondary">Private</span>'
+            ),
             join_leave_btn,
             book_html,
             forum_html,
@@ -2475,9 +2456,7 @@ function leaveClub(cid) {
         LB = ""
         for entry in leaderboard[:10]:
             rank = entry.get("rank", 0)
-            medal = {1: "\U0001f947", 2: "\U0001f948", 3: "\U0001f949"}.get(
-                rank, f"#{rank}"
-            )
+            medal = {1: "\U0001f947", 2: "\U0001f948", 3: "\U0001f949"}.get(rank, f"#{rank}")
             LB += (
                 '<div class="d-flex align-items-center gap-2 mb-2 p-2" style="border-radius:8px;border:1px solid var(--border);"><span style="min-width:30px;text-align:center;font-weight:700;">'
                 + medal
@@ -2497,9 +2476,7 @@ function leaveClub(cid) {
         # Achievements grid
         ACH = ""
         for a in gd.get("achievements", []):
-            unlocked_cls = (
-                "" if a.get("unlocked") else "opacity:0.4;filter:grayscale(1)"
-            )
+            unlocked_cls = "" if a.get("unlocked") else "opacity:0.4;filter:grayscale(1)"
             ACH += (
                 '<div class="col-4 mb-2 text-center" style="'
                 + unlocked_cls
@@ -2569,9 +2546,7 @@ function leaveClub(cid) {
 </div>""" % (
             pts,
             min(100, int(pts / max(1, pts + next_pts) * 100)) if next_pts > 0 else 100,
-            ("Next: " + h(next_lvl) + " (" + str(next_pts) + " pts)")
-            if next_lvl
-            else "MAX LEVEL",
+            ("Next: " + h(next_lvl) + " (" + str(next_pts) + " pts)") if next_lvl else "MAX LEVEL",
             h(lvl),
             h(lvl),
             streak,
@@ -2635,9 +2610,7 @@ function leaveClub(cid) {
             severity = (
                 "danger"
                 if o["days_overdue"] > 14
-                else "warning"
-                if o["days_overdue"] > 7
-                else "dark"
+                else "warning" if o["days_overdue"] > 7 else "dark"
             )
             rows += (
                 '<tr><td><a href="/profile/'
@@ -2701,9 +2674,7 @@ function leaveClub(cid) {
         users_data = _storage.load_users()
         user = users_data.get(uid)
         if not user:
-            return render_page(
-                "Not Found", '<div class="text-center py-5">User not found</div>'
-            )
+            return render_page("Not Found", '<div class="text-center py-5">User not found</div>')
 
         # Gather stats
         diary_stats = {}
@@ -2718,12 +2689,8 @@ function leaveClub(cid) {
         reading_stats = {}
         challenge_data = {}
         try:
-            reading_stats = (
-                _review_mgr.get_user_reading_stats(uid) if _review_mgr else {}
-            )
-            challenge_data = (
-                _challenge.get_goal(uid, datetime.now().year) if _challenge else {}
-            )
+            reading_stats = _review_mgr.get_user_reading_stats(uid) if _review_mgr else {}
+            challenge_data = _challenge.get_goal(uid, datetime.now().year) if _challenge else {}
         except Exception:
             pass
 
@@ -2733,9 +2700,7 @@ function leaveClub(cid) {
         total_pages = diary_stats.get("total_pages_read", 0)
         streak_info = {}
         try:
-            streak_info = (
-                _gamification.get_user_gamification(uid) if _gamification else {}
-            )
+            streak_info = _gamification.get_user_gamification(uid) if _gamification else {}
         except Exception:
             pass
 
@@ -2831,9 +2796,7 @@ h2{color:#4f46e5}
     def api_club_join(club_id):
         uid = session["user_id"]
         ok, msg = (
-            _communities.join_club(club_id, uid)
-            if _communities
-            else (False, "Clubs unavailable")
+            _communities.join_club(club_id, uid) if _communities else (False, "Clubs unavailable")
         )
         return jsonify({"success": ok, "message": msg})
 
@@ -2842,9 +2805,7 @@ h2{color:#4f46e5}
     def api_club_leave(club_id):
         uid = session["user_id"]
         ok, msg = (
-            _communities.leave_club(club_id, uid)
-            if _communities
-            else (False, "Clubs unavailable")
+            _communities.leave_club(club_id, uid) if _communities else (False, "Clubs unavailable")
         )
         return jsonify({"success": ok, "message": msg})
 

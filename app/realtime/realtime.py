@@ -29,12 +29,8 @@ class RealtimeManager:
         self.storage = storage
         self.online_users: dict[str, str] = {}  # user_id -> sid
         self.user_rooms: dict[str, set[str]] = {}  # user_id -> set of rooms
-        self.post_viewers: dict[
-            str, set[str]
-        ] = {}  # post_id -> set of user_ids viewing comments
-        self.post_typing: dict[
-            str, dict[str, float]
-        ] = {}  # post_id -> {user_id: timestamp}
+        self.post_viewers: dict[str, set[str]] = {}  # post_id -> set of user_ids viewing comments
+        self.post_typing: dict[str, dict[str, float]] = {}  # post_id -> {user_id: timestamp}
 
     def user_connected(self, user_id: str, sid: str) -> None:
         """Track online users."""
@@ -84,9 +80,7 @@ class RealtimeManager:
                     }
                 )
             else:
-                viewer_list.append(
-                    {"user_id": vid, "user_name": vid, "is_online": False}
-                )
+                viewer_list.append({"user_id": vid, "user_name": vid, "is_online": False})
         return viewer_list
 
     def viewer_left(self, post_id: str, user_id: str) -> list[dict]:
@@ -160,9 +154,7 @@ class RealtimeManager:
         if sid:
             socketio.emit("notification", notification, namespace="/social", to=sid)
 
-    def emit_follow_update(
-        self, follower_id: str, following_id: str, is_following: bool
-    ) -> None:
+    def emit_follow_update(self, follower_id: str, following_id: str, is_following: bool) -> None:
         """Emit follow update to both users."""
         if not socketio:
             return
@@ -216,9 +208,7 @@ def init_socketio(app, storage: Storage):
         user_id = session.get("user_id")
         if user_id:
             realtime_manager.user_disconnected(user_id)
-            emit(
-                "user_offline", {"user_id": user_id}, broadcast=True, include_self=False
-            )
+            emit("user_offline", {"user_id": user_id}, broadcast=True, include_self=False)
 
     @socketio.on("join_post", namespace="/social")
     def handle_join_post(data):

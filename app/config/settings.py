@@ -19,18 +19,14 @@ class Config:
     MEMBERSHIP_VALIDITY_DAYS: int = int(os.getenv("MEMBERSHIP_VALIDITY_DAYS", "365"))
 
     # ── Data Directories ────────────────────────────────────────
-    BASE_DIR: str = os.path.dirname(
-        os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    )
+    BASE_DIR: str = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     DATA_DIR: str = os.path.join(BASE_DIR, "data")
     LOGS_DIR: str = os.path.join(BASE_DIR, "logs")
     BACKUPS_DIR: str = os.path.join(BASE_DIR, "backups")
     UPLOADS_DIR: str = os.path.join(BASE_DIR, "uploads")
 
     # ── Upload Settings ─────────────────────────────────────────
-    MAX_UPLOAD_SIZE: int = int(
-        os.getenv("MAX_UPLOAD_SIZE", str(5 * 1024 * 1024))
-    )  # 5 MB
+    MAX_UPLOAD_SIZE: int = int(os.getenv("MAX_UPLOAD_SIZE", str(5 * 1024 * 1024)))  # 5 MB
     ALLOWED_EXTENSIONS: set = set(
         os.getenv("ALLOWED_EXTENSIONS", ".jpg,.jpeg,.png,.gif,.webp").split(",")
     )
@@ -74,18 +70,12 @@ class Config:
     RQ_QUEUE: str = os.getenv("RQ_QUEUE", "booktale")
     # When Redis is unreachable the jobs facade degrades to a bounded local
     # thread pool (never unbounded raw threads) so the app still works.
-    BACKGROUND_JOBS_ENABLED: bool = (
-        os.getenv("BACKGROUND_JOBS_ENABLED", "True").lower() == "true"
-    )
+    BACKGROUND_JOBS_ENABLED: bool = os.getenv("BACKGROUND_JOBS_ENABLED", "True").lower() == "true"
     COVER_FETCH_WORKERS: int = int(os.getenv("COVER_FETCH_WORKERS", "4"))
-    COVER_FETCH_TIMEOUT_SECONDS: int = int(
-        os.getenv("COVER_FETCH_TIMEOUT_SECONDS", "120")
-    )
+    COVER_FETCH_TIMEOUT_SECONDS: int = int(os.getenv("COVER_FETCH_TIMEOUT_SECONDS", "120"))
     # Overdue-email batches send SMTP sequentially (15 s each) — a large batch
     # needs a much longer budget than a single cover fetch. 30 min default.
-    EMAIL_BATCH_TIMEOUT_SECONDS: int = int(
-        os.getenv("EMAIL_BATCH_TIMEOUT_SECONDS", "1800")
-    )
+    EMAIL_BATCH_TIMEOUT_SECONDS: int = int(os.getenv("EMAIL_BATCH_TIMEOUT_SECONDS", "1800"))
     # Cron schedules for the scheduler thread in worker.py (croniter format).
     CRON_OVERDUE_EMAILS: str = os.getenv("CRON_OVERDUE_EMAILS", "0 9 * * *")
     CRON_TOKEN_PURGE: str = os.getenv("CRON_TOKEN_PURGE", "30 * * * *")
@@ -95,7 +85,9 @@ class Config:
     # validation (validate_secure_config) fail fast instead of running with a
     # forgeable session key.
     SECRET_KEY: str = os.getenv("SECRET_KEY", "")
-    FLASK_HOST: str = os.getenv("FLASK_HOST", "0.0.0.0")  # nosec B104 - container/dev server default
+    FLASK_HOST: str = os.getenv(
+        "FLASK_HOST", "0.0.0.0"
+    )  # nosec B104 - container/dev server default
     FLASK_PORT: int = int(os.getenv("FLASK_PORT", "5000"))
     FLASK_DEBUG: bool = os.getenv("FLASK_DEBUG", "False").lower() == "true"
 
@@ -160,9 +152,7 @@ def _load_settings_overrides() -> None:
     except Exception as _e:
         import sys as _sys
 
-        print(
-            "[Config] Warning: Could not load settings override:", _e, file=_sys.stderr
-        )
+        print("[Config] Warning: Could not load settings override:", _e, file=_sys.stderr)
 
 
 # Known-insecure defaults that must never be used in any environment.
