@@ -20,6 +20,6 @@ flask-limiter>=4.1.1
 redis>=5.0.0
 rq>=2.10.0,<3.0  # <2.0: app/jobs/worker.py uses rq.Connection, removed in rq 2.x
 croniter>=2.0.0
-sqlalchemy>=2.0.51
+sqlalchemy>=2.0.52
 alembic>=1.19.1
 psycopg2-binary>=2.9.12
