@@ -2,7 +2,6 @@
 auth.py - Authentication and session management
 """
 
-
 import bcrypt
 
 from app.core.exceptions import AuthenticationError
@@ -158,9 +157,7 @@ def _find_token(token: str, purpose: str):
 
     with session_scope() as db:
         row = db.scalar(
-            select(AuthToken).where(
-                AuthToken.token == token, AuthToken.purpose == purpose
-            )
+            select(AuthToken).where(AuthToken.token == token, AuthToken.purpose == purpose)
         )
         if row is None:
             return None
@@ -191,9 +188,7 @@ def _consume_token(token: str, purpose: str) -> str | None:
 
     with session_scope() as db:
         row = db.scalar(
-            select(AuthToken).where(
-                AuthToken.token == token, AuthToken.purpose == purpose
-            )
+            select(AuthToken).where(AuthToken.token == token, AuthToken.purpose == purpose)
         )
         if row is None:
             return None
@@ -253,7 +248,5 @@ def purge_expired_tokens() -> int:
     from app.db.models import AuthToken
 
     with session_scope() as db:
-        result = db.execute(
-            _sa_delete(AuthToken).where(AuthToken.expires_at < _now_iso())
-        )
+        result = db.execute(_sa_delete(AuthToken).where(AuthToken.expires_at < _now_iso()))
         return result.rowcount or 0

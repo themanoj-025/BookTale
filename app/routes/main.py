@@ -8,9 +8,7 @@ import os
 import sys
 from datetime import datetime
 
-sys.path.insert(
-    0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-)
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
 import requests
 
@@ -55,9 +53,7 @@ def bootstrap(storage: Storage, auth: AuthManager) -> None:
         admin_password = Config.DEFAULT_ADMIN_PASSWORD
         if not admin_password:
             admin_password = secrets.token_urlsafe(16)
-            print_warning(
-                "⚠  DEFAULT_ADMIN_PASSWORD not set! Using a randomly generated password."
-            )
+            print_warning("⚠  DEFAULT_ADMIN_PASSWORD not set! Using a randomly generated password.")
             print_warning(f"   Admin ID: {Config.DEFAULT_ADMIN_ID}")
             print_warning(f"   Admin Password: {admin_password}")
             print_warning(
@@ -301,9 +297,7 @@ def add_book_flow(lib: Library, auth: AuthManager):
             if not author and info["author"]:
                 author = info["author"]
                 print_info(f"Author auto-filled: {author}")
-            print_success(
-                f"Found: {info['title']} by {info['author']} ({info['pages']} pages)"
-            )
+            print_success(f"Found: {info['title']} by {info['author']} ({info['pages']} pages)")
         else:
             print_warning("Could not fetch details. Please enter manually.")
 
@@ -349,9 +343,7 @@ def _generate_barcode(book_id: str, isbn: str) -> None:
 
 def search_books_menu(lib: Library):
     header("🔍 ADVANCED SEARCH")
-    print(
-        "  Search by: 1.All  2.Title  3.Author  4.ISBN  5.Category  6.Advanced Filters"
-    )
+    print("  Search by: 1.All  2.Title  3.Author  4.ISBN  5.Category  6.Advanced Filters")
     by_map = {"1": "all", "2": "title", "3": "author", "4": "isbn"}
     by_choice = input("  Choice [1]: ").strip() or "1"
 
@@ -368,9 +360,7 @@ def search_books_menu(lib: Library):
         query = input("  Query     : ").strip()
         print("  Filter by: 1.All  2.Title  3.Author  4.ISBN")
         fb = input("  [1]: ").strip() or "1"
-        search_by = {"1": "all", "2": "title", "3": "author", "4": "isbn"}.get(
-            fb, "all"
-        )
+        search_by = {"1": "all", "2": "title", "3": "author", "4": "isbn"}.get(fb, "all")
         print("  Categories:", ", ".join(CATEGORIES))
         cat_str = input("  Category (optional): ").strip()
         if cat_str in CATEGORIES:
@@ -644,16 +634,13 @@ def reports_menu(lib: Library):
             header("📚 Most Issued Books")
             for i, r in enumerate(data, 1):
                 print(
-                    f"  {i:2}. [{r['id']}] {r['title']} — {r['author']} "
-                    f"| Issued {r['count']}×"
+                    f"  {i:2}. [{r['id']}] {r['title']} — {r['author']} " f"| Issued {r['count']}×"
                 )
         elif choice == "2":
             data = lib.report_active_users()
             header("🏆 Most Active Users")
             for i, r in enumerate(data, 1):
-                print(
-                    f"  {i:2}. [{r['user_id']}] {r['name']} — {r['total_issues']} issues"
-                )
+                print(f"  {i:2}. [{r['user_id']}] {r['name']} — {r['total_issues']} issues")
         elif choice == "3":
             header("📅 Issue Counts")
             print(f"  Today         : {lib.report_issued_today()} books")
@@ -949,9 +936,7 @@ def _show_frequently_bought(recommender: Recommender) -> None:
     if not recs:
         print_info("No co-borrowing data available for this book yet.")
     else:
-        print(
-            f"\n  Users who borrowed [bold]{recs[0]['title']}[/bold] also borrowed:\n"
-        )
+        print(f"\n  Users who borrowed [bold]{recs[0]['title']}[/bold] also borrowed:\n")
         for r in recs:
             avail = "✅" if r["available"] > 0 else "❌"
             print(
@@ -966,9 +951,7 @@ def _browse_by_category(recommender: Recommender, lib: Library) -> None:
     header("🗂  Browse by Category")
     cats = recommender.get_all_categories_with_counts()
     for i, c in enumerate(cats, 1):
-        print(
-            f"  {i}. {c['category']} ({c['count']} books, {c['total_issues']} issues)"
-        )
+        print(f"  {i}. {c['category']} ({c['count']} books, {c['total_issues']} issues)")
     print("\n  0. Back")
     try:
         idx = int(input("  Choose category: ").strip())
@@ -1011,9 +994,7 @@ def notifications_menu(notif_mgr: NotificationManager, user_id: str) -> None:
             break
 
 
-def _show_notifications(
-    notif_mgr: NotificationManager, user_id: str, unread_only: bool
-) -> None:
+def _show_notifications(notif_mgr: NotificationManager, user_id: str, unread_only: bool) -> None:
     """Display notifications for a user."""
     notifs = notif_mgr.get_notifications(user_id, unread_only=unread_only)
     if not notifs:
@@ -1144,9 +1125,7 @@ def email_overdue_alerts(lib: Library) -> None:
         if result["failed"] > 0:
             print_error(f"❌ Failed: {result['failed']}")
         if result["skipped"] > 0:
-            print_warning(
-                f"⏭️ Skipped: {result['skipped']} (no email on file or user not found)"
-            )
+            print_warning(f"⏭️ Skipped: {result['skipped']} (no email on file or user not found)")
         print_info(f"📊 Total processed: {result['total']}")
         log(
             f"Overdue email alerts sent: {result['sent']} sent, {result['failed']} failed, {result['skipped']} skipped",
@@ -1160,9 +1139,7 @@ def email_overdue_alerts(lib: Library) -> None:
 # SEED DATA / GOODREADS KNOWLEDGE BASE
 
 
-def seed_recommendations_menu(
-    lib: Library, recommender: Recommender, auth: AuthManager
-) -> None:
+def seed_recommendations_menu(lib: Library, recommender: Recommender, auth: AuthManager) -> None:
     """Browse recommendations from the Goodreads seed knowledge base."""
     while True:
         choice = menu(
@@ -1389,7 +1366,7 @@ def seed_import_menu(lib: Library, auth: AuthManager) -> None:
             print(f"  {i:2}. {c:<18} : {cnt} books")
         try:
             idx = int(input("  Choose category: ").strip()) - 1
-            cat = list(sorted(cats.items(), key=lambda x: x[1], reverse=True))[idx][0]
+            cat = sorted(cats.items(), key=lambda x: x[1], reverse=True)[idx][0]
             count_str = input("  How many to import [10]: ").strip()
             count = int(count_str) if count_str.isdigit() else 10
             books_to_import = _sd.recommend_seed_by_category(cat, top_n=count)
@@ -1522,7 +1499,8 @@ def main() -> None:
 
     bootstrap(storage, auth)
 
-    console.print("""
+    console.print(
+        """
 [cyan]
   ╔══════════════════════════════════════════╗
   ║   📚 Library Management System v2.0     ║
@@ -1530,7 +1508,8 @@ def main() -> None:
   ║   + Recommendations Engine              ║
   ╚══════════════════════════════════════════╝
 [/cyan]
-    """)
+    """
+    )
 
     try:
         while True:

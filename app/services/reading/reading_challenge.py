@@ -90,9 +90,7 @@ class ReadingChallenge:
         entry["progress"] = len(books_read)
         entry["goal"] = entry.get("goal", 0)
         entry["percentage"] = (
-            round(len(books_read) / entry["goal"] * 100, 1)
-            if entry.get("goal", 0) > 0
-            else 0
+            round(len(books_read) / entry["goal"] * 100, 1) if entry.get("goal", 0) > 0 else 0
         )
         entry["remaining"] = max(0, entry["goal"] - len(books_read))
         # Calculate pace

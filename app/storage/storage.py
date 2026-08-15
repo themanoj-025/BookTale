@@ -33,11 +33,7 @@ def _read_json(path: str, force: bool = False) -> Any:
     lock = _get_lock(path)
     with lock:
         now = time.time()
-        if (
-            not force
-            and path in _cache
-            and (now - _cache_timestamps.get(path, 0)) < CACHE_TTL
-        ):
+        if not force and path in _cache and (now - _cache_timestamps.get(path, 0)) < CACHE_TTL:
             return _cache[path]
 
         os.makedirs(os.path.dirname(path), exist_ok=True)

@@ -146,9 +146,7 @@ class ReviewManager:
         if not content.strip():
             return False, "Comment cannot be empty", None
 
-        comments_path = os.path.join(
-            storage_lib.Config.DATA_DIR, "review_comments.json"
-        )
+        comments_path = os.path.join(storage_lib.Config.DATA_DIR, "review_comments.json")
         try:
             with open(comments_path, "r", encoding="utf-8") as f:
                 comments = json.load(f)
@@ -170,9 +168,7 @@ class ReviewManager:
 
     def get_review_comments(self, review_id: str) -> list[dict]:
         """Get all comments on a review."""
-        comments_path = os.path.join(
-            storage_lib.Config.DATA_DIR, "review_comments.json"
-        )
+        comments_path = os.path.join(storage_lib.Config.DATA_DIR, "review_comments.json")
         try:
             with open(comments_path, "r", encoding="utf-8") as f:
                 all_comments = json.load(f)
@@ -221,9 +217,7 @@ class ReviewManager:
 
         # Sort
         if sort_by == "helpful":
-            book_reviews.sort(
-                key=lambda r: len(r.get("helpful_votes", [])), reverse=True
-            )
+            book_reviews.sort(key=lambda r: len(r.get("helpful_votes", [])), reverse=True)
         elif sort_by == "rating":
             book_reviews.sort(key=lambda r: r["rating"], reverse=True)
         elif sort_by == "lowest":
@@ -316,15 +310,9 @@ class ReviewManager:
 
         shelves = self.storage.load_bookshelves()
         # Remove existing entry for this user+book
-        shelves = [
-            s
-            for s in shelves
-            if not (s["user_id"] == user_id and s["book_id"] == book_id)
-        ]
+        shelves = [s for s in shelves if not (s["user_id"] == user_id and s["book_id"] == book_id)]
         now = datetime.now().isoformat()
-        shelves.append(
-            {"user_id": user_id, "book_id": book_id, "shelf": shelf, "created_at": now}
-        )
+        shelves.append({"user_id": user_id, "book_id": book_id, "shelf": shelf, "created_at": now})
         self.storage.save_bookshelves(shelves)
         log(f"Added {book_id} to {shelf}", user_id)
         return True, f"Book added to {shelf.replace('_', ' ')}"
@@ -378,11 +366,7 @@ class ReviewManager:
         """Remove a book from a user's shelf entirely."""
         shelves = self.storage.load_bookshelves()
         old_len = len(shelves)
-        shelves = [
-            s
-            for s in shelves
-            if not (s["user_id"] == user_id and s["book_id"] == book_id)
-        ]
+        shelves = [s for s in shelves if not (s["user_id"] == user_id and s["book_id"] == book_id)]
         if len(shelves) == old_len:
             return False, "Book not found on any shelf"
         self.storage.save_bookshelves(shelves)
@@ -459,16 +443,12 @@ class ReviewManager:
         _save_custom_shelves(self.storage, custom)
         # Remove all books from this shelf
         shelves = self.storage.load_bookshelves()
-        shelves = [
-            s for s in shelves if not (s["user_id"] == user_id and s["shelf"] == name)
-        ]
+        shelves = [s for s in shelves if not (s["user_id"] == user_id and s["shelf"] == name)]
         self.storage.save_bookshelves(shelves)
         log(f"Deleted custom shelf '{name}'", user_id)
         return True, f"Shelf '{name}' deleted"
 
-    def rename_custom_shelf(
-        self, user_id: str, old_name: str, new_name: str
-    ) -> tuple[bool, str]:
+    def rename_custom_shelf(self, user_id: str, old_name: str, new_name: str) -> tuple[bool, str]:
         """Rename a custom shelf. Books are preserved."""
         new_name = new_name.strip()
         if not new_name:
@@ -510,9 +490,7 @@ class ReviewManager:
         shelves = self.storage.load_bookshelves()
         for c in user_custom:
             c["book_count"] = sum(
-                1
-                for s in shelves
-                if s["user_id"] == user_id and s["shelf"] == c["name"]
+                1 for s in shelves if s["user_id"] == user_id and s["shelf"] == c["name"]
             )
         return user_custom
 

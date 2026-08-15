@@ -313,9 +313,7 @@ def _load_seed_data(force: bool = False) -> None:
                     isbn = (row.get("isbn", "") or "").strip()
                     isbn13 = (row.get("isbn13", "") or "").strip()
                     rating_str = (row.get("average_rating", "0") or "0").strip()
-                    pages_str = (
-                        row.get("  num_pages", row.get("num_pages", "0")) or "0"
-                    ).strip()
+                    pages_str = (row.get("  num_pages", row.get("num_pages", "0")) or "0").strip()
                     ratings_str = (row.get("ratings_count", "0") or "0").strip()
                     pub_date = (row.get("publication_date", "") or "").strip()
                     publisher = (row.get("publisher", "") or "").strip()
@@ -352,9 +350,7 @@ def _load_seed_data(force: bool = False) -> None:
                         "pages": pages,
                         "publication_date": pub_date,
                         "publisher": publisher,
-                        "relevance_score": round(
-                            rating * math.log10(max(ratings_count, 1) + 1), 2
-                        ),
+                        "relevance_score": round(rating * math.log10(max(ratings_count, 1) + 1), 2),
                     }
 
                     _SEED_BOOKS.append(book)
@@ -394,9 +390,7 @@ def get_seed_stats() -> dict:
     _load_seed_data()
     if not _SEED_BOOKS:
         return {"total": 0, "categories": [], "authors": 0, "avg_rating": 0}
-    avg_rating = round(
-        sum(b["average_rating"] for b in _SEED_BOOKS) / len(_SEED_BOOKS), 2
-    )
+    avg_rating = round(sum(b["average_rating"] for b in _SEED_BOOKS) / len(_SEED_BOOKS), 2)
     unique_authors = len(set(b["author"].lower() for b in _SEED_BOOKS))
     return {
         "total": len(_SEED_BOOKS),

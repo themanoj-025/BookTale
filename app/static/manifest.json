@@ -8,12 +8,7 @@
   "background_color": "#0f0f13",
   "theme_color": "#7c6af7",
   "scope": "/",
-  "categories": [
-    "books",
-    "social",
-    "entertainment",
-    "lifestyle"
-  ],
+  "categories": ["books", "social", "entertainment", "lifestyle"],
   "lang": "en",
   "dir": "ltr",
   "prefer_related_applications": false,

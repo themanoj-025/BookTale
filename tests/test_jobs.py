@@ -29,9 +29,8 @@ os.environ.setdefault("DEFAULT_ADMIN_PASSWORD", "TestAdmin123")
 
 import pytest
 
-import app.jobs.jobs as jobs
-import app.jobs.tasks as tasks
 from app.config.settings import Config
+from app.jobs import jobs, tasks
 
 
 @pytest.fixture(autouse=True)
@@ -87,9 +86,7 @@ class TestCoverFetchJob:
                 "genres": ["Fiction"],
             },
         )
-        monkeypatch.setattr(
-            "app.db.storage_adapter.create_storage", lambda: _FakeStorage()
-        )
+        monkeypatch.setattr("app.db.storage_adapter.create_storage", lambda: _FakeStorage())
 
         result = tasks.job_fetch_book_cover("BK-2026-0001", "Test Book", "A", "123")
         assert result["ok"] is True
@@ -132,9 +129,7 @@ class TestCoverFetchJob:
                 "genres": [],
             },
         )
-        monkeypatch.setattr(
-            "app.db.storage_adapter.create_storage", lambda: _FakeStorage()
-        )
+        monkeypatch.setattr("app.db.storage_adapter.create_storage", lambda: _FakeStorage())
         result = tasks.job_fetch_book_cover("BK-2026-0001", "Test", "A", "123")
         assert result["ok"] is False
         assert book.cover_fetched is False  # untouched
@@ -154,9 +149,7 @@ class TestCoverFetchJob:
                 "cover_source": "openlibrary",
             },
         )
-        monkeypatch.setattr(
-            "app.db.storage_adapter.create_storage", lambda: _FakeStorage()
-        )
+        monkeypatch.setattr("app.db.storage_adapter.create_storage", lambda: _FakeStorage())
         result = tasks.job_fetch_book_cover("BK-NOPE", "T", "A", "1")
         assert result["ok"] is False
         assert result["reason"] == "book_gone"
@@ -208,14 +201,11 @@ class TestJobsFacade:
     def test_fallback_pool_runs_job(self, monkeypatch):
         """With Redis unreachable, the job still executes on the local pool."""
         captured = []
-        monkeypatch.setattr(
-            "app.jobs.tasks.job_fetch_book_cover", lambda *a: captured.append(a)
-        )
+        monkeypatch.setattr("app.jobs.tasks.job_fetch_book_cover", lambda *a: captured.append(a))
 
         # Make the pool submit synchronously so the test is deterministic.
         def _sync_submit(fn, *args):
             fn(*args)
-            return None
 
         monkeypatch.setattr(
             jobs,
@@ -242,13 +232,10 @@ class TestJobsFacade:
         cannot serialize it and the worker builds its own)."""
         captured = []
         fake_storage = object()
-        monkeypatch.setattr(
-            "app.jobs.tasks.job_fetch_book_cover", lambda *a: captured.append(a)
-        )
+        monkeypatch.setattr("app.jobs.tasks.job_fetch_book_cover", lambda *a: captured.append(a))
 
         def _sync_submit(fn, *args):
             fn(*args)
-            return None
 
         monkeypatch.setattr(
             jobs,
@@ -294,24 +281,19 @@ class TestJobsFacade:
         pool = jobs._get_pool()
         assert isinstance(
             pool,
-            __import__(
-                "concurrent.futures", fromlist=["ThreadPoolExecutor"]
-            ).ThreadPoolExecutor,
+            __import__("concurrent.futures", fromlist=["ThreadPoolExecutor"]).ThreadPoolExecutor,
         )
         assert pool._max_workers == Config.COVER_FETCH_WORKERS
 
     def test_disabled_flag_still_runs_on_pool(self, monkeypatch):
         monkeypatch.setattr(Config, "BACKGROUND_JOBS_ENABLED", False)
         calls = []
-        monkeypatch.setattr(
-            "app.jobs.tasks.job_purge_expired_tokens", lambda: calls.append(1) or 0
-        )
+        monkeypatch.setattr("app.jobs.tasks.job_purge_expired_tokens", lambda: calls.append(1) or 0)
 
         captured = []
 
         def _sync_submit(fn, *args):
             captured.append(fn(*args))
-            return None
 
         monkeypatch.setattr(
             jobs,
@@ -339,7 +321,7 @@ class TestCronNextRun:
     def test_next_run_after_now_is_strictly_future(self):
         """The computed next run must be strictly after the reference time."""
         pytest.importorskip("croniter")
-        import app.jobs.worker as worker
+        from app.jobs import worker
 
         base = __import__("datetime", fromlist=["datetime"]).datetime.now()
         nxt = worker._next_run_after("0 9 * * *", after=base)
@@ -350,7 +332,7 @@ class TestCronNextRun:
         pytest.importorskip("croniter")
         from datetime import datetime as _dt
 
-        import app.jobs.worker as worker
+        from app.jobs import worker
 
         base = _dt(2026, 8, 1, 10, 30, 0)
         nxt = worker._next_run_after("0 9 * * *", after=base)
@@ -378,7 +360,7 @@ class TestWorkerSchemaEnsure:
         called = []
         monkeypatch.setattr("app.db.database.create_all", lambda: called.append(True))
         monkeypatch.delenv("STORAGE_BACKEND", raising=False)
-        import app.jobs.worker as worker
+        from app.jobs import worker
 
         worker._ensure_schema()
         assert called, "create_all() must run on worker startup"
@@ -391,7 +373,7 @@ class TestWorkerSchemaEnsure:
 
         monkeypatch.setattr("app.db.database.create_all", _boom)
         monkeypatch.delenv("STORAGE_BACKEND", raising=False)
-        import app.jobs.worker as worker
+        from app.jobs import worker
 
         worker._ensure_schema()  # must not raise
 
@@ -400,7 +382,7 @@ class TestWorkerSchemaEnsure:
         called = []
         monkeypatch.setattr("app.db.database.create_all", lambda: called.append(True))
         monkeypatch.setenv("STORAGE_BACKEND", "json")
-        import app.jobs.worker as worker
+        from app.jobs import worker
 
         worker._ensure_schema()
         assert not called

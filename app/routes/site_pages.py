@@ -63,9 +63,7 @@ def init_site_pages(app, storage, lib, recommender, social, review_mgr, notif_mg
         avail_rate = (avail_copies / total_copies * 100) if total_copies else 0
         total_users = len(users)
         active_users = sum(1 for u in users.values() if u.membership_status == "Active")
-        blocked_users = sum(
-            1 for u in users.values() if u.membership_status == "Blocked"
-        )
+        blocked_users = sum(1 for u in users.values() if u.membership_status == "Blocked")
         new_users_month = sum(
             1
             for u in users.values()
@@ -73,15 +71,11 @@ def init_site_pages(app, storage, lib, recommender, social, review_mgr, notif_mg
             and u.registered_on
             and datetime.fromisoformat(u.registered_on) >= tms
         )
-        new_books_month = sum(
-            1 for b in all_books if datetime.fromisoformat(b.added_on) >= tms
-        )
+        new_books_month = sum(1 for b in all_books if datetime.fromisoformat(b.added_on) >= tms)
         issues = [t for t in txns if t["type"] == "issue"]
         active_issues = [t for t in issues if t.get("return_date") is None]
         total_txns = len(txns)
-        month_txns = sum(
-            1 for t in txns if datetime.fromisoformat(t.get("issue_date", "")) >= tms
-        )
+        month_txns = sum(1 for t in txns if datetime.fromisoformat(t.get("issue_date", "")) >= tms)
         unique_borrowers = len(set(t["user_id"] for t in issues))
         fines = storage.load_fines()
         total_fines = sum(f.get("amount", 0) for f in fines)
@@ -128,9 +122,7 @@ def init_site_pages(app, storage, lib, recommender, social, review_mgr, notif_mg
         s = _library_stats()
         books = storage.load_books()
         all_books = [b for b in books.values() if not b.is_deleted]
-        featured_books = sorted(all_books, key=lambda b: b.issue_count, reverse=True)[
-            :6
-        ]
+        featured_books = sorted(all_books, key=lambda b: b.issue_count, reverse=True)[:6]
         posts = storage.load_posts() if hasattr(storage, "load_posts") else []
 
         cat_counts = {}
@@ -182,9 +174,7 @@ def init_site_pages(app, storage, lib, recommender, social, review_mgr, notif_mg
         user = get_current_user() if uid else None
 
         posts = storage.load_posts() if hasattr(storage, "load_posts") else []
-        reviews_data = (
-            storage.load_reviews() if hasattr(storage, "load_reviews") else []
-        )
+        reviews_data = storage.load_reviews() if hasattr(storage, "load_reviews") else []
         following_count = 0
         follower_count = 0
         if user and social:

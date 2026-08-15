@@ -27,9 +27,7 @@ import sys
 import threading
 from datetime import datetime
 
-sys.path.insert(
-    0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-)
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
 from app.config.settings import Config
 from app.core.logger import log
@@ -45,9 +43,7 @@ def _next_run_after(cron_expr: str, after: datetime | None = None) -> datetime:
     return croniter(cron_expr, base).get_next(datetime)
 
 
-def _register_cron(
-    conn, key_prefix: str, cron_expr: str, job_func, timeout: int
-) -> None:
+def _register_cron(conn, key_prefix: str, cron_expr: str, job_func, timeout: int) -> None:
     """Enqueue job_func at its next cron occurrence — idempotent per run.
 
     Restart-safe: the next-occurrence timestamp is stored in Redis under
@@ -142,8 +138,7 @@ def _ensure_schema() -> None:
         log("Worker: relational schema verified (create_all)", "worker")
     except Exception as e:
         log(
-            f"Worker: schema ensure failed (DB jobs will fail until the "
-            f"schema exists): {e}",
+            f"Worker: schema ensure failed (DB jobs will fail until the " f"schema exists): {e}",
             "worker",
         )
 
@@ -163,9 +158,7 @@ def main() -> None:
     # socket_connect_timeout gives fail-fast startup, but NO socket_timeout:
     # RQ's worker uses this connection for blocking pubsub/BRPOP and a short
     # socket timeout is interpreted as connection loss (worker quits after 2s).
-    conn = _redis_client.Redis.from_url(
-        Config.REDIS_URL, socket_connect_timeout=2.0
-    )
+    conn = _redis_client.Redis.from_url(Config.REDIS_URL, socket_connect_timeout=2.0)
     try:
         conn.ping()
     except Exception as e:

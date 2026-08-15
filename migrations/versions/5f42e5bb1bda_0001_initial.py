@@ -6,7 +6,6 @@ Create Date: 2026-08-01 00:35:26.000450
 
 """
 
-from typing import Union
 from collections.abc import Sequence
 
 import sqlalchemy as sa
@@ -14,9 +13,9 @@ from alembic import op
 
 # revision identifiers, used by Alembic.
 revision: str = "5f42e5bb1bda"
-down_revision: Union[str, None] = None
-branch_labels: Union[str, Sequence[str], None] = None
-depends_on: Union[str, Sequence[str], None] = None
+down_revision: str | None = None
+branch_labels: str | Sequence[str] | None = None
+depends_on: str | Sequence[str] | None = None
 
 
 def upgrade() -> None:
@@ -58,9 +57,7 @@ def upgrade() -> None:
     )
     op.create_index(op.f("ix_books_is_deleted"), "books", ["is_deleted"], unique=False)
     op.create_index(op.f("ix_books_isbn"), "books", ["isbn"], unique=False)
-    op.create_index(
-        op.f("ix_books_issue_count"), "books", ["issue_count"], unique=False
-    )
+    op.create_index(op.f("ix_books_issue_count"), "books", ["issue_count"], unique=False)
     op.create_index("ix_books_title", "books", ["title"], unique=False)
     op.create_table(
         "communities",
@@ -133,16 +130,10 @@ def upgrade() -> None:
         op.f("ix_users_membership_status"), "users", ["membership_status"], unique=False
     )
     op.create_index("ix_users_name", "users", ["name"], unique=False)
-    op.create_index(
-        op.f("ix_users_registered_on"), "users", ["registered_on"], unique=False
-    )
+    op.create_index(op.f("ix_users_registered_on"), "users", ["registered_on"], unique=False)
     op.create_index(op.f("ix_users_role"), "users", ["role"], unique=False)
-    op.create_index(
-        "ix_users_role_status", "users", ["role", "membership_status"], unique=False
-    )
-    op.create_index(
-        op.f("ix_users_unpaid_fine"), "users", ["unpaid_fine"], unique=False
-    )
+    op.create_index("ix_users_role_status", "users", ["role", "membership_status"], unique=False)
+    op.create_index(op.f("ix_users_unpaid_fine"), "users", ["unpaid_fine"], unique=False)
     op.create_table(
         "bookshelves",
         sa.Column("id", sa.Integer(), autoincrement=True, nullable=False),
@@ -157,9 +148,7 @@ def upgrade() -> None:
         ),
         sa.PrimaryKeyConstraint("id"),
     )
-    op.create_index(
-        op.f("ix_bookshelves_user_id"), "bookshelves", ["user_id"], unique=False
-    )
+    op.create_index(op.f("ix_bookshelves_user_id"), "bookshelves", ["user_id"], unique=False)
     op.create_table(
         "diary_entries",
         sa.Column("entry_id", sa.String(length=64), nullable=False),
@@ -180,12 +169,8 @@ def upgrade() -> None:
     op.create_index(
         op.f("ix_diary_entries_date_read"), "diary_entries", ["date_read"], unique=False
     )
-    op.create_index(
-        op.f("ix_diary_entries_user_id"), "diary_entries", ["user_id"], unique=False
-    )
-    op.create_index(
-        "ix_diary_user_date", "diary_entries", ["user_id", "date_read"], unique=False
-    )
+    op.create_index(op.f("ix_diary_entries_user_id"), "diary_entries", ["user_id"], unique=False)
+    op.create_index("ix_diary_user_date", "diary_entries", ["user_id", "date_read"], unique=False)
     op.create_table(
         "fines",
         sa.Column("id", sa.Integer(), autoincrement=True, nullable=False),
@@ -220,13 +205,9 @@ def upgrade() -> None:
         sa.PrimaryKeyConstraint("follow_id"),
         sa.UniqueConstraint("follower_id", "following_id", name="uq_follow_pair"),
     )
-    op.create_index(
-        op.f("ix_follows_follower_id"), "follows", ["follower_id"], unique=False
-    )
+    op.create_index(op.f("ix_follows_follower_id"), "follows", ["follower_id"], unique=False)
     op.create_index("ix_follows_following", "follows", ["following_id"], unique=False)
-    op.create_index(
-        op.f("ix_follows_following_id"), "follows", ["following_id"], unique=False
-    )
+    op.create_index(op.f("ix_follows_following_id"), "follows", ["following_id"], unique=False)
     op.create_table(
         "gamification",
         sa.Column("user_id", sa.String(length=64), nullable=False),
@@ -261,15 +242,9 @@ def upgrade() -> None:
         ["created_at"],
         unique=False,
     )
-    op.create_index(
-        op.f("ix_notifications_read"), "notifications", ["read"], unique=False
-    )
-    op.create_index(
-        op.f("ix_notifications_user_id"), "notifications", ["user_id"], unique=False
-    )
-    op.create_index(
-        "ix_notifs_user_read", "notifications", ["user_id", "read"], unique=False
-    )
+    op.create_index(op.f("ix_notifications_read"), "notifications", ["read"], unique=False)
+    op.create_index(op.f("ix_notifications_user_id"), "notifications", ["user_id"], unique=False)
+    op.create_index("ix_notifs_user_read", "notifications", ["user_id", "read"], unique=False)
     op.create_table(
         "posts",
         sa.Column("post_id", sa.String(length=64), nullable=False),
@@ -288,9 +263,7 @@ def upgrade() -> None:
         sa.PrimaryKeyConstraint("post_id"),
     )
     op.create_index(op.f("ix_posts_created_at"), "posts", ["created_at"], unique=False)
-    op.create_index(
-        "ix_posts_user_created", "posts", ["user_id", "created_at"], unique=False
-    )
+    op.create_index("ix_posts_user_created", "posts", ["user_id", "created_at"], unique=False)
     op.create_index(op.f("ix_posts_user_id"), "posts", ["user_id"], unique=False)
     op.create_table(
         "reading_challenges",
@@ -333,18 +306,14 @@ def upgrade() -> None:
         sa.PrimaryKeyConstraint("id"),
         sa.UniqueConstraint("book_id", "user_id", name="uq_reservation_book_user"),
     )
-    op.create_index(
-        op.f("ix_reservations_book_id"), "reservations", ["book_id"], unique=False
-    )
+    op.create_index(op.f("ix_reservations_book_id"), "reservations", ["book_id"], unique=False)
     op.create_index(
         "ix_reservations_book_pos",
         "reservations",
         ["book_id", "position"],
         unique=False,
     )
-    op.create_index(
-        op.f("ix_reservations_user_id"), "reservations", ["user_id"], unique=False
-    )
+    op.create_index(op.f("ix_reservations_user_id"), "reservations", ["user_id"], unique=False)
     op.create_table(
         "reviews",
         sa.Column("review_id", sa.String(length=64), nullable=False),
@@ -366,12 +335,8 @@ def upgrade() -> None:
         sa.UniqueConstraint("user_id", "book_id", name="uq_review_user_book"),
     )
     op.create_index(op.f("ix_reviews_book_id"), "reviews", ["book_id"], unique=False)
-    op.create_index(
-        "ix_reviews_book_rating", "reviews", ["book_id", "rating"], unique=False
-    )
-    op.create_index(
-        op.f("ix_reviews_created_at"), "reviews", ["created_at"], unique=False
-    )
+    op.create_index("ix_reviews_book_rating", "reviews", ["book_id", "rating"], unique=False)
+    op.create_index(op.f("ix_reviews_created_at"), "reviews", ["created_at"], unique=False)
     op.create_index(op.f("ix_reviews_user_id"), "reviews", ["user_id"], unique=False)
     op.create_table(
         "transactions",
@@ -393,12 +358,8 @@ def upgrade() -> None:
         ),
         sa.PrimaryKeyConstraint("txn_id"),
     )
-    op.create_index(
-        op.f("ix_transactions_book_id"), "transactions", ["book_id"], unique=False
-    )
-    op.create_index(
-        op.f("ix_transactions_due_date"), "transactions", ["due_date"], unique=False
-    )
+    op.create_index(op.f("ix_transactions_book_id"), "transactions", ["book_id"], unique=False)
+    op.create_index(op.f("ix_transactions_due_date"), "transactions", ["due_date"], unique=False)
     op.create_index(
         op.f("ix_transactions_issue_date"), "transactions", ["issue_date"], unique=False
     )
@@ -408,15 +369,9 @@ def upgrade() -> None:
         ["return_date"],
         unique=False,
     )
-    op.create_index(
-        op.f("ix_transactions_user_id"), "transactions", ["user_id"], unique=False
-    )
-    op.create_index(
-        "ix_txns_open_due", "transactions", ["return_date", "due_date"], unique=False
-    )
-    op.create_index(
-        "ix_txns_user_open", "transactions", ["user_id", "return_date"], unique=False
-    )
+    op.create_index(op.f("ix_transactions_user_id"), "transactions", ["user_id"], unique=False)
+    op.create_index("ix_txns_open_due", "transactions", ["return_date", "due_date"], unique=False)
+    op.create_index("ix_txns_user_open", "transactions", ["user_id", "return_date"], unique=False)
     op.create_table(
         "wishlist_suggestions",
         sa.Column("suggestion_id", sa.String(length=64), nullable=False),
@@ -475,12 +430,8 @@ def upgrade() -> None:
         ),
         sa.PrimaryKeyConstraint("comment_id"),
     )
-    op.create_index(
-        op.f("ix_comments_created_at"), "comments", ["created_at"], unique=False
-    )
-    op.create_index(
-        "ix_comments_post_created", "comments", ["post_id", "created_at"], unique=False
-    )
+    op.create_index(op.f("ix_comments_created_at"), "comments", ["created_at"], unique=False)
+    op.create_index("ix_comments_post_created", "comments", ["post_id", "created_at"], unique=False)
     op.create_index(op.f("ix_comments_post_id"), "comments", ["post_id"], unique=False)
     op.create_index(op.f("ix_comments_user_id"), "comments", ["user_id"], unique=False)
     # ### end Alembic commands ###
@@ -493,15 +444,9 @@ def downgrade() -> None:
     op.drop_index("ix_comments_post_created", table_name="comments")
     op.drop_index(op.f("ix_comments_created_at"), table_name="comments")
     op.drop_table("comments")
-    op.drop_index(
-        op.f("ix_wishlist_suggestions_user_id"), table_name="wishlist_suggestions"
-    )
-    op.drop_index(
-        op.f("ix_wishlist_suggestions_status"), table_name="wishlist_suggestions"
-    )
-    op.drop_index(
-        op.f("ix_wishlist_suggestions_created_at"), table_name="wishlist_suggestions"
-    )
+    op.drop_index(op.f("ix_wishlist_suggestions_user_id"), table_name="wishlist_suggestions")
+    op.drop_index(op.f("ix_wishlist_suggestions_status"), table_name="wishlist_suggestions")
+    op.drop_index(op.f("ix_wishlist_suggestions_created_at"), table_name="wishlist_suggestions")
     op.drop_table("wishlist_suggestions")
     op.drop_index("ix_txns_user_open", table_name="transactions")
     op.drop_index("ix_txns_open_due", table_name="transactions")
@@ -521,9 +466,7 @@ def downgrade() -> None:
     op.drop_index(op.f("ix_reservations_book_id"), table_name="reservations")
     op.drop_table("reservations")
     op.drop_index(op.f("ix_reading_challenges_year"), table_name="reading_challenges")
-    op.drop_index(
-        op.f("ix_reading_challenges_user_id"), table_name="reading_challenges"
-    )
+    op.drop_index(op.f("ix_reading_challenges_user_id"), table_name="reading_challenges")
     op.drop_table("reading_challenges")
     op.drop_index(op.f("ix_posts_user_id"), table_name="posts")
     op.drop_index("ix_posts_user_created", table_name="posts")

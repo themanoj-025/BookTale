@@ -262,15 +262,15 @@ def _render_heatmap_svg(heatmap_data: list, total: int) -> str:
     cur_m = start
     for i in range(52):
         if cur_m.month != (cur_m - timedelta(weeks=1)).month or i == 0:
-            ml += (
-                '<text x="%d" y="12" font-size="8" fill="var(--bt-text-muted)">%s</text>'
-                % (i * cw + 15, months[cur_m.month - 1])
+            ml += '<text x="%d" y="12" font-size="8" fill="var(--bt-text-muted)">%s</text>' % (
+                i * cw + 15,
+                months[cur_m.month - 1],
             )
         cur_m += timedelta(weeks=1)
     for i, dlbl in enumerate(["", "Mon", "", "Wed", "", "Fri", ""]):
-        dl += (
-            '<text x="2" y="%d" font-size="7" fill="var(--bt-text-muted)">%s</text>'
-            % (i * rh + 17, dlbl)
+        dl += '<text x="2" y="%d" font-size="7" fill="var(--bt-text-muted)">%s</text>' % (
+            i * rh + 17,
+            dlbl,
         )
     lg = ""
     lcs = [
@@ -281,9 +281,9 @@ def _render_heatmap_svg(heatmap_data: list, total: int) -> str:
         "rgba(124,106,247,0.75)",
     ]
     lx = svg_w - 130
-    lg += (
-        '<text x="%d" y="%d" font-size="7" fill="var(--bt-text-muted)">Less</text>'
-        % (lx - 25, svg_h - 5)
+    lg += '<text x="%d" y="%d" font-size="7" fill="var(--bt-text-muted)">Less</text>' % (
+        lx - 25,
+        svg_h - 5,
     )
     for li, lc in enumerate(lcs):
         xx = lx + li * (cell_size + 2)
@@ -294,9 +294,9 @@ def _render_heatmap_svg(heatmap_data: list, total: int) -> str:
             cell_size,
             lc,
         )
-    lg += (
-        '<text x="%d" y="%d" font-size="7" fill="var(--bt-text-muted)">More</text>'
-        % (lx + 5 * (cell_size + 2) + 2, svg_h - 5)
+    lg += '<text x="%d" y="%d" font-size="7" fill="var(--bt-text-muted)">More</text>' % (
+        lx + 5 * (cell_size + 2) + 2,
+        svg_h - 5,
     )
     svg = (
         '<svg viewBox="0 0 %d %d" xmlns="http://www.w3.org/2000/svg" style="width:100%%;max-width:700px;height:auto;"><g>%s%s%s%s</g></svg>'
@@ -319,18 +319,16 @@ def _render_fav_grid(fav_books: list, is_own: bool) -> str:
         if is_own
         else ""
     )
-    drop_attrs = (
-        'ondrop="onFavDrop(event)" ondragover="onFavDragOver(event)"' if is_own else ""
-    )
+    drop_attrs = 'ondrop="onFavDrop(event)" ondragover="onFavDragOver(event)"' if is_own else ""
     h_out = '<div class="bt-fav-grid" id="favGrid">'
     for idx in range(4):
         if idx < len(favs):
             b = favs[idx]
             cc = cat_color(b.category)
             if b.cover_url:
-                cover = (
-                    '<img src="%s" alt="%s" class="bt-cover-img" loading="lazy">'
-                    % (_esc(b.cover_url), _esc(b.title))
+                cover = '<img src="%s" alt="%s" class="bt-cover-img" loading="lazy">' % (
+                    _esc(b.cover_url),
+                    _esc(b.title),
                 )
             else:
                 cover = (
@@ -385,9 +383,7 @@ def _render_badges_grid(badges: list) -> str:
 
 def _render_diary_entries(entries: list) -> str:
     if not entries:
-        return (
-            '<div class="text-center text-muted small py-3">No diary entries yet.</div>'
-        )
+        return '<div class="text-center text-muted small py-3">No diary entries yet.</div>'
     _esc = html.escape
     h_out = ""
     for e in entries:
@@ -429,17 +425,7 @@ def init_social_routes(
     _communities=None,
     _gamification=None,
 ):
-    global \
-        storage, \
-        lib, \
-        auth, \
-        social, \
-        review_mgr, \
-        recommender, \
-        notif_mgr, \
-        book_lists, \
-        communities, \
-        gamification
+    global storage, lib, auth, social, review_mgr, recommender, notif_mgr, book_lists, communities, gamification
     storage = _storage
     lib = _lib
     auth = _auth
@@ -494,9 +480,7 @@ def init_social_routes(
         ptype = data.get("type", "post")
         bids = data.get("book_ids", [])
         imgs = data.get("image_urls", [])
-        post = social.create_post(
-            uid, content, post_type=ptype, book_ids=bids, image_urls=imgs
-        )
+        post = social.create_post(uid, content, post_type=ptype, book_ids=bids, image_urls=imgs)
         rt = get_realtime()
         if rt:
             users = storage.load_users()
@@ -596,9 +580,7 @@ def init_social_routes(
         rt = get_realtime()
         if rt:
             rt.emit_like_update(post_id, uid, is_liked, lc)
-        return jsonify(
-            {"success": ok, "message": msg, "is_liked": is_liked, "likes_count": lc}
-        )
+        return jsonify({"success": ok, "message": msg, "is_liked": is_liked, "likes_count": lc})
 
     @app.route("/api/posts/<post_id>/vote", methods=["POST"])
     @login_required
@@ -606,9 +588,7 @@ def init_social_routes(
     @_rate_limit("60 per minute")
     def api_vote_post(post_id):
         data = request.get_json() or {}
-        ok, msg, ns = social.vote_post(
-            post_id, session["user_id"], data.get("vote", "up")
-        )
+        ok, msg, ns = social.vote_post(post_id, session["user_id"], data.get("vote", "up"))
         return jsonify(
             {
                 "success": ok,
@@ -665,8 +645,7 @@ def init_social_routes(
                             post["user_id"],
                             {
                                 "type": "comment",
-                                "message": "%s commented on your post"
-                                % (uu.name if uu else uid),
+                                "message": "%s commented on your post" % (uu.name if uu else uid),
                                 "post_id": post_id,
                             },
                         )
@@ -697,9 +676,7 @@ def init_social_routes(
         rt = get_realtime()
         if rt:
             rt.emit_follow_update(uid, user_id, not is_following)
-        return jsonify(
-            {"success": ok, "message": msg, "is_following": not is_following}
-        )
+        return jsonify({"success": ok, "message": msg, "is_following": not is_following})
 
     @app.route("/api/hashtags/trending")
     @login_required
@@ -745,9 +722,7 @@ def init_social_routes(
     def api_add_to_shelf(book_id):
         uid = session["user_id"]
         data = request.get_json() or {}
-        ok, msg = review_mgr.add_to_shelf(
-            uid, book_id, data.get("shelf", "want_to_read")
-        )
+        ok, msg = review_mgr.add_to_shelf(uid, book_id, data.get("shelf", "want_to_read"))
         return jsonify({"success": ok, "message": msg})
 
     @app.route("/api/bookshelves/status/<book_id>")
@@ -905,9 +880,7 @@ def init_social_routes(
                 users_page.append(ud)
             result["users"] = {"results": users_page, "total": total}
         if entity in ("all", "posts") and q:
-            posts_result, posts_total = social.search_posts(
-                q, uid, page=page, per_page=pp
-            )
+            posts_result, posts_total = social.search_posts(q, uid, page=page, per_page=pp)
             result["posts"] = {"results": posts_result, "total": posts_total}
         return jsonify(result)
 
@@ -940,9 +913,7 @@ def init_social_routes(
                 break
         if not parent:
             return jsonify({"success": False, "error": "Comment not found"})
-        ok, msg, comment = social.add_comment(
-            parent["post_id"], uid, content, parent_id=comment_id
-        )
+        ok, msg, comment = social.add_comment(parent["post_id"], uid, content, parent_id=comment_id)
         return jsonify({"success": ok, "message": msg, "comment": comment})
 
     @app.route("/api/reviews/<review_id>/comments", methods=["GET", "POST"])
@@ -968,9 +939,7 @@ def init_social_routes(
         uid = session["user_id"]
         page = max(1, int(request.args.get("page", 1)))
         sort_by = request.args.get("sort", "recent")
-        reviews, stats = review_mgr.get_book_reviews(
-            book_id, uid, page=page, sort_by=sort_by
-        )
+        reviews, stats = review_mgr.get_book_reviews(book_id, uid, page=page, sort_by=sort_by)
         return jsonify({"reviews": reviews, "stats": stats})
 
     @app.route("/api/books/<book_id>/reviews")
@@ -1710,7 +1679,9 @@ document.addEventListener("DOMContentLoaded", function(){
                     )
                 )
                 if not sh_section:
-                    sh_section = '<div class="text-center text-muted small py-3">No books yet.</div>'
+                    sh_section = (
+                        '<div class="text-center text-muted small py-3">No books yet.</div>'
+                    )
                 SH += (
                     '<div class="glass-card p-3 mb-3"><div class="section-title"><i class="bi bi-%s-fill" style="color:%s;"></i> %s (%d)</div>%s</div>'
                     % (icon, col, label, cnt, sh_section)
@@ -1733,9 +1704,7 @@ document.addEventListener("DOMContentLoaded", function(){
                 )
             )
             if not sh_section:
-                sh_section = (
-                    '<div class="text-center text-muted small py-3">Empty shelf.</div>'
-                )
+                sh_section = '<div class="text-center text-muted small py-3">Empty shelf.</div>'
             db = (
                 '<button class="btn btn-sm" style="background:none;border:none;color:var(--text-dim);font-size:.65rem;padding:0;" onclick="deleteShelf(\'%s\')" title="Delete shelf"><i class="bi bi-trash"></i></button>'
                 % h(name)
@@ -1837,9 +1806,11 @@ document.addEventListener("DOMContentLoaded", function(){
         PC = PCONTENT % (
             PA_escaped,
             h(pu.name),
-            '<span class="verified-badge"><i class="bi bi-check"></i></span>'
-            if pu.role in ("admin", "librarian")
-            else "",
+            (
+                '<span class="verified-badge"><i class="bi bi-check"></i></span>'
+                if pu.role in ("admin", "librarian")
+                else ""
+            ),
             h(user_id),
             h(pu.role.upper()),
             FB,
@@ -2164,9 +2135,7 @@ function addFavBook(bookId) {
                 list_id, data.get("book_id", ""), uid, data.get("note", "")
             )
         else:
-            ok, msg = book_lists.remove_book_from_list(
-                list_id, data.get("book_id", ""), uid
-            )
+            ok, msg = book_lists.remove_book_from_list(list_id, data.get("book_id", ""), uid)
         return jsonify({"success": ok, "message": msg})
 
     @app.route("/api/lists/<list_id>/follow", methods=["POST"])
