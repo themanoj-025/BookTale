@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}Reports &amp; Analytics — BookTale{% endblock %}
+{% block content %}
+<div class="animate-in">
+    <div class="glass-card p-0 mb-3" style="overflow:hidden;">
+        <div class="p-3" style="background:linear-gradient(135deg,#7c3aed,#4f46e5);color:white;">
+            <h4 class="fw-bold mb-0"><i class="bi bi-bar-chart-fill me-2"></i>Reports &amp; Analytics</h4>
+            <p class="mb-0" style="opacity:.8;font-size:.85rem;">Library performance metrics</p>
+        </div>
+    </div>
+
+    <section aria-labelledby="today-heading" class="report-section mb-3">
+        <h2 id="today-heading" class="section-title"><i class="bi bi-clock-fill text-primary"></i> Today &amp; This Month</h2>
+        <div class="stats-grid">
+            <div class="stat-card"><span class="stat-number">{{ s.month_txns }}</span><span class="stat-label">This Month</span></div>
+            <div class="stat-card"><span class="stat-number" style="color:var(--color-success);">{{ s.new_books_month }}</span><span class="stat-label">New Books</span></div>
+            <div class="stat-card"><span class="stat-number" style="color:var(--color-info);">{{ s.new_users_month }}</span><span class="stat-label">New Users</span></div>
+            <div class="stat-card"><span class="stat-number">{{ s.total_txns }}</span><span class="stat-label">All Transactions</span></div>
+        </div>
+    </section>
+
+    <section aria-labelledby="health-heading" class="report-section mb-3">
+        <h2 id="health-heading" class="section-title"><i class="bi bi-shield-check text-success"></i> Library Health</h2>
+        <div class="stats-grid">
+            <div class="stat-card"><span class="stat-number" style="color:var(--color-success);">{{ '%.1f'|format(s.avail_rate) }}%</span><span class="stat-label">Availability</span></div>
+            <div class="stat-card"><span class="stat-number">{{ s.total_copies }}</span><span class="stat-label">Total Copies</span></div>
+            <div class="stat-card"><span class="stat-number">{{ s.active_issues }}</span><span class="stat-label">Active Issues</span></div>
+            <div class="stat-card"><span class="stat-number" style="color:var(--color-info);">{{ s.unique_borrowers }}</span><span class="stat-label">Unique Borrowers</span></div>
+        </div>
+    </section>
+
+    <section aria-labelledby="overdue-heading" class="report-section mb-3">
+        <h2 id="overdue-heading" class="section-title"><i class="bi bi-exclamation-triangle-fill text-danger"></i> Overdue &amp; Fines</h2>
+        <div class="stats-grid">
+            <div class="stat-card"><span class="stat-number" style="color:var(--color-danger);">{{ s.blocked_users }}</span><span class="stat-label">Blocked Users</span></div>
+            <div class="stat-card"><span class="stat-number" style="color:var(--color-warning);">&#8377;{{ '%.0f'|format(s.pending_fines) }}</span><span class="stat-label">Pending Fines</span></div>
+            <div class="stat-card"><span class="stat-number">&#8377;{{ '%.0f'|format(s.total_fines) }}</span><span class="stat-label">Total Fines</span></div>
+            <div class="stat-card"><span class="stat-number" style="color:var(--color-success);">&#8377;{{ '%.0f'|format(s.paid_fines) }}</span><span class="stat-label">Paid Fines</span></div>
+        </div>
+    </section>
+
+    <div class="glass-card p-3 mb-3 animate-d1">
+        <div class="section-title"><i class="bi bi-bar-chart-fill"></i> Monthly Trends</div>
+        <div class="chart-container" style="height:220px;">
+            <canvas id="report-monthly-chart" aria-label="Monthly trends chart"></canvas>
+        </div>
+    </div>
+
+    <div class="glass-card p-3 mb-3 animate-d2">
+        <div class="section-title"><i class="bi bi-pie-chart-fill"></i> Category Distribution</div>
+        <div class="chart-container" style="height:220px;">
+            <canvas id="category-chart" aria-label="Category distribution chart"></canvas>
+        </div>
+    </div>
+
+    <div class="d-flex gap-2 export-actions">
+        <button class="btn btn-primary btn-sm" onclick="window.print()"><i class="bi bi-printer"></i> Print</button>
+        <button class="btn btn-outline btn-sm"><i class="bi bi-download"></i> Export CSV</button>
+    </div>
+</div>
+{% endblock %}

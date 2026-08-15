@@ -1,0 +1,93 @@
+<!DOCTYPE html><html lang="en" data-theme="light">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="description" content="Explore all BookTale features — library management, analytics, social feed, profiles, and gamification.">
+<title>{{ title }} &mdash; LibraryMS + BookSocial</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--primary:#4f46e5;--primary-dark:#4338ca;--primary-light:#eef2ff;--primary-glow:rgba(79,70,229,.25);--bg:#f8fafc;--bg-card:rgba(255,255,255,.85);--text:#0f172a;--text-muted:#64748b;--text-dim:#94a3b8;--border:rgba(226,232,240,.8);--success:#10b981;--warning:#f59e0b;--danger:#ef4444;--info:#3b82f6;--glass-bg:rgba(255,255,255,.7);--glass-border:rgba(255,255,255,.3);--glass-shadow:0 8px 32px rgba(0,0,0,.06);--radius:16px;--radius-sm:10px;--font:'Inter','Segoe UI',system-ui,-apple-system,sans-serif;--ease:cubic-bezier(.4,0,.2,1);--ease-spring:cubic-bezier(.34,1.56,.64,1)}
+[data-theme="dark"]{--bg:#0b1121;--bg-card:rgba(30,41,59,.85);--text:#f1f5f9;--text-muted:#94a3b8;--text-dim:#64748b;--border:rgba(51,65,85,.6);--glass-bg:rgba(30,41,59,.6);--glass-border:rgba(51,65,85,.3);--primary-light:#1e1b4b}
+html{scroll-behavior:smooth}*{transition:background-color .3s,color .3s,border-color .3s,box-shadow .3s,transform .3s,opacity .3s}
+body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:100vh;opacity:0;animation:bodyIn .4s forwards}
+::selection{background:var(--primary);color:white}
+@keyframes bodyIn{to{opacity:1}}@keyframes fadeInUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.page-wrapper{animation:pageEnter .5s ease both}
+@keyframes pageEnter{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.glass-card{background:var(--glass-bg);backdrop-filter:blur(16px);border:1px solid var(--glass-border);border-radius:var(--radius);box-shadow:var(--glass-shadow);transition:all .35s var(--ease)}
+.glass-card:hover{box-shadow:var(--glass-shadow),0 0 0 1px var(--primary-glow),0 12px 40px rgba(79,70,229,.08);transform:translateY(-3px)}
+.section-title{font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--text-muted);margin-bottom:.8rem;display:flex;align-items:center;gap:.4rem}
+.btn{border-radius:var(--radius-sm);font-weight:600;padding:.5rem 1.2rem;transition:all .25s var(--ease);border:none;position:relative;overflow:hidden}
+.btn-primary{background:linear-gradient(135deg,#4f46e5,#7c3aed);color:white}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 25px rgba(79,70,229,.4);color:white}
+.btn-outline{background:transparent;border:2px solid var(--border);color:var(--text)}
+.btn-outline:hover{border-color:var(--primary);color:var(--primary);background:var(--primary-light)}
+.btn-lg{padding:.7rem 1.8rem;font-size:1rem}
+.badge{border-radius:50px;font-weight:500;font-size:.75rem}
+</style>
+<script>
+function toggleTheme(){const h=document.documentElement,n=h.getAttribute('data-theme')==='dark'?'light':'dark';h.setAttribute('data-theme',n);localStorage.setItem('theme',n)}
+document.addEventListener('DOMContentLoaded',()=>{const s=localStorage.getItem('theme');if(s)document.documentElement.setAttribute('data-theme',s)})
+</script>
+</head>
+<body>
+<div class="page-wrapper">
+<div class="container py-4">
+  <div class="text-center mb-5">
+    <span class="badge" style="background:var(--primary)15;color:var(--primary);font-size:.8rem;padding:.4rem 1.2rem;border-radius:50px;">All Features</span>
+    <h1 class="fw-bold mt-3" style="font-size:2.8rem;">Everything in <span style="background:linear-gradient(135deg,#4f46e5,#a855f7);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">One Platform</span></h1>
+    <p class="text-muted" style="max-width:600px;margin:0 auto;">{{ books_count }} books, {{ users_count }} users, and a complete social reading community</p>
+  </div>
+
+  <section class="glass-card p-4 mb-4" aria-labelledby="lib-mgmt-title">
+    <h2 id="lib-mgmt-title" class="section-title"><i class="bi bi-building text-primary"></i> Library Management System</h2>
+    <div class="row g-3 mt-2">
+      <div class="col-md-6"><div class="d-flex gap-3"><div style="width:44px;height:44px;border-radius:10px;background:#4f46e515;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="bi bi-book-fill" style="color:#4f46e5;"></i></div><div><h6 class="fw-bold mb-1">Book Inventory</h6><p class="small text-muted mb-0">Full CRUD for books with title, author, ISBN, category, copies tracking. Search, filter, and export to CSV.</p></div></div></div>
+      <div class="col-md-6"><div class="d-flex gap-3"><div style="width:44px;height:44px;border-radius:10px;background:#05966915;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="bi bi-arrow-left-right" style="color:#059669;"></i></div><div><h6 class="fw-bold mb-1">Issue & Return</h6><p class="small text-muted mb-0">Track book checkouts and returns with due dates, fine calculation (Rs. {{ fine_per_day }}/day), and reservation queue.</p></div></div></div>
+      <div class="col-md-6"><div class="d-flex gap-3"><div style="width:44px;height:44px;border-radius:10px;background:#d9770615;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="bi bi-currency-rupee" style="color:#d97706;"></i></div><div><h6 class="fw-bold mb-1">Fine Management</h6><p class="small text-muted mb-0">Automatic fine calculation, overdue tracking, payment recording, and membership status management.</p></div></div></div>
+      <div class="col-md-6"><div class="d-flex gap-3"><div style="width:44px;height:44px;border-radius:10px;background:#8b5cf615;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="bi bi-people-fill" style="color:#8b5cf6;"></i></div><div><h6 class="fw-bold mb-1">User Management</h6><p class="small text-muted mb-0">Register users with roles (admin/librarian/user), manage membership, view borrowing history and stats.</p></div></div></div>
+    </div>
+  </section>
+
+  <div class="glass-card p-4 mb-4">
+    <div class="section-title"><i class="bi bi-graph-up-arrow text-success"></i> Analytics & Reports</div>
+    <div class="row g-3 mt-2">
+      <div class="col-md-4"><div class="d-flex gap-3"><div style="width:44px;height:44px;border-radius:10px;background:#10b98115;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="bi bi-bar-chart-fill" style="color:#10b981;"></i></div><div><h6 class="fw-bold mb-1">Dashboard</h6><p class="small text-muted mb-0">Live stats with Chart.js — monthly trends, weekly activity, category breakdown. Animated count-ups.</p></div></div></div>
+      <div class="col-md-4"><div class="d-flex gap-3"><div style="width:44px;height:44px;border-radius:10px;background:#3b82f615;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="bi bi-stars" style="color:#3b82f6;"></i></div><div><h6 class="fw-bold mb-1">Recommendations</h6><p class="small text-muted mb-0">AI-powered personalized, trending, similar, and co-borrowed book recommendations with Goodreads integration.</p></div></div></div>
+      <div class="col-md-4"><div class="d-flex gap-3"><div style="width:44px;height:44px;border-radius:10px;background:#ef444415;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="bi bi-exclamation-triangle-fill" style="color:#ef4444;"></i></div><div><h6 class="fw-bold mb-1">Overdue Alerts</h6><p class="small text-muted mb-0">Automatic overdue detection with email reminders. Badge notifications for blocked and expiring memberships.</p></div></div></div>
+    </div>
+  </div>
+
+  <div class="glass-card p-4 mb-4">
+    <div class="section-title"><i class="bi bi-rss-fill" style="color:#a855f7;"></i> BookSocial Platform</div>
+    <div class="row g-3 mt-2">
+      <div class="col-md-6"><div class="d-flex gap-3"><div style="width:44px;height:44px;border-radius:10px;background:#a855f715;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="bi bi-rss-fill" style="color:#a855f7;"></i></div><div><h6 class="fw-bold mb-1">Social Feed</h6><p class="small text-muted mb-0">Real-time feed with following/trending/discover tabs. Posts support book tagging, image uploads, hashtags, and Reddit-style voting.</p></div></div></div>
+      <div class="col-md-6"><div class="d-flex gap-3"><div style="width:44px;height:44px;border-radius:10px;background:#ec489915;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="bi bi-chat-dots-fill" style="color:#ec4899;"></i></div><div><h6 class="fw-bold mb-1">Comments & Real-time</h6><p class="small text-muted mb-0">Threaded comments with Socket.IO real-time updates. Typing indicators and read receipts included.</p></div></div></div>
+      <div class="col-md-6"><div class="d-flex gap-3"><div style="width:44px;height:44px;border-radius:10px;background:#0ea5e915;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="bi bi-person-fill" style="color:#0ea5e9;"></i></div><div><h6 class="fw-bold mb-1">Profiles & Bookshelves</h6><p class="small text-muted mb-0">Rich profiles with reading stats, custom bookshelves (Want to Read/Reading/Read), follow system, and avatar upload.</p></div></div></div>
+      <div class="col-md-6"><div class="d-flex gap-3"><div style="width:44px;height:44px;border-radius:10px;background:#f59e0b15;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="bi bi-trophy-fill" style="color:#f59e0b;"></i></div><div><h6 class="fw-bold mb-1">Gamification</h6><p class="small text-muted mb-0">Achievements, badges, leaderboard, and XP points for posts, reviews, likes, and community participation.</p></div></div></div>
+    </div>
+  </div>
+
+  <div class="glass-card p-4 mb-4">
+    <div class="section-title"><i class="bi bi-gear-fill text-secondary"></i> Technical Details</div>
+    <div class="row g-3 mt-2">
+      <div class="col-6 col-md-3"><div class="text-center p-3" style="background:var(--primary-light);border-radius:10px;"><div class="fw-bold" style="font-size:1.3rem;">{{ books_count }}</div><small class="text-muted">Books</small></div></div>
+      <div class="col-6 col-md-3"><div class="text-center p-3" style="background:var(--primary-light);border-radius:10px;"><div class="fw-bold" style="font-size:1.3rem;">{{ users_count }}</div><small class="text-muted">Users</small></div></div>
+      <div class="col-6 col-md-3"><div class="text-center p-3" style="background:var(--primary-light);border-radius:10px;"><div class="fw-bold" style="font-size:1.3rem;">{{ categories_count }}</div><small class="text-muted">Categories</small></div></div>
+      <div class="col-6 col-md-3"><div class="text-center p-3" style="background:var(--primary-light);border-radius:10px;"><div class="fw-bold" style="font-size:1.3rem;">{{ posts_count }}</div><small class="text-muted">Social Posts</small></div></div>
+    </div>
+    <div class="mt-4" style="font-size:.8rem;color:var(--text-muted);">
+      <strong>Tech Stack:</strong> Python 3 &bull; Flask &bull; Socket.IO (WebSockets) &bull; Chart.js &bull; Bootstrap 5 &bull; Google Fonts (Inter) &bull; SQLite/PostgreSQL
+      <br><strong>Features:</strong> Real-time updates &bull; Dark/Light theme &bull; Ctrl+K search &bull; AI recommendations &bull; CSV export &bull; Print support &bull; Responsive design
+      <br><strong>Social:</strong> Book tagging &bull; Image uploads &bull; Custom shelves &bull; Follow system &bull; Achievements &bull; Leaderboard &bull; Typing indicators &bull; Read receipts
+    </div>
+  </div>
+
+  <div class="text-center mb-4">
+    <a href="/login" class="btn btn-primary btn-lg"><i class="bi bi-rocket-takeoff-fill me-2"></i>Get Started</a>
+    <a href="/" class="btn btn-outline btn-lg ms-2"><i class="bi bi-arrow-left me-2"></i>Back to Home</a>
+  </div>
+</div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body></html>

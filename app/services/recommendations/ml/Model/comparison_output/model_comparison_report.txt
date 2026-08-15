@@ -1,0 +1,139 @@
+======================================================================
+  📚 BOOK RECOMMENDATION SYSTEM — MODEL COMPARISON REPORT
+======================================================================
+
+  Dataset: 11,123 books
+  Features: 11 numerical
+  Date: 2026-06-03 23:21
+
+----------------------------------------------------------------------
+  ALGORITHM PERFORMANCE SUMMARY
+----------------------------------------------------------------------
+
+  📊 t-SNE+K-Means:
+     Calinski-Harabasz              = 9715.4297
+     Clusters                       = 7.0000
+     Coverage                       = 0.0140
+     Davies-Bouldin                 = 0.8164
+     Diversity                      = 0.1000
+     Noise %                        = 0.0000
+     Noise Points                   = 0.0000
+     Silhouette Score               = 0.3649
+     Time                           = 37.303s
+
+  📊 DBSCAN:
+     Calinski-Harabasz              = 431.1046
+     Clusters                       = 5.0000
+     Coverage                       = 0.0110
+     Davies-Bouldin                 = 2.0692
+     Diversity                      = 0.1910
+     Noise %                        = 7.0395
+     Noise Points                   = 783.0000
+     Silhouette Score               = 0.2716
+     Time                           = 4.773s
+
+  📊 SVD:
+     Calinski-Harabasz              = 2352.9948
+     Clusters                       = 7.0000
+     Coverage                       = 0.9865
+     Davies-Bouldin                 = 1.0718
+     Diversity                      = 0.1010
+     Explained Variance             = 0.9095
+     Noise %                        = 0.0000
+     Noise Points                   = 0.0000
+     SVD Components                 = 20.0000
+     Silhouette Score               = 0.2222
+     Time                           = 5.350s
+
+  📊 PCA+K-Means:
+     Calinski-Harabasz              = 2245.7570
+     Clusters                       = 7.0000
+     Coverage                       = 0.0209
+     Davies-Bouldin                 = 1.0984
+     Diversity                      = 0.1000
+     Noise %                        = 0.0000
+     Noise Points                   = 0.0000
+     PCA Components                 = 50.0000
+     Silhouette Score               = 0.2128
+     Variance Retained              = 0.9287
+     Time                           = 4.510s
+
+  📊 K-Means:
+     Calinski-Harabasz              = 1927.3721
+     Clusters                       = 3.0000
+     Coverage                       = 0.0099
+     Davies-Bouldin                 = 1.5650
+     Diversity                      = 0.1000
+     Elbow K                        = 3.0000
+     Noise %                        = 0.0000
+     Noise Points                   = 0.0000
+     Silhouette Score               = 0.1907
+     Time                           = 22.268s
+
+  📊 Hybrid:
+     Calinski-Harabasz              = 1920.0341
+     Clusters                       = 7.0000
+     Coverage                       = 0.9399
+     Davies-Bouldin                 = 1.1982
+     Diversity                      = 0.1215
+     Noise %                        = 0.0000
+     Noise Points                   = 0.0000
+     Silhouette Score               = 0.1857
+     Time                           = 15.803s
+
+  📊 Agglomerative:
+     Calinski-Harabasz              = 1319.8386
+     Clusters                       = 7.0000
+     Coverage                       = 0.0181
+     Davies-Bouldin                 = 1.7857
+     Diversity                      = 0.1000
+     Noise %                        = 0.0000
+     Noise Points                   = 0.0000
+     Silhouette Score               = 0.1089
+     Time                           = 3.366s
+
+  📊 Content-Based:
+     Calinski-Harabasz              = -1.0000
+     Clusters                       = 7.0000
+     Coverage                       = 1.0000
+     Davies-Bouldin                 = -1.0000
+     Diversity                      = 0.0135
+     Noise %                        = 0.0000
+     Noise Points                   = 0.0000
+     Silhouette Score               = -1.0000
+     Time                           = 4.222s
+
+  📊 KNN:
+     Coverage                       = 1.0000
+     Diversity                      = 0.8857
+     Time                           = 5.467s
+
+  📊 XGBoost:
+     MAE                            = 0.0039
+     RMSE                           = 0.0198
+     R²                             = 0.9969
+     Top Feature Importance         = 0.2442
+     Time                           = 1.586s
+
+  📊 Neural Net:
+     MAE                            = 0.0150
+     RMSE                           = 0.0219
+     R²                             = 0.9962
+     Time                           = 10.416s
+
+----------------------------------------------------------------------
+  🏆 TOP RECOMMENDATIONS
+----------------------------------------------------------------------
+
+  Best Overall: t-SNE+K-Means
+  Silhouette Score: 0.3649
+
+  Best 'Silhouette Score': t-SNE+K-Means (0.3649)
+  Best 'Coverage': Content-Based (1.0000)
+  Best 'Diversity': KNN (0.8857)
+  Best 'RMSE': Neural Net (0.0219)
+  Best 'R²': XGBoost (0.9969)
+
+======================================================================
+  Generated by LibraryMS — Recommendation Model Comparison
+======================================================================

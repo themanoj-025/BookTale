@@ -1,0 +1,118 @@
+# ── Docker Compose for BookTale ──────────────────────────────────────────────
+# Full development stack: app + PostgreSQL + Redis + worker
+#
+# Usage:
+#   docker compose up -d          # start all services
+#   docker compose logs -f app    # follow app logs
+#   docker compose down -v        # stop and remove volumes
+
+services:
+  # ── PostgreSQL database ────────────────────────────────────────────────
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: booktale
+      POSTGRES_PASSWORD: booktale
+      POSTGRES_DB: booktale
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U booktale -d booktale"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  # ── Redis (caching + Socket.IO pub/sub + rate limiting backend) ────────
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  # ── Application (Flask + Gunicorn) ─────────────────────────────────────
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    environment:
+      DATABASE_URL: "postgresql+psycopg2://booktale:booktale@db:5432/booktale"
+      SECRET_KEY: "${SECRET_KEY:-change-me-in-production}"
+      FLASK_DEBUG: "False"
+      ENABLE_CSRF: "1"
+      REDIS_URL: "redis://redis:6379/0"
+      STORAGE_BACKEND: db
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - appdata:/app/data
+      - applogs:/app/logs
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:5000/healthz')"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+
+  # ── Background worker (RQ: overdue emails, cover fetch, token purge) ──
+  # Runs python worker.py: an RQ worker consuming the "booktale" queue PLUS
+  # a cron scheduler thread (overdue emails daily, token purge hourly).
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: ["python", "worker.py"]
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: "postgresql+psycopg2://booktale:booktale@db:5432/booktale"
+      REDIS_URL: "redis://redis:6379/0"
+      STORAGE_BACKEND: db
+      RQ_QUEUE: "${RQ_QUEUE:-booktale}"
+      CRON_OVERDUE_EMAILS: "${CRON_OVERDUE_EMAILS:-0 9 * * *}"
+      CRON_TOKEN_PURGE: "${CRON_TOKEN_PURGE:-30 * * * *}"
+      SMTP_HOST: "${SMTP_HOST:-}"
+      SMTP_PORT: "${SMTP_PORT:-587}"
+      SMTP_USER: "${SMTP_USER:-}"
+      SMTP_PASSWORD: "${SMTP_PASSWORD:-}"
+      SMTP_FROM: "${SMTP_FROM:-noreply@libraryms.com}"
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - appdata:/app/data
+      - applogs:/app/logs
+
+  # ── Nginx reverse proxy (optional, for TLS termination) ────────────────
+  nginx:
+    image: nginx:alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    volumes:
+      - ./docker/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - app
+
+volumes:
+  pgdata:
+  redisdata:
+  appdata:
+  applogs:

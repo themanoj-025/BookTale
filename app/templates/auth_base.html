@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="theme-color" content="#7c6af7">
+<title>{{ title }} — BookTale</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--primary:#4f46e5;--primary-dark:#4338ca;--primary-light:#eef2ff;--primary-glow:rgba(79,70,229,.25);--bg:#f8fafc;--bg-card:#fff;--text:#0f172a;--text-muted:#536471;--text-dim:#94a3b8;--border:#eff3f4;--success:#10b981;--warning:#f59e0b;--danger:#ef4444;--info:#3b82f6;--radius:16px;--radius-sm:10px;--radius-lg:24px;--radius-xl:32px;--font:'Poppins','Inter','Segoe UI',system-ui,-apple-system,sans-serif;--ease:cubic-bezier(.4,0,.2,1);--ease-out:cubic-bezier(0,.55,.45,1);--ease-spring:cubic-bezier(.34,1.56,.64,1)}
+[data-theme="dark"]{--bg:#000;--bg-card:#16181c;--text:#e7e9ea;--text-muted:#71767b;--text-dim:#536471;--border:#2f3336;--primary-light:#1d1f23}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;height:100%}
+body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:100vh;height:100%;overflow-x:hidden}
+/* ── Split Screen Layout ── */
+.auth-split{display:flex;min-height:100vh;height:100%}
+/* ── Left Panel: Book-Cover Collage Background ── */
+.auth-left{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;overflow:hidden;background:#0f0f1a}
+.auth-left::before{content:'';position:absolute;inset:0;background:
+  radial-gradient(ellipse at 20% 80%, rgba(79,70,229,.4) 0%, transparent 50%),
+  radial-gradient(ellipse at 80% 20%, rgba(168,85,247,.3) 0%, transparent 50%),
+  radial-gradient(ellipse at 50% 50%, rgba(0,0,0,.5) 0%, transparent 70%);
+  z-index:1}
+.auth-left .book-collage{position:absolute;inset:0;display:grid;grid-template-columns:repeat(4,1fr);grid-template-rows:repeat(4,1fr);gap:8px;padding:16px;opacity:.3;z-index:0}
+.auth-left .book-collage .collage-book{background:linear-gradient(135deg,var(--c1,#4f46e5),var(--c2,#7c3aed));border-radius:4px;aspect-ratio:2/3;width:100%;display:flex;align-items:center;justify-content:center;font-size:1.2rem;color:rgba(255,255,255,.3);transform:rotate(var(--r,0deg));transition:transform .5s var(--ease)}
+.auth-left .book-collage .collage-book:nth-child(1){--c1:#4f46e5;--c2:#7c3aed;--r:-3deg}
+.auth-left .book-collage .collage-book:nth-child(2){--c1:#059669;--c2:#10b981;--r:2deg}
+.auth-left .book-collage .collage-book:nth-child(3){--c1:#d97706;--c2:#f59e0b;--r:-1deg}
+.auth-left .book-collage .collage-book:nth-child(4){--c1:#dc2626;--c2:#ef4444;--r:4deg}
+.auth-left .book-collage .collage-book:nth-child(5){--c1:#0891b2;--c2:#06b6d4;--r:-2deg}
+.auth-left .book-collage .collage-book:nth-child(6){--c1:#7c3aed;--c2:#a855f7;--r:3deg}
+.auth-left .book-collage .collage-book:nth-child(7){--c1:#db2777;--c2:#ec4899;--r:-4deg}
+.auth-left .book-collage .collage-book:nth-child(8){--c1:#ca8a04;--c2:#eab308;--r:1deg}
+.auth-left .book-collage .collage-book:nth-child(9){--c1:#2563eb;--c2:#3b82f6;--r:-2deg}
+.auth-left .book-collage .collage-book:nth-child(10){--c1:#16a34a;--c2:#22c55e;--r:3deg}
+.auth-left .book-collage .collage-book:nth-child(11){--c1:#9333ea;--c2:#a855f7;--r:-1deg}
+.auth-left .book-collage .collage-book:nth-child(12){--c1:#ea580c;--c2:#f97316;--r:2deg}
+.auth-left .book-collage .collage-book:nth-child(13){--c1:#64748b;--c2:#94a3b8;--r:-3deg}
+.auth-left .book-collage .collage-book:nth-child(14){--c1:#0d9488;--c2:#14b8a6;--r:1deg}
+.auth-left .book-collage .collage-book:nth-child(15){--c1:#e11d48;--c2:#f43f5e;--r:-2deg}
+.auth-left .book-collage .collage-book:nth-child(16){--c1:#6366f1;--c2:#818cf8;--r:4deg}
+/* Overlay for readability */
+.auth-left .overlay{position:absolute;inset:0;background:linear-gradient(180deg,rgba(15,15,26,.7) 0%,rgba(15,15,26,.4) 50%,rgba(15,15,26,.8) 100%);z-index:2}
+.auth-left .hero-content{position:relative;z-index:3;text-align:center;padding:2rem}
+.auth-left .hero-content .logo-icon{font-size:4rem;margin-bottom:1rem;filter:drop-shadow(0 8px 32px rgba(0,0,0,.3))}
+.auth-left .hero-content h1{color:white;font-size:2.2rem;font-weight:800;line-height:1.3;margin-bottom:.75rem}
+.auth-left .hero-content p{color:rgba(255,255,255,.7);max-width:400px;font-size:.95rem;line-height:1.6;margin-bottom:2rem}
+.auth-left .hero-content .stats{display:flex;gap:2rem;justify-content:center}
+.auth-left .hero-content .stats .stat{text-align:center}
+.auth-left .hero-content .stats .stat .num{font-size:1.8rem;font-weight:800;color:white}
+.auth-left .hero-content .stats .stat .label{font-size:.75rem;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.5px}
+.auth-left .testimonial{position:relative;z-index:3;background:rgba(255,255,255,.08);backdrop-filter:blur(12px);border-radius:12px;padding:1rem 1.5rem;margin-top:1.5rem;max-width:360px;border:1px solid rgba(255,255,255,.1)}
+.auth-left .testimonial p{font-size:.8rem;color:rgba(255,255,255,.85);margin:0;text-align:left;font-style:italic}
+.auth-left .testimonial .author{font-size:.7rem;color:rgba(255,255,255,.4);margin-top:.3rem}
+/* ── Right Panel: Form Card ── */
+.auth-right{flex:1;display:flex;align-items:center;justify-content:center;padding:2rem;background:var(--bg)}
+.auth-card{width:100%;max-width:420px;animation:fadeInUp .5s var(--ease) both}
+.auth-card .auth-logo{font-size:2rem;font-weight:800;color:var(--primary);margin-bottom:.25rem;text-align:center}
+.auth-card .auth-logo a{color:var(--primary);text-decoration:none}
+.auth-card h2{font-size:1.5rem;font-weight:800;text-align:center;margin-bottom:.25rem;color:var(--text)}
+.auth-card .auth-subtitle{text-align:center;color:var(--text-muted);font-size:.85rem;margin-bottom:1.5rem}
+.auth-card .auth-divider{display:flex;align-items:center;gap:1rem;margin:1.25rem 0;color:var(--text-dim);font-size:.8rem}
+.auth-card .auth-divider::before,.auth-card .auth-divider::after{content:'';flex:1;height:1px;background:var(--border)}
+.auth-card .auth-footer{text-align:center;margin-top:1.25rem;font-size:.85rem;color:var(--text-muted)}
+.auth-card .auth-footer a{color:var(--primary);text-decoration:none;font-weight:600}
+.auth-card .auth-footer a:hover{text-decoration:underline}
+/* ── Step Indicator ── */
+.step-indicator{display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:1.5rem}
+.step-indicator .step{display:flex;align-items:center;gap:6px;font-size:.75rem;color:var(--text-dim)}
+.step-indicator .step .step-num{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;border:2px solid var(--border);color:var(--text-dim);background:transparent;transition:all .3s}
+.step-indicator .step.active .step-num{background:var(--primary);border-color:var(--primary);color:white}
+.step-indicator .step.completed .step-num{background:var(--success);border-color:var(--success);color:white}
+.step-indicator .step.active{color:var(--text);font-weight:600}
+.step-indicator .step.completed{color:var(--success)}
+.step-indicator .step-line{width:24px;height:2px;background:var(--border);border-radius:1px;transition:all .3s}
+.step-indicator .step-line.completed{background:var(--success)}
+/* ── Password Strength Meter (4-step) ── */
+.password-strength-bar{display:flex;gap:4px;margin-top:.3rem;height:4px}
+.password-strength-bar .segment{flex:1;height:100%;border-radius:2px;background:var(--border);transition:all .3s}
+.password-strength-bar .segment.active.weak{background:var(--danger)}
+.password-strength-bar .segment.active.medium{background:var(--warning)}
+.password-strength-bar .segment.active.strong{background:var(--info)}
+.password-strength-bar .segment.active.very-strong{background:var(--success)}
+.password-strength-text{font-size:.7rem;color:var(--text-muted);margin-top:.15rem;min-height:1rem}
+/* ── Password Toggle ── */
+.password-wrapper{position:relative}
+.password-wrapper .form-control{padding-right:2.5rem}
+.password-toggle{position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text-muted);cursor:pointer;padding:6px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.1rem;transition:all .2s}
+.password-toggle:hover{color:var(--primary);background:var(--primary-light)}
+.password-toggle:focus-visible{outline:2px solid var(--primary);outline-offset:2px}
+/* ── Role Selector ── */
+.role-selector{display:flex;gap:8px;margin-bottom:1rem}
+.role-option{flex:1;padding:.6rem .8rem;border:2px solid var(--border);border-radius:10px;text-align:center;cursor:pointer;transition:all .2s;background:transparent;font-size:.85rem;font-weight:500;color:var(--text-muted)}
+.role-option:hover{border-color:var(--primary);color:var(--primary)}
+.role-option input{position:absolute;opacity:0;pointer-events:none}
+.role-option.selected{border-color:var(--primary);background:var(--primary-light);color:var(--primary);font-weight:600}
+.role-option .role-icon{font-size:1.3rem;display:block;margin-bottom:4px}
+.role-option .role-desc{font-size:.65rem;color:var(--text-dim);margin-top:2px}
+/* ── Form Elements ── */
+.form-label{font-weight:600;font-size:.8rem;color:var(--text-muted);margin-bottom:.3rem}
+.form-control,.form-select{background:var(--bg-card);color:var(--text);border:1px solid var(--border);border-radius:8px;padding:.65rem 1rem;font-size:.9rem;transition:all .2s;width:100%}
+.form-control:focus,.form-select:focus{border-color:var(--primary);outline:none;box-shadow:0 0 0 2px var(--primary-glow)}
+.form-control.is-invalid{border-color:var(--danger);box-shadow:0 0 0 2px rgba(239,68,68,.15)}
+.input-group-text{background:var(--bg-card);border:1px solid var(--border);border-right:none;border-radius:8px 0 0 8px;color:var(--text-dim)}
+.input-group .form-control{border-radius:0 8px 8px 0}
+.btn{border-radius:9999px;font-weight:700;padding:.6rem 1.4rem;transition:all .25s var(--ease);border:none;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px;font-size:.9rem;width:100%}
+.btn-primary{background:var(--primary);color:white}
+.btn-primary:hover{background:var(--primary-dark);transform:translateY(-1px);box-shadow:0 4px 16px var(--primary-glow)}
+.btn-outline{background:transparent;border:1.5px solid var(--border);color:var(--text)}
+.btn-outline:hover{border-color:var(--primary);color:var(--primary);background:var(--primary-light)}
+.btn-sm{padding:.35rem 1rem;font-size:.8rem;width:auto}
+@keyframes fadeInUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.animate-in{animation:fadeInUp .5s var(--ease) both}
+.animate-d1{animation:fadeInUp .5s var(--ease) .08s both}
+.text-muted{color:var(--text-muted)!important}
+.text-success{color:var(--success)!important}
+.text-danger{color:var(--danger)!important}
+.alert{padding:.75rem 1rem;border-radius:8px;font-size:.85rem;margin-bottom:1rem}
+.alert-danger{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);color:var(--danger)}
+.alert-success{background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.2);color:var(--success)}
+.alert-info{background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.2);color:var(--info)}
+.theme-toggle{position:fixed;top:1rem;right:1rem;z-index:999;width:40px;height:40px;border-radius:50%;background:var(--bg-card);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text);font-size:1.1rem;transition:all .3s;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.theme-toggle:hover{transform:rotate(25deg);box-shadow:0 4px 16px rgba(0,0,0,.1)}
+@media(max-width:768px){.auth-left{display:none}.auth-right{padding:1.5rem}.auth-card{max-width:100%}}
+@media(max-width:480px){.auth-right{padding:1rem}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:0.01ms!important;transition-duration:0.01ms!important}}
+</style>
+</head>
+<body>
+<button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle dark mode" type="button"><i class="bi bi-moon-stars-fill"></i></button>
+<div id="toastContainer" class="toast-container" style="position:fixed;top:1rem;right:1rem;z-index:9999;display:flex;flex-direction:column;gap:.5rem;" role="status" aria-live="polite"></div>
+
+<main role="main" {% if form_aria_label %}aria-label="{{ form_aria_label }}"{% endif %}>
+<div class="auth-split">
+  <div class="auth-left" aria-hidden="true">
+    <div class="book-collage">
+      <div class="collage-book"><i class="bi bi-book-fill"></i></div>
+      <div class="collage-book"><i class="bi bi-book-fill"></i></div>
+      <div class="collage-book"><i class="bi bi-book-fill"></i></div>
+      <div class="collage-book"><i class="bi bi-book-fill"></i></div>
+      <div class="collage-book"><i class="bi bi-book-fill"></i></div>
+      <div class="collage-book"><i class="bi bi-book-fill"></i></div>
+      <div class="collage-book"><i class="bi bi-book-fill"></i></div>
+      <div class="collage-book"><i class="bi bi-book-fill"></i></div>
+      <div class="collage-book"><i class="bi bi-book-fill"></i></div>
+      <div class="collage-book"><i class="bi bi-book-fill"></i></div>
+      <div class="collage-book"><i class="bi bi-book-fill"></i></div>
+      <div class="collage-book"><i class="bi bi-book-fill"></i></div>
+      <div class="collage-book"><i class="bi bi-book-fill"></i></div>
+      <div class="collage-book"><i class="bi bi-book-fill"></i></div>
+      <div class="collage-book"><i class="bi bi-book-fill"></i></div>
+      <div class="collage-book"><i class="bi bi-book-fill"></i></div>
+    </div>
+    <div class="overlay"></div>
+    <div class="hero-content">
+      <div class="logo-icon">📚</div>
+      <h1>Welcome to BookTale</h1>
+      <p>Discover, track, and share your reading journey. Join a community of book lovers and unlock insights about your reading habits.</p>
+      <div class="stats">
+        <div class="stat"><div class="num" id="heroBooksCount">—</div><div class="label">Books</div></div>
+        <div class="stat"><div class="num" id="heroUsersCount">—</div><div class="label">Readers</div></div>
+        <div class="stat"><div class="num" id="heroTxnsCount">—</div><div class="label">Transactions</div></div>
+      </div>
+      <div class="testimonial">
+        <p>"An incredible platform for managing my reading. The recommendations are spot-on!"</p>
+        <div class="author">— Alex, Avid Reader</div>
+      </div>
+    </div>
+  </div>
+  <div class="auth-right">
+    <div class="auth-card animate-in">
+      <div class="auth-logo"><a href="/login">📖 BookTale</a></div>
+      {% block auth_content %}{{ auth_content|safe }}{% endblock %}
+    </div>
+  </div>
+</div>
+</main>
+
+<script>
+function toggleTheme(){var h=document.documentElement,n=h.getAttribute('data-theme')==='dark'?'light':'dark';h.setAttribute('data-theme',n);localStorage.setItem('theme',n);var e=document.querySelector('.theme-toggle i');if(e)e.className=n==='dark'?'bi bi-sun-fill':'bi bi-moon-stars-fill'}
+document.addEventListener('DOMContentLoaded',function(){
+  var s=localStorage.getItem('theme');if(s){document.documentElement.setAttribute('data-theme',s);var e=document.querySelector('.theme-toggle i');if(e)e.className=s==='dark'?'bi bi-sun-fill':'bi bi-moon-stars-fill'}
+  fetch('/api/analytics/monthly').then(function(r){return r.json()}).then(function(d){
+    if(d.values&&d.values.length){var total=d.values.reduce(function(a,b){return a+b},0);var el=document.getElementById('heroTxnsCount');if(el)el.textContent=total}
+  }).catch(function(){});
+  // Password strength evaluator
+  document.querySelectorAll('input[type="password"]').forEach(function(input){
+    input.addEventListener('input',function(){updatePasswordStrength(this)});
+  });
+  // Password toggle buttons
+  document.querySelectorAll('.password-toggle').forEach(function(btn){
+    btn.addEventListener('click',function(){togglePasswordVisibility(this)});
+  });
+  // Role selector
+  document.querySelectorAll('.role-option').forEach(function(opt){
+    opt.addEventListener('click',function(){
+      document.querySelectorAll('.role-option').forEach(function(o){o.classList.remove('selected')});
+      this.classList.add('selected');
+      var radio=this.querySelector('input[type="radio"]');
+      if(radio) radio.checked=true;
+    });
+  });
+});
+function showToast(msg,type){var c=document.getElementById('toastContainer');var t=document.createElement('div');t.className='toast-msg';t.style.cssText='background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:.8rem 1.2rem;box-shadow:0 8px 32px rgba(0,0,0,.1);display:flex;align-items:center;gap:.6rem;font-size:.9rem;animation:fadeInUp .3s ease both;border-left:4px solid '+(type==='success'?'var(--success)':type==='error'?'var(--danger)':'var(--info)');t.innerHTML=(type==='success'?'<i class=\"bi bi-check-circle-fill text-success\"></i>':type==='error'?'<i class=\"bi bi-x-circle-fill text-danger\"></i>':'<i class=\"bi bi-info-circle-fill text-info\"></i>')+' '+msg;c.appendChild(t);setTimeout(function(){t.style.opacity='0';t.style.transition='opacity .3s';setTimeout(function(){t.remove()},350)},4000)}
+window.showToast=showToast;
+function togglePasswordVisibility(btn){var input=btn.parentElement.querySelector('input');if(!input)return;var isPassword=input.type==='password';input.type=isPassword?'text':'password';btn.setAttribute('aria-pressed',!isPassword);btn.innerHTML=isPassword?'<i class=\"bi bi-eye-slash-fill\"></i>':'<i class=\"bi bi-eye-fill\"></i>'}
+function updatePasswordStrength(input){var val=input.value;var segments=document.querySelectorAll('.password-strength-bar .segment');var text=document.querySelector('.password-strength-text');if(!segments.length)return;var score=0;if(val.length>=8)score++;if(val.length>=12)score++;if(/[A-Z]/.test(val)&&/[a-z]/.test(val))score++;if(/[0-9]/.test(val)&&/[^A-Za-z0-9]/.test(val))score++;var labels=['','Weak','Fair','Strong','Very Strong'];var classes=['','weak','medium','strong','very-strong'];segments.forEach(function(s,i){s.className='segment';if(i<score){s.classList.add('active');s.classList.add(classes[score])}});if(text)text.textContent=val?labels[score]:''}
+</script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

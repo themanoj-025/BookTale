@@ -1,0 +1,159 @@
+{% macro book_card(book, mode='grid', show_badge=True) %}
+  {% if mode == 'grid' %}
+  <article class="book-card" aria-label="Book: {{ book.title }} by {{ book.author }}">
+    <figure>
+      <a href="/books/{{ book.book_id }}">
+        <div style="width:100%;aspect-ratio:2/3;border-radius:8px;background:linear-gradient(135deg,var(--primary),var(--accent));display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:.9rem;">
+          {{ book.title[:2].upper() }}
+        </div>
+      </a>
+      {% if show_badge %}
+      <div class="availability-badge {{ 'available' if book.available_copies > 0 else 'unavailable' }}" aria-label="{{ 'Available' if book.available_copies > 0 else 'Checked out' }}">
+        {{ 'Available' if book.available_copies > 0 else 'Out' }}
+      </div>
+      {% endif %}
+    </figure>
+    <figcaption>
+      <h3 style="font-size:.8rem;font-weight:700;margin-top:.3rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
+        <a href="/books/{{ book.book_id }}" style="color:var(--text);text-decoration:none;">{{ book.title }}</a>
+      </h3>
+      <p style="font-size:.7rem;color:var(--text-muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ book.author }}</p>
+      <p style="font-size:.6rem;color:var(--text-dim);">{{ book.category }}</p>
+    </figcaption>
+  </article>
+  {% else %}
+  <article class="book-card-list" aria-label="Book: {{ book.title }} by {{ book.author }}">
+    <div style="display:flex;align-items:center;gap:1rem;padding:.5rem;border-bottom:1px solid var(--border);">
+      <div style="width:40px;height:60px;border-radius:6px;background:linear-gradient(135deg,var(--primary),var(--accent));display:flex;align-items:center;justify-content:center;flex-shrink:0;color:white;font-weight:700;font-size:.7rem;">{{ book.title[:2].upper() }}</div>
+      <div style="flex:1;min-width:0;">
+        <div style="font-weight:600;font-size:.85rem;"><a href="/books/{{ book.book_id }}" style="color:var(--text);text-decoration:none;">{{ book.title }}</a></div>
+        <div style="font-size:.75rem;color:var(--text-muted);">{{ book.author }} · {{ book.category }}</div>
+      </div>
+      {% if show_badge %}
+      <span class="badge {{ 'bg-success' if book.available_copies > 0 else 'bg-danger' }}" style="font-size:.65rem;">
+        {{ 'Available' if book.available_copies > 0 else 'Out' }}
+      </span>
+      {% endif %}
+    </div>
+  </article>
+  {% endif %}
+{% endmacro %}
+
+{% macro notification_item(n, icons, is_unread, time_ago) %}
+  {% set ntype = n.get('type', 'general') %}
+  {% set icon = icons.get(ntype, 'bell-fill') if icons else 'bell-fill' %}
+  <article class="notification-item{{ ' unread' if is_unread else '' }}" data-id="{{ n.notif_id }}">
+    <span class="notif-icon" aria-hidden="true"><i class="bi bi-{{ icon }}"></i></span>
+    <div class="notif-body">
+      <div class="notif-text">{{ n.message }}</div>
+      <time class="notif-time">{{ time_ago(n.created_at) if time_ago else n.created_at }}</time>
+    </div>
+    <button class="notif-mark-read" onclick="markNotifRead('{{ n.notif_id }}',this)" aria-label="Mark as read">
+      {% if is_unread %}<i class="bi bi-check"></i>{% else %}<i class="bi bi-check-all" style="opacity:.3;"></i>{% endif %}
+    </button>
+  </article>
+{% endmacro %}
+
+{% macro stat_card(label, value, sub=None, trend=None, color='default') %}
+  {% set color_map = {'default': 'var(--text)', 'success': 'var(--color-success)', 'warning': 'var(--color-warning)', 'danger': 'var(--color-danger)', 'info': 'var(--color-info)'} %}
+  {% set trend_icon = {'up': '↑', 'down': '↓', 'stable': '→'} %}
+  <div class="stat-card" role="group" aria-label="{{ label }}">
+    <span class="stat-number" style="color:{{ color_map.get(color, color_map['default']) }};font-variant-numeric:tabular-nums;">{{ value }}</span>
+    <span class="stat-label">{{ label }}</span>
+    {% if sub %}<span class="stat-sub">{{ sub }}</span>{% endif %}
+    {% if trend %}<span class="stat-sub trend-{{ trend }}">{{ trend_icon.get(trend, '') }} {{ trend }}</span>{% endif %}
+  </div>
+{% endmacro %}
+
+{% macro user_avatar(user, size='md', show_online=False) %}
+  {% set size_map = {'sm': 32, 'md': 44, 'lg': 80} %}
+  {% set px = size_map.get(size, 44) %}
+  {% set name = user.name if user else '?' %}
+  {% set parts = name.strip().split() %}
+  {% if parts|length >= 2 %}
+    {% set initials = (parts[0][0] + parts[-1][0]).upper() %}
+  {% elif parts %}
+    {% set initials = parts[0][:2].upper() %}
+  {% else %}
+    {% set initials = '?' %}
+  {% endif %}
+  {% set colors = ['#4f46e5','#059669','#d97706','#dc2626','#0891b2','#7c3aed','#db2777','#ca8a04'] %}
+  {% set c = colors[(name|string|length) % colors|length] %}
+  <div class="avatar" style="width:{{ px }}px;height:{{ px }}px;background:{{ c }}20;color:{{ c }};font-size:{{ px//2 }}px;font-weight:700;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;position:relative;" title="{{ name }}">
+    {{ initials }}
+    {% if show_online %}<span style="position:absolute;bottom:0;right:0;width:10px;height:10px;border-radius:50%;background:var(--color-success);border:2px solid var(--bg);"></span>{% endif %}
+  </div>
+{% endmacro %}
+
+{% macro empty_state(icon, heading, message, cta_text=None, cta_href=None) %}
+  <div class="empty-state" style="text-align:center;padding:3rem 1rem;">
+    <div class="empty-icon" style="font-size:3rem;margin-bottom:.5rem;color:var(--text-muted);">{{ icon }}</div>
+    <h5 style="font-weight:700;margin-bottom:.3rem;">{{ heading }}</h5>
+    <p style="color:var(--text-muted);font-size:.85rem;margin-bottom:.8rem;">{{ message }}</p>
+    {% if cta_text and cta_href %}
+    <a href="{{ cta_href }}" class="btn btn-primary btn-sm"><i class="bi bi-arrow-right"></i> {{ cta_text }}</a>
+    {% elif cta_text %}
+    <button class="btn btn-primary btn-sm" onclick="{{ cta_href }}"><i class="bi bi-arrow-right"></i> {{ cta_text }}</button>
+    {% endif %}
+  </div>
+{% endmacro %}
+
+{% macro loading_skeleton(type='book_card') %}
+  {% if type == 'book_card' %}
+  <div class="skeleton-card" role="status" aria-label="Loading..." style="padding:1rem;">
+    <div class="skeleton-shimmer" style="width:100%;aspect-ratio:2/3;border-radius:8px;margin-bottom:.5rem;"></div>
+    <div class="skeleton-shimmer" style="height:14px;width:80%;margin-bottom:.3rem;border-radius:4px;"></div>
+    <div class="skeleton-shimmer" style="height:12px;width:60%;border-radius:4px;"></div>
+  </div>
+  {% elif type == 'stat_card' %}
+  <div class="skeleton-card" role="status" aria-label="Loading..." style="padding:1rem;text-align:center;">
+    <div class="skeleton-shimmer" style="height:28px;width:40%;margin:0 auto .5rem;border-radius:4px;"></div>
+    <div class="skeleton-shimmer" style="height:12px;width:60%;margin:0 auto;border-radius:4px;"></div>
+  </div>
+  {% elif type == 'user_row' %}
+  <div class="skeleton-card" role="status" aria-label="Loading..." style="display:flex;align-items:center;gap:.8rem;padding:.5rem;">
+    <div class="skeleton-shimmer" style="width:40px;height:40px;border-radius:50%;flex-shrink:0;"></div>
+    <div style="flex:1;">
+      <div class="skeleton-shimmer" style="height:14px;width:60%;margin-bottom:.3rem;border-radius:4px;"></div>
+      <div class="skeleton-shimmer" style="height:10px;width:40%;border-radius:4px;"></div>
+    </div>
+  </div>
+  {% elif type == 'feed_post' %}
+  <div class="skeleton-card" role="status" aria-label="Loading..." style="padding:1rem;">
+    <div style="display:flex;align-items:center;gap:.8rem;margin-bottom:.8rem;">
+      <div class="skeleton-shimmer" style="width:40px;height:40px;border-radius:50%;flex-shrink:0;"></div>
+      <div style="flex:1;">
+        <div class="skeleton-shimmer" style="height:14px;width:50%;border-radius:4px;"></div>
+      </div>
+    </div>
+    <div class="skeleton-shimmer" style="height:12px;width:100%;margin-bottom:.3rem;border-radius:4px;"></div>
+    <div class="skeleton-shimmer" style="height:12px;width:90%;margin-bottom:.3rem;border-radius:4px;"></div>
+    <div class="skeleton-shimmer" style="height:12px;width:60%;border-radius:4px;"></div>
+  </div>
+  {% elif type == 'notification_item' %}
+  <div class="skeleton-card" role="status" aria-label="Loading..." style="display:flex;align-items:flex-start;gap:.8rem;padding:.8rem;">
+    <div class="skeleton-shimmer" style="width:36px;height:36px;border-radius:50%;flex-shrink:0;"></div>
+    <div style="flex:1;">
+      <div class="skeleton-shimmer" style="height:12px;width:80%;margin-bottom:.4rem;border-radius:4px;"></div>
+      <div class="skeleton-shimmer" style="height:10px;width:40%;border-radius:4px;"></div>
+    </div>
+  </div>
+  {% endif %}
+{% endmacro %}
+
+{% macro notification_item(notif) %}
+  {% set notif_icons = {'follow': 'person-plus-fill', 'like': 'heart-fill', 'comment': 'chat-dots-fill', 'repost': 'arrow-repeat', 'overdue': 'exclamation-triangle-fill', 'challenge': 'trophy-fill', 'system': 'gear-fill', 'general': 'bell-fill'} %}
+  {% set ntype = notif.get('type', 'general') %}
+  {% set icon = notif_icons.get(ntype, 'bell-fill') %}
+  {% set is_unread = notif.read is sameas false or notif.read == False %}
+  <article class="notification-item {{ 'unread' if is_unread else '' }}" aria-label="Notification: {{ notif.message }}">
+    <span class="notif-icon" aria-hidden="true"><i class="bi bi-{{ icon }}"></i></span>
+    <div class="notif-body">
+      <div class="notif-text">{{ notif.message }}</div>
+      <time class="notif-time">{{ notif.created_at[:10] if notif.created_at else '' }}</time>
+    </div>
+    <button class="notif-mark-read" onclick="markNotifRead('{{ notif.notif_id }}',this)" aria-label="Mark as read">
+      <i class="bi bi-{{ 'check' if is_unread else 'check-all' }}" style="{{ 'opacity:.3;' if not is_unread else '' }}"></i>
+    </button>
+  </article>
+{% endmacro %}

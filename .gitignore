@@ -1,0 +1,64 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+# ...but NOT static/dist: built assets + manifest are committed so a fresh
+# clone serves hashed URLs without running npm first.
+!app/static/dist/
+build/
+*.egg
+.eggs/
+
+# Virtual environment
+venv/
+env/
+.venv/
+ENV/
+
+# Environment & secrets (NEVER COMMIT)
+.env
+.env.*
+!.env.example
+
+# IDE
+.vscode/*
+!.vscode/settings.json
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
+logs/
+
+# Documentation
+/docs/
+
+# Project data (user-generated)
+data/
+backups/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Testing
+.coverage
+htmlcov/
+.pytest_cache/
+
+# Frontend build (node_modules never committed; static/dist IS committed so
+# a fresh clone runs without a build step — see the !app/static/dist/ negation above)
+node_modules/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Backup / temp
+*.bak.gemini/
+
+# Root-level AI tool config only — docs/agents/ copies are tracked.
+/.cursorrules
+
+CLAUDE.md

@@ -1,0 +1,13 @@
+{
+  "name": "booktale-frontend",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Frontend build pipeline for BookTale (esbuild: minify + content-hash cache busting)",
+  "scripts": {
+    "build": "node scripts/build_frontend.mjs",
+    "watch": "node scripts/build_frontend.mjs --watch"
+  },
+  "devDependencies": {
+    "esbuild": "^0.24.0"
+  }
+}

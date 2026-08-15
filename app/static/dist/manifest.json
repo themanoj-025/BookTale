@@ -1,0 +1,18 @@
+{
+  "js/ai-companion.js": "/static/dist/js/ai-companion-G2AGBBPG.min.js",
+  "js/analytics.js": "/static/dist/js/analytics-PRA7MADA.min.js",
+  "js/animations.js": "/static/dist/js/animations-MC6P4J6C.min.js",
+  "js/api.js": "/static/dist/js/api-U4ZE6CLP.min.js",
+  "js/charts.js": "/static/dist/js/charts-AX2HWD4X.min.js",
+  "js/drag-drop.js": "/static/dist/js/drag-drop-PUEP3XP4.min.js",
+  "js/feed.js": "/static/dist/js/feed-GRGKCH4R.min.js",
+  "js/notifications.js": "/static/dist/js/notifications-4R2L6CJS.min.js",
+  "js/recommendations.js": "/static/dist/js/recommendations-5ZR2D3ME.min.js",
+  "js/search.js": "/static/dist/js/search-TU3JNDYX.min.js",
+  "js/streak.js": "/static/dist/js/streak-JFTREDHM.min.js",
+  "js/theme.js": "/static/dist/js/theme-XIAXVVVE.min.js",
+  "js/toast.js": "/static/dist/js/toast-5QUL3RJH.min.js",
+  "js/utils.js": "/static/dist/js/utils-JB5OISGU.min.js",
+  "js/voice.js": "/static/dist/js/voice-5KUPDFOD.min.js",
+  "css/booktale.css": "/static/dist/booktale-UWVVTQ4Z.min.css"
+}

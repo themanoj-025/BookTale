@@ -1,0 +1,8 @@
+{% extends "error_base.html" %}
+{# Centralized error page (Phase 7): the error handlers in web_app.py pick
+   the icon/title/message per HTTP status; this template fills the blocks of
+   error_base.html. |safe is only applied to `icon`, a hardcoded emoji
+   constant from web_app._ERROR_PAGES — never user input. #}
+{% block error_icon %}{{ icon | safe }}{% endblock %}
+{% block error_title %}{{ error_title }}{% endblock %}
+{% block error_message %}{{ error_message }}{% endblock %}
