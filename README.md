@@ -1,5 +1,15 @@
 # 📚 Book-Tale
 
+<p align="center">
+  <img src="https://img.shields.io/badge/Python-3.10%2B-3776AB?logo=python&logoColor=white" alt="Python" />
+  <img src="https://img.shields.io/badge/Flask-000000?logo=flask" alt="Flask" />
+  <img src="https://img.shields.io/badge/SQLAlchemy-2.x-d71f00?logo=sqlalchemy&logoColor=white" alt="SQLAlchemy" />
+  <img src="https://img.shields.io/badge/tests-202%20passing-brightgreen" alt="Tests" />
+  <img src="https://img.shields.io/github/license/themanoj-025/BookTale" alt="License" />
+  <img src="https://img.shields.io/github/actions/workflow/status/themanoj-025/BookTale/ci.yml?label=CI" alt="CI" />
+</p>
+
+
 A full-featured library management system — catalog, lending, reservations, fines, reading challenges, a social feed, realtime notifications, and book recommendations — built with Flask + SQLAlchemy + a bundled esbuild frontend.
 
 > **Honesty first:** this README describes what the code actually does today, verified against a green test suite. Where something is planned but not built, it says so explicitly — see **What's real vs. aspirational** below.
@@ -294,3 +304,11 @@ MIT — see [LICENSE](LICENSE).
 ---
 
 *README accuracy is checked against the running code and test suite; if this document and the code ever disagree, the code wins and the README is wrong.*
+---
+
+## ⭐ Star History
+
+[![Last Commit](https://img.shields.io/github/last-commit/themanoj-025/BookTale?style=flat-square)](https://github.com/themanoj-025/BookTale)
+[![Contributors](https://img.shields.io/github/contributors/themanoj-025/BookTale?style=flat-square)](https://github.com/themanoj-025/BookTale/graphs/contributors)
+
+[![Star History Chart](https://api.star-history.com/svg?repos=themanoj-025/BookTale&type=Date)](https://star-history.com/#BookTale&Date)
