@@ -1,7 +1,7 @@
 # ── Multi-stage Dockerfile for BookTale ──────────────────────────────────────
 # Builder stage: install deps + build frontend assets
 # Runtime stage: slim image with only runtime deps
-# 
+#
 # Usage:
 #   docker build -t booktale .
 #   docker run -p 5000:5000 -e SECRET_KEY=... -e DATABASE_URL=... booktale

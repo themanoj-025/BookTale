@@ -154,9 +154,7 @@ print("== B. Library Core ==")
 # /books and /book detail are login_required — log back in first.
 client.post("/login", data={"user_id": "MEM-SMOKE1", "password": "secret123456"})
 
-lib.add_book(
-    "Dune", "Frank Herbert", "9780441172719", "Fiction", 2, fetch_cover_async=False
-)
+lib.add_book("Dune", "Frank Herbert", "9780441172719", "Fiction", 2, fetch_cover_async=False)
 lib.add_book(
     "Neuromancer",
     "William Gibson",
@@ -186,9 +184,7 @@ check(14, "Issue a book (available) -> success", ok, msg)
 # #15: drain the last copy (Neuromancer has 1 copy) with a fresh user, then a
 # second fresh user must be offered the reservation queue.
 neuromancer = [b for b in books.values() if b.title == "Neuromancer"][0].book_id
-lib.register_user(
-    "MEM-RESERVED", "Reserved", "rv@x.io", "", "user", "hash", actor="test"
-)
+lib.register_user("MEM-RESERVED", "Reserved", "rv@x.io", "", "user", "hash", actor="test")
 ok1, m1 = lib.issue_book("MEM-RESERVED", neuromancer, actor="Librarian")
 ok2, m2 = lib.issue_book("MEM-ADMINWANNABE", neuromancer, actor="Librarian")
 check(
@@ -207,14 +203,8 @@ lib.add_book(
     5,
     fetch_cover_async=False,
 )
-lib.add_book(
-    "Hyperion", "Dan Simmons", "9780553283686", "Science", 5, fetch_cover_async=False
-)
-others = [
-    b.book_id
-    for b in storage.load_books().values()
-    if b.book_id not in (bid, neuromancer)
-]
+lib.add_book("Hyperion", "Dan Simmons", "9780553283686", "Science", 5, fetch_cover_async=False)
+others = [b.book_id for b in storage.load_books().values() if b.book_id not in (bid, neuromancer)]
 for b in others:
     lib.issue_book("MEM-SMOKE1", b, actor="Librarian")
 # MEM-SMOKE1 now holds 3 books (Dune + both others) = MAX_BORROW_LIMIT.
@@ -235,9 +225,7 @@ admin_session()
 r = client.get("/admin/overdue")
 check(18, "Overdue list page renders", r.status_code == 200)
 
-ok, msg = lib.add_book(
-    "Temp Book", "T", "9780000000000", "Other", 1, fetch_cover_async=False
-)
+ok, msg = lib.add_book("Temp Book", "T", "9780000000000", "Other", 1, fetch_cover_async=False)
 tb = [b for b in storage.load_books().values() if b.title == "Temp Book"][0]
 ok2, _ = lib.delete_book(tb.book_id, actor="ADMIN001")
 check(
@@ -285,9 +273,7 @@ check(28, "Set reading challenge goal", ok)
 from app.services.reading.diary import DiaryManager
 
 diary = DiaryManager(storage)
-ok, msg, entry = diary.log_read(
-    "MEM-SMOKE1", bid, date_read="2026-07-01", star_rating=5
-)
+ok, msg, entry = diary.log_read("MEM-SMOKE1", bid, date_read="2026-07-01", star_rating=5)
 r = client.get("/reading-calendar")
 check(29, "Diary entry + calendar page", ok and r.status_code == 200)
 
@@ -358,13 +344,9 @@ check(
 )
 
 lib.add_book("Rare Book", "R", "9789999999999", "Other", 1, fetch_cover_async=False)
-rare_id = [b for b in storage.load_books().values() if b.title == "Rare Book"][
-    0
-].book_id
+rare_id = [b for b in storage.load_books().values() if b.title == "Rare Book"][0].book_id
 for i in range(20):
-    lib.register_user(
-        f"MEM-RACE{i}", f"Race{i}", f"r{i}@x.io", "", "user", "hash", actor="test"
-    )
+    lib.register_user(f"MEM-RACE{i}", f"Race{i}", f"r{i}@x.io", "", "user", "hash", actor="test")
 race_results = []
 lock = threading.Lock()
 

@@ -77,9 +77,7 @@ def _seed(users: int = 1, copies: int = 1, book_id: str = "BK-1"):
                     role="user",
                     password_hash="h",
                     membership_status="Active",
-                    membership_expiry=(
-                        datetime.now() + timedelta(days=365)
-                    ).isoformat(),
+                    membership_expiry=(datetime.now() + timedelta(days=365)).isoformat(),
                     books_issued=[],
                     unpaid_fine=0.0,
                 )

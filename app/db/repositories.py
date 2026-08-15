@@ -30,11 +30,7 @@ def _parse_dt(value: str | None) -> datetime | None:
         return None
     for fmt in (None, "%d %b %Y", "%Y-%m-%d"):
         try:
-            dt = (
-                datetime.fromisoformat(value)
-                if fmt is None
-                else datetime.strptime(value, fmt)
-            )
+            dt = datetime.fromisoformat(value) if fmt is None else datetime.strptime(value, fmt)
             # Normalize to naive so comparisons against datetime.now() (naive)
             # never raise TypeError on tz-aware legacy values.
             return dt.replace(tzinfo=None)
@@ -321,14 +317,10 @@ class FineRepository:
         self.db = db
 
     def collection(self) -> dict:
-        total = float(
-            self.db.scalar(select(func.coalesce(func.sum(Fine.fine), 0.0))) or 0
-        )
+        total = float(self.db.scalar(select(func.coalesce(func.sum(Fine.fine), 0.0))) or 0)
         collected = float(
             self.db.scalar(
-                select(func.coalesce(func.sum(Fine.fine), 0.0)).where(
-                    Fine.paid.is_(True)
-                )
+                select(func.coalesce(func.sum(Fine.fine), 0.0)).where(Fine.paid.is_(True))
             )
             or 0
         )
@@ -402,10 +394,7 @@ class AuditLogRepository:
         if action:
             stmt = stmt.where(AuditLog.action == action)
         stmt = stmt.order_by(AuditLog.created_at.desc(), AuditLog.id.desc())
-        return [
-            self._plain(r)
-            for r in self.db.scalars(paginate(stmt, page, per_page)).all()
-        ]
+        return [self._plain(r) for r in self.db.scalars(paginate(stmt, page, per_page)).all()]
 
     def count(self, query: str = "", admin_id: str = "", action: str = "") -> int:
         from app.db.models import AuditLog
@@ -462,9 +451,7 @@ def library_stats(db: Session) -> dict:
     )
     total_copies = int(
         db.scalar(
-            select(func.coalesce(func.sum(Book.total_copies), 0)).where(
-                Book.is_deleted.is_(False)
-            )
+            select(func.coalesce(func.sum(Book.total_copies), 0)).where(Book.is_deleted.is_(False))
         )
         or 0
     )
@@ -492,19 +479,13 @@ def library_stats(db: Session) -> dict:
         "total_copies": total_copies,
         "avail_copies": avail_copies,
         "issued_copies": issued_copies,
-        "avail_rate": round(avail_copies / total_copies * 100, 1)
-        if total_copies
-        else 0,
+        "avail_rate": round(avail_copies / total_copies * 100, 1) if total_copies else 0,
         "new_books_month": new_books_month,
         "total_users": total_users,
         "active_users": active_users,
         "blocked_users": blocked_users,
         "new_users_month": int(
-            db.scalar(
-                select(func.count(User.user_id)).where(
-                    User.registered_on >= month_start
-                )
-            )
+            db.scalar(select(func.count(User.user_id)).where(User.registered_on >= month_start))
             or 0
         ),
         "total_issues": txn_counts["total"],
@@ -512,9 +493,7 @@ def library_stats(db: Session) -> dict:
         "total_txns": txn_counts["total"],
         "month_txns": txns.issued_this_month(),
         "unique_borrowers": unique_borrowers,
-        "avg_books_per_user": round(txn_counts["total"] / total_users, 1)
-        if total_users
-        else 0,
+        "avg_books_per_user": round(txn_counts["total"] / total_users, 1) if total_users else 0,
         "total_fines": round(fine_stats["total"], 2),
         "paid_fines": round(fine_stats["collected"], 2),
         "pending_fines": round(fine_stats["pending"], 2),

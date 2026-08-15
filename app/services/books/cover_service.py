@@ -39,9 +39,7 @@ def _fetch_url(url: str, timeout: int = 5) -> bytes | None:
     try:
         req = urllib.request.Request(
             url,
-            headers={
-                "User-Agent": "BookTale/1.0 (library management system; book metadata fetch)"
-            },
+            headers={"User-Agent": "BookTale/1.0 (library management system; book metadata fetch)"},
         )
         # nosec B310: scheme restricted to http(s) by the guard above.
         with urllib.request.urlopen(req, timeout=timeout) as resp:  # nosec B310
@@ -59,9 +57,7 @@ def _head_url(url: str, timeout: int = 5) -> bool:
         req = urllib.request.Request(
             url,
             method="HEAD",
-            headers={
-                "User-Agent": "BookTale/1.0 (library management system; cover check)"
-            },
+            headers={"User-Agent": "BookTale/1.0 (library management system; cover check)"},
         )
         # nosec B310: scheme restricted to http(s) by the guard above.
         with urllib.request.urlopen(req, timeout=timeout) as resp:  # nosec B310
@@ -94,9 +90,7 @@ def _is_near_black(r: int, g: int, b: int, threshold: int = 25) -> bool:
     return r < threshold and g < threshold and b < threshold
 
 
-def _extract_dominant_color(
-    image_bytes: bytes, max_bytes: int = 50_000
-) -> str | None:
+def _extract_dominant_color(image_bytes: bytes, max_bytes: int = 50_000) -> str | None:
     """
     Extract dominant color from image bytes using raw pixel sampling.
 
@@ -134,9 +128,7 @@ def _extract_dominant_color(
                         px_offset = pixel_offset + (height - 1 - y) * row_size + x * 3
                         if 0 <= px_offset + 2 < len(data):
                             b, g, r = struct.unpack_from("BBB", data, px_offset)
-                            if not _is_near_white(r, g, b) and not _is_near_black(
-                                r, g, b
-                            ):
+                            if not _is_near_white(r, g, b) and not _is_near_black(r, g, b):
                                 pixels.append((r, g, b))
         except (struct.error, ValueError):
             pass
@@ -195,9 +187,7 @@ def _extract_dominant_from_url(cover_url: str) -> str | None:
 
 def _try_openlibrary(
     isbn: str,
-) -> tuple[
-    str | None, str | None, str | None, str | None, int | None, list
-]:
+) -> tuple[str | None, str | None, str | None, str | None, int | None, list]:
     """
     Try OpenLibrary cover API.
     Returns (cover_url, description, source, dominant_color, page_count, genres).
@@ -257,9 +247,7 @@ def _try_openlibrary(
 
 def _try_google_books(
     isbn: str,
-) -> tuple[
-    str | None, str | None, str | None, str | None, int | None, list
-]:
+) -> tuple[str | None, str | None, str | None, str | None, int | None, list]:
     """
     Try Google Books API.
     Returns (cover_url, description, source, dominant_color, page_count, genres).
@@ -270,9 +258,7 @@ def _try_google_books(
     if not clean_isbn.isdigit():
         return None, None, None, None, None, []
 
-    api_url = (
-        f"https://www.googleapis.com/books/v1/volumes?q=isbn:{clean_isbn}&maxResults=1"
-    )
+    api_url = f"https://www.googleapis.com/books/v1/volumes?q=isbn:{clean_isbn}&maxResults=1"
     try:
         data = _fetch_url(api_url)
         if not data:
@@ -445,14 +431,14 @@ def fetch_cover(isbn: str = "", title: str = "", author: str = "") -> dict:
 
     # 1. Try OpenLibrary
     if isbn:
-        (cover_url, description, source, dominant_color, page_count, genres) = (
-            _try_openlibrary(isbn)
+        (cover_url, description, source, dominant_color, page_count, genres) = _try_openlibrary(
+            isbn
         )
 
     # 2. Try Google Books
     if not cover_url and isbn:
-        (cover_url, description, source, dominant_color, page_count, genres) = (
-            _try_google_books(isbn)
+        (cover_url, description, source, dominant_color, page_count, genres) = _try_google_books(
+            isbn
         )
 
     # 3. Fallback: placeholder SVG
@@ -470,9 +456,7 @@ def fetch_cover(isbn: str = "", title: str = "", author: str = "") -> dict:
     }
 
 
-def fetch_description(
-    isbn: str = "", title: str = "", author: str = ""
-) -> str | None:
+def fetch_description(isbn: str = "", title: str = "", author: str = "") -> str | None:
     """Fetch only the description for a book. Returns None if unavailable."""
     if isbn:
         result = _try_openlibrary(isbn)

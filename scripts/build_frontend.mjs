@@ -11,23 +11,23 @@
  * Usage:  npm run build        (one-shot)
  *         npm run watch        (rebuild on change)
  */
-import { build, context } from 'esbuild';
-import { mkdirSync, readdirSync, writeFileSync } from 'node:fs';
-import { join, dirname, basename } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { build, context } from "esbuild";
+import { mkdirSync, readdirSync, writeFileSync } from "node:fs";
+import { join, dirname, basename } from "node:path";
+import { fileURLToPath } from "node:url";
 
-const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
-const JS_DIR = join(ROOT, 'app', 'static', 'js');
-const CSS_FILE = join(ROOT, 'app', 'static', 'css', 'booktale.css');
-const OUT_DIR = join(ROOT, 'app', 'static', 'dist');
-const MANIFEST = join(OUT_DIR, 'manifest.json');
+const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
+const JS_DIR = join(ROOT, "app", "static", "js");
+const CSS_FILE = join(ROOT, "app", "static", "css", "booktale.css");
+const OUT_DIR = join(ROOT, "app", "static", "dist");
+const MANIFEST = join(OUT_DIR, "manifest.json");
 
-const watch = process.argv.includes('--watch');
+const watch = process.argv.includes("--watch");
 
 async function buildOnce() {
   mkdirSync(OUT_DIR, { recursive: true });
 
-  const jsFiles = readdirSync(JS_DIR).filter((f) => f.endsWith('.js'));
+  const jsFiles = readdirSync(JS_DIR).filter((f) => f.endsWith(".js"));
 
   // ── JS: minify each file in isolation (they are classic scripts that share
   //    the global scope via load order — bundling would break globals like
@@ -35,13 +35,13 @@ async function buildOnce() {
   const jsResult = await build({
     entryPoints: jsFiles.map((f) => join(JS_DIR, f)),
     outdir: OUT_DIR,
-    entryNames: 'js/[name]-[hash].min',
-    format: 'iife',
+    entryNames: "js/[name]-[hash].min",
+    format: "iife",
     bundle: false,
     minify: true,
-    charset: 'utf8',
+    charset: "utf8",
     sourcemap: false,
-    logLevel: 'silent',
+    logLevel: "silent",
     metafile: true,
   });
 
@@ -50,12 +50,12 @@ async function buildOnce() {
   const cssResult = await build({
     entryPoints: [CSS_FILE],
     outdir: OUT_DIR,
-    entryNames: '[name]-[hash].min',
+    entryNames: "[name]-[hash].min",
     bundle: false,
     minify: true,
-    charset: 'utf8',
+    charset: "utf8",
     sourcemap: false,
-    logLevel: 'silent',
+    logLevel: "silent",
     metafile: true,
   });
 
@@ -64,9 +64,9 @@ async function buildOnce() {
   //    Metafile output keys are CWD-relative (e.g. static/dist/js/x.min.js),
   //    so strip any leading path and rebuild the URL from the dist root.
   const toUrl = (outPath) => {
-    const parts = outPath.replace(/\\/g, '/').split('/');
+    const parts = outPath.replace(/\\/g, "/").split("/");
     const file = parts[parts.length - 1];
-    const sub = parts.includes('js') && file.endsWith('.js') ? 'js/' : '';
+    const sub = parts.includes("js") && file.endsWith(".js") ? "js/" : "";
     return `/static/dist/${sub}${file}`;
   };
   const manifest = {};
@@ -78,7 +78,7 @@ async function buildOnce() {
   }
   for (const [out, info] of Object.entries(cssResult.metafile.outputs)) {
     if (!info.entryPoint) continue;
-    manifest['css/booktale.css'] = toUrl(out);
+    manifest["css/booktale.css"] = toUrl(out);
   }
 
   // Fallback safety: any source file that somehow produced no output keeps
@@ -87,31 +87,42 @@ async function buildOnce() {
     const logical = `js/${f}`;
     if (!manifest[logical]) manifest[logical] = `/static/js/${f}`;
   }
-  if (!manifest['css/booktale.css']) manifest['css/booktale.css'] = '/static/css/booktale.css';
+  if (!manifest["css/booktale.css"])
+    manifest["css/booktale.css"] = "/static/css/booktale.css";
 
-  writeFileSync(MANIFEST, JSON.stringify(manifest, null, 2) + '\n');
-  console.log(`[build] ${Object.keys(manifest).length} assets -> static/dist/manifest.json`);
+  writeFileSync(MANIFEST, JSON.stringify(manifest, null, 2) + "\n");
+  console.log(
+    `[build] ${
+      Object.keys(manifest).length
+    } assets -> static/dist/manifest.json`,
+  );
   for (const [k, v] of Object.entries(manifest)) console.log(`  ${k} -> ${v}`);
 }
 
 if (watch) {
   // ── Watch mode ──
   const ctx = await context({
-    entryPoints: readdirSync(JS_DIR).filter((f) => f.endsWith('.js')).map((f) => join(JS_DIR, f)),
+    entryPoints: readdirSync(JS_DIR)
+      .filter((f) => f.endsWith(".js"))
+      .map((f) => join(JS_DIR, f)),
     outdir: OUT_DIR,
-    entryNames: 'js/[name]-[hash].min',
-    format: 'iife',
+    entryNames: "js/[name]-[hash].min",
+    format: "iife",
     bundle: false,
     minify: true,
-    charset: 'utf8',
+    charset: "utf8",
     sourcemap: false,
-    logLevel: 'silent',
+    logLevel: "silent",
     metafile: true,
   });
   // Regenerate the manifest on every rebuild so the running app always
   // resolves fresh content hashes (the asset() helper caches the manifest).
-  await ctx.watch({ onRebuild: () => { buildOnce(); } });
-  console.log('[build] watching static/js + static/css... (Ctrl+C to stop)');
+  await ctx.watch({
+    onRebuild: () => {
+      buildOnce();
+    },
+  });
+  console.log("[build] watching static/js + static/css... (Ctrl+C to stop)");
 } else {
   await buildOnce();
 }

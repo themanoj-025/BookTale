@@ -102,9 +102,7 @@ def migrate() -> dict[str, dict]:
     users_raw = _as_dict(_load(_json_path("users.json")))
     txns_raw = _as_dict(_load(_json_path("transactions.json"))).get("transactions", [])
     fines_raw = _as_dict(_load(_json_path("fines.json"))).get("fines", [])
-    notifs_raw = _as_dict(_load(_json_path("notifications.json"))).get(
-        "notifications", []
-    )
+    notifs_raw = _as_dict(_load(_json_path("notifications.json"))).get("notifications", [])
     res_raw = _as_dict(_load(_json_path("reservations.json")))  # {book_id: [user_ids]}
 
     # ── Social ─────────────────────────────────────────────────────
@@ -152,23 +150,18 @@ def migrate() -> dict[str, dict]:
         report["users"] = _safe_add_all(db, users, "users")
 
         txns = [
-            Transaction(
-                **{k: v for k, v in t.items() if k in Transaction.__table__.columns}
-            )
+            Transaction(**{k: v for k, v in t.items() if k in Transaction.__table__.columns})
             for t in txns_raw
         ]
         report["transactions"] = _safe_add_all(db, txns, "transactions")
 
         fines = [
-            Fine(**{k: v for k, v in f.items() if k in Fine.__table__.columns})
-            for f in fines_raw
+            Fine(**{k: v for k, v in f.items() if k in Fine.__table__.columns}) for f in fines_raw
         ]
         report["fines"] = _safe_add_all(db, fines, "fines")
 
         notifs = [
-            Notification(
-                **{k: v for k, v in n.items() if k in Notification.__table__.columns}
-            )
+            Notification(**{k: v for k, v in n.items() if k in Notification.__table__.columns})
             for n in notifs_raw
         ]
         report["notifications"] = _safe_add_all(db, notifs, "notifications")
@@ -177,14 +170,11 @@ def migrate() -> dict[str, dict]:
         res_rows = []
         for book_id, user_ids in res_raw.items():
             for position, uid in enumerate(user_ids, start=1):
-                res_rows.append(
-                    Reservation(book_id=book_id, user_id=uid, position=position)
-                )
+                res_rows.append(Reservation(book_id=book_id, user_id=uid, position=position))
         report["reservations"] = _safe_add_all(db, res_rows, "reservations")
 
         posts = [
-            Post(**{k: v for k, v in p.items() if k in Post.__table__.columns})
-            for p in posts_raw
+            Post(**{k: v for k, v in p.items() if k in Post.__table__.columns}) for p in posts_raw
         ]
         report["posts"] = _safe_add_all(db, posts, "posts")
 
@@ -207,28 +197,20 @@ def migrate() -> dict[str, dict]:
         report["reviews"] = _safe_add_all(db, reviews, "reviews")
 
         shelves = [
-            Bookshelf(
-                **{k: v for k, v in s.items() if k in Bookshelf.__table__.columns}
-            )
+            Bookshelf(**{k: v for k, v in s.items() if k in Bookshelf.__table__.columns})
             for s in shelves_raw
         ]
         report["bookshelves"] = _safe_add_all(db, shelves, "bookshelves")
 
         diary = [
-            DiaryEntry(
-                **{k: v for k, v in d.items() if k in DiaryEntry.__table__.columns}
-            )
+            DiaryEntry(**{k: v for k, v in d.items() if k in DiaryEntry.__table__.columns})
             for d in diary_raw
         ]
         report["diary_entries"] = _safe_add_all(db, diary, "diary_entries")
 
         wish = [
             WishlistSuggestion(
-                **{
-                    k: v
-                    for k, v in w.items()
-                    if k in WishlistSuggestion.__table__.columns
-                }
+                **{k: v for k, v in w.items() if k in WishlistSuggestion.__table__.columns}
             )
             for w in wishlist_raw
         ]
@@ -241,34 +223,22 @@ def migrate() -> dict[str, dict]:
         report["series"] = _safe_add_all(db, series, "series")
 
         communities = [
-            Community(
-                **{k: v for k, v in c.items() if k in Community.__table__.columns}
-            )
+            Community(**{k: v for k, v in c.items() if k in Community.__table__.columns})
             for c in communities_raw
         ]
         report["communities"] = _safe_add_all(db, communities, "communities")
 
         challenges = [
             ReadingChallenge(
-                **{
-                    k: v
-                    for k, v in c.items()
-                    if k in ReadingChallenge.__table__.columns
-                }
+                **{k: v for k, v in c.items() if k in ReadingChallenge.__table__.columns}
             )
             for c in challenges_raw
         ]
-        report["reading_challenges"] = _safe_add_all(
-            db, challenges, "reading_challenges"
-        )
+        report["reading_challenges"] = _safe_add_all(db, challenges, "reading_challenges")
 
         gamification = [
             GamificationState(
-                **{
-                    k: v
-                    for k, v in g.items()
-                    if k in GamificationState.__table__.columns
-                }
+                **{k: v for k, v in g.items() if k in GamificationState.__table__.columns}
             )
             for g in gamification_raw
         ]
@@ -308,17 +278,13 @@ def verify() -> dict[str, dict]:
             ("reading_challenges", ReadingChallenge),
             ("gamification", GamificationState),
         ]:
-            counts[name] = {
-                "loaded": int(db.scalar(select(func.count()).select_from(model)) or 0)
-            }
+            counts[name] = {"loaded": int(db.scalar(select(func.count()).select_from(model)) or 0)}
     return counts
 
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Migrate JSON data files into the DB")
-    parser.add_argument(
-        "--dry-run", action="store_true", help="report counts only; do not write"
-    )
+    parser.add_argument("--dry-run", action="store_true", help="report counts only; do not write")
     args = parser.parse_args()
 
     if args.dry_run:
@@ -337,10 +303,7 @@ def main() -> int:
         match = c["source"] == c["loaded"]
         ok = ok and match
         status = "✓" if match else "✗ MISMATCH"
-        print(
-            f"  {name:<24} {c['source']:>8} {c['loaded']:>8} "
-            f"{c['skipped']:>8}   {status}"
-        )
+        print(f"  {name:<24} {c['source']:>8} {c['loaded']:>8} " f"{c['skipped']:>8}   {status}")
 
     if not ok:
         print("\nMIGRATION FAILED: row counts disagree (see MISMATCH rows).")

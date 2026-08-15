@@ -154,9 +154,7 @@ class SocialFeed:
                     return True, "Post liked", True
         return False, "Post not found", False
 
-    def vote_post(
-        self, post_id: str, user_id: str, vote: str
-    ) -> tuple[bool, str, int | None]:
+    def vote_post(self, post_id: str, user_id: str, vote: str) -> tuple[bool, str, int | None]:
         """Reddit-style voting: 'up', 'down', or 'none' to remove vote.
         Returns (success, message, net_score)."""
         posts = self.storage.load_posts()
@@ -313,8 +311,7 @@ class SocialFeed:
         """Check if follower_id follows following_id."""
         follows = self.storage.load_follows()
         return any(
-            f["follower_id"] == follower_id and f["following_id"] == following_id
-            for f in follows
+            f["follower_id"] == follower_id and f["following_id"] == following_id for f in follows
         )
 
     def get_follower_count(self, user_id: str) -> int:
@@ -327,9 +324,7 @@ class SocialFeed:
     # FEED GENERATION
     # ═══════════════════════════════════════════════════════════════
 
-    def get_feed(
-        self, user_id: str, page: int = 1, per_page: int = 20
-    ) -> tuple[list[dict], int]:
+    def get_feed(self, user_id: str, page: int = 1, per_page: int = 20) -> tuple[list[dict], int]:
         """Get the main social feed for a user.
 
         Feed algorithm:
@@ -400,8 +395,7 @@ class SocialFeed:
 
             # Reddit-style hot ranking
             engagement = likes + comments * 2
-            if hours_ago < 1:
-                hours_ago = 1
+            hours_ago = max(hours_ago, 1)
             score = engagement / (hours_ago**0.8)
             scored_posts.append((score, p))
 
@@ -497,11 +491,12 @@ class SocialFeed:
                     "likes_count": len(p.get("likes", [])),
                     "upvotes": p.get("upvotes", []),
                     "downvotes": p.get("downvotes", []),
-                    "net_score": len(p.get("upvotes", []))
-                    - len(p.get("downvotes", [])),
-                    "user_vote": "up"
-                    if viewer_id in p.get("upvotes", [])
-                    else ("down" if viewer_id in p.get("downvotes", []) else "none"),
+                    "net_score": len(p.get("upvotes", [])) - len(p.get("downvotes", [])),
+                    "user_vote": (
+                        "up"
+                        if viewer_id in p.get("upvotes", [])
+                        else ("down" if viewer_id in p.get("downvotes", []) else "none")
+                    ),
                     "books": post_books,
                     "time_ago": self._time_ago(p["created_at"]),
                 }
@@ -548,9 +543,7 @@ class SocialFeed:
 
         results = []
         for p in posts:
-            if q in p["content"].lower():
-                results.append(p)
-            elif q in p.get("post_id", "").lower():
+            if q in p["content"].lower() or q in p.get("post_id", "").lower():
                 results.append(p)
             else:
                 # Check if query matches book title in post

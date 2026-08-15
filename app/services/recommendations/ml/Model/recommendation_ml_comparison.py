@@ -149,13 +149,9 @@ def load_and_preprocess_data(path: str = str(DATA_PATH)) -> pd.DataFrame:
 
     # Handle missing values
     df.dropna(subset=["title", "authors"], inplace=True)
-    df["average_rating"] = pd.to_numeric(df["average_rating"], errors="coerce").fillna(
-        0
-    )
+    df["average_rating"] = pd.to_numeric(df["average_rating"], errors="coerce").fillna(0)
     df["ratings_count"] = pd.to_numeric(df["ratings_count"], errors="coerce").fillna(0)
-    df["text_reviews_count"] = pd.to_numeric(
-        df["text_reviews_count"], errors="coerce"
-    ).fillna(0)
+    df["text_reviews_count"] = pd.to_numeric(df["text_reviews_count"], errors="coerce").fillna(0)
     # Column '  num_pages' has leading spaces in CSV, stripped to 'num_pages'
     pages_col = "num_pages"
     if pages_col not in df.columns:
@@ -194,11 +190,7 @@ def load_and_preprocess_data(path: str = str(DATA_PATH)) -> pd.DataFrame:
 
     # Feature: text features for content-based
     df["text_features"] = (
-        df["authors"].fillna("")
-        + " "
-        + df["publisher"].fillna("")
-        + " "
-        + df["title"].fillna("")
+        df["authors"].fillna("") + " " + df["publisher"].fillna("") + " " + df["title"].fillna("")
     )
 
     print(f"  ✅ After cleaning: {len(df):,} rows")
@@ -628,9 +620,7 @@ def xgboost_model(df: pd.DataFrame, X: np.ndarray) -> ModelResult:
 
     # Feature importance
     if hasattr(model, "feature_importances_"):
-        result.metrics["Top Feature Importance"] = float(
-            model.feature_importances_.max()
-        )
+        result.metrics["Top Feature Importance"] = float(model.feature_importances_.max())
 
     result.time_taken = time.time() - start
     print(f"✅ ({result.time_taken:.2f}s)")
@@ -718,11 +708,7 @@ def neural_network_model(X: np.ndarray, df: pd.DataFrame) -> ModelResult:
             X_hidden = np.maximum(
                 0,
                 X_hidden @ layer
-                + (
-                    mlp.intercepts_[mlp.coefs_.index(layer)]
-                    if layer is mlp.coefs_[0]
-                    else 0
-                ),
+                + (mlp.intercepts_[mlp.coefs_.index(layer)] if layer is mlp.coefs_[0] else 0),
             )
 
         if X_hidden.shape[0] > N_CLUSTERS:
@@ -774,9 +760,7 @@ def agglomerative_model(X: np.ndarray, df: pd.DataFrame) -> ModelResult:
 # 3. VISUALIZATION FUNCTIONS
 
 
-def save_radar_chart(
-    results: list[ModelResult], filename: str = "radar_comparison.png"
-):
+def save_radar_chart(results: list[ModelResult], filename: str = "radar_comparison.png"):
     """Create a radar chart comparing algorithms across key metrics."""
     print("\n  📊 Generating Radar Chart...")
 
@@ -788,9 +772,7 @@ def save_radar_chart(
         "Coverage",
         "Diversity",
     ]
-    available_metrics = [
-        m for m in metric_names if any(m in r.metrics for r in results)
-    ]
+    available_metrics = [m for m in metric_names if any(m in r.metrics for r in results)]
     if not available_metrics:
         print("  ⚠️  No common metrics available for radar chart")
         return
@@ -859,9 +841,7 @@ def save_bar_comparison(results: list[ModelResult], metric: str, filename: str =
     colors = [ALGORITHM_COLORS.get(n, f"C{i}") for i, n in enumerate(names)]
 
     fig, ax = plt.subplots(figsize=(14, 6))
-    bars = ax.bar(
-        range(len(names)), values, color=colors, edgecolor="white", linewidth=0.5
-    )
+    bars = ax.bar(range(len(names)), values, color=colors, edgecolor="white", linewidth=0.5)
 
     # Add value labels on bars
     for bar, val in zip(bars, values):
@@ -931,9 +911,7 @@ def save_k_distance_plot(k_dist: np.ndarray, filename: str = "k_distance_plot.pn
     ax.plot(range(len(k_dist)), k_dist, "b-", linewidth=1.5, alpha=0.7)
     ax.set_xlabel("Points Sorted by Distance", fontsize=12)
     ax.set_ylabel("k-Distance", fontsize=12)
-    ax.set_title(
-        "📊 k-Distance Graph for DBSCAN eps Selection", fontsize=14, fontweight="bold"
-    )
+    ax.set_title("📊 k-Distance Graph for DBSCAN eps Selection", fontsize=14, fontweight="bold")
     ax.set_axisbelow(True)
     ax.grid(alpha=0.3)
 
@@ -956,9 +934,7 @@ def save_k_distance_plot(k_dist: np.ndarray, filename: str = "k_distance_plot.pn
     print(f"  ✅ k-Distance plot saved: {path}")
 
 
-def save_cluster_visualization(
-    X_2d: np.ndarray, labels: np.ndarray, title: str, filename: str
-):
+def save_cluster_visualization(X_2d: np.ndarray, labels: np.ndarray, title: str, filename: str):
     """Save 2D cluster visualization."""
     n_clusters = len(set(labels)) - (1 if -1 in labels else 0)
     fig, ax = plt.subplots(figsize=(12, 8))
@@ -973,9 +949,7 @@ def save_cluster_visualization(
         edgecolors="none",
     )
 
-    ax.set_title(
-        f"{title}\n({n_clusters} clusters found)", fontsize=14, fontweight="bold"
-    )
+    ax.set_title(f"{title}\n({n_clusters} clusters found)", fontsize=14, fontweight="bold")
     ax.set_xlabel("Component 1", fontsize=11)
     ax.set_ylabel("Component 2", fontsize=11)
     ax.set_axisbelow(True)
@@ -989,9 +963,7 @@ def save_cluster_visualization(
     print(f"  ✅ Cluster viz saved: {path}")
 
 
-def save_heatmap_comparison(
-    results: list[ModelResult], filename: str = "performance_heatmap.png"
-):
+def save_heatmap_comparison(results: list[ModelResult], filename: str = "performance_heatmap.png"):
     """Create a heatmap of all metrics across all algorithms."""
     metrics_pool = set()
     for r in results:
@@ -999,11 +971,7 @@ def save_heatmap_comparison(
 
     # Filter to consistent numeric metrics
     sorted(
-        [
-            m
-            for m in metrics_pool
-            if any(m in r.metrics for r in results) and not isinstance(m, str)
-        ]
+        [m for m in metrics_pool if any(m in r.metrics for r in results) and not isinstance(m, str)]
     )
 
     # Focus on key metrics
@@ -1055,9 +1023,7 @@ def save_heatmap_comparison(
                 )
 
     ax.set_xticks(range(len(key_metrics)))
-    ax.set_xticklabels(
-        [m[:12] for m in key_metrics], rotation=30, ha="right", fontsize=9
-    )
+    ax.set_xticklabels([m[:12] for m in key_metrics], rotation=30, ha="right", fontsize=9)
     ax.set_yticks(range(len(results)))
     ax.set_yticklabels([r.name for r in results], fontsize=9)
     ax.set_title("📊 Performance Comparison Heatmap", fontsize=14, fontweight="bold")
@@ -1070,9 +1036,7 @@ def save_heatmap_comparison(
     print(f"  ✅ Heatmap saved: {path}")
 
 
-def save_interactive_radar(
-    results: list[ModelResult], filename: str = "interactive_radar.html"
-):
+def save_interactive_radar(results: list[ModelResult], filename: str = "interactive_radar.html"):
     """Create interactive radar chart using Plotly."""
     if not PLOTLY_AVAILABLE:
         return
@@ -1084,9 +1048,7 @@ def save_interactive_radar(
         "Coverage",
         "Diversity",
     ]
-    available_metrics = [
-        m for m in metric_names if any(m in r.metrics for r in results)
-    ]
+    available_metrics = [m for m in metric_names if any(m in r.metrics for r in results)]
     if not available_metrics:
         return
 
@@ -1129,9 +1091,7 @@ def save_summary_report(results: list[ModelResult], df: pd.DataFrame):
         f.write("  📚 BOOK RECOMMENDATION SYSTEM — MODEL COMPARISON REPORT\n")
         f.write("=" * 70 + "\n\n")
         f.write(f"  Dataset: {len(df):,} books\n")
-        f.write(
-            f"  Features: {df.select_dtypes(include=[np.number]).shape[1]} numerical\n"
-        )
+        f.write(f"  Features: {df.select_dtypes(include=[np.number]).shape[1]} numerical\n")
         f.write(f"  Date: {pd.Timestamp.now().strftime('%Y-%m-%d %H:%M')}\n\n")
 
         f.write("-" * 70 + "\n")
@@ -1150,8 +1110,7 @@ def save_summary_report(results: list[ModelResult], df: pd.DataFrame):
         )
         unsorted = [r for r in results if sort_key not in r.metrics]
 
-        for r in sorted_results + unsorted:
-            f.write(r.get_formatted_metrics() + "\n\n")
+        f.writelines(r.get_formatted_metrics() + "\n\n" for r in sorted_results + unsorted)
 
         # Recommendations
         if sorted_results:
@@ -1161,9 +1120,7 @@ def save_summary_report(results: list[ModelResult], df: pd.DataFrame):
 
             best = sorted_results[0]
             f.write(f"  Best Overall: {best.name}\n")
-            f.write(
-                f"  Silhouette Score: {best.metrics.get('Silhouette Score', 'N/A'):.4f}\n\n"
-            )
+            f.write(f"  Silhouette Score: {best.metrics.get('Silhouette Score', 'N/A'):.4f}\n\n")
 
             # Best for each metric
             metrics_to_check = [
@@ -1351,12 +1308,8 @@ def run_comparison():
                 reverse=True,
             )
             if ranked:
-                print(
-                    f"  🥇 Best '{metric}': {ranked[0].name} = {ranked[0].metrics[metric]:.4f}"
-                )
-                print(
-                    f"  🥈 Runner-up: {ranked[1].name} = {ranked[1].metrics[metric]:.4f}"
-                )
+                print(f"  🥇 Best '{metric}': {ranked[0].name} = {ranked[0].metrics[metric]:.4f}")
+                print(f"  🥈 Runner-up: {ranked[1].name} = {ranked[1].metrics[metric]:.4f}")
                 print()
 
     print(f"\n  💡 Open {OUTPUT_DIR}/model_comparison_report.txt for full details")
@@ -1381,9 +1334,7 @@ def get_best_model_weights() -> dict[str, float]:
     }
 
 
-def get_improved_recommendations(
-    book_features: dict, all_books: list[dict]
-) -> list[dict]:
+def get_improved_recommendations(book_features: dict, all_books: list[dict]) -> list[dict]:
     """Use trained models to get improved recommendations.
 
     This is a lightweight version that can be called from the main app.
@@ -1392,22 +1343,16 @@ def get_improved_recommendations(
     weights = get_best_model_weights()
 
     # Content score (TF-IDF cosine similarity)
-    content_score = (
-        book_features.get("content_similarity", 0) * weights["content_weight"]
-    )
+    content_score = book_features.get("content_similarity", 0) * weights["content_weight"]
 
     # Collaborative score
-    collab_score = (
-        book_features.get("collaborative_score", 0) * weights["collaborative_weight"]
-    )
+    collab_score = book_features.get("collaborative_score", 0) * weights["collaborative_weight"]
 
     # Popularity score
     pop_score = book_features.get("popularity_score", 0) * weights["popularity_weight"]
 
     # Cluster score
-    cluster_score = (
-        book_features.get("cluster_similarity", 0) * weights["cluster_weight"]
-    )
+    cluster_score = book_features.get("cluster_similarity", 0) * weights["cluster_weight"]
 
     content_score + collab_score + pop_score + cluster_score
 

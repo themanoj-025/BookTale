@@ -122,17 +122,13 @@ class SeriesManager:
                 return True, "Series deleted!"
         return False, "Series not found"
 
-    def get_all_series(
-        self, page: int = 1, per_page: int = 20
-    ) -> tuple[list[dict], int]:
+    def get_all_series(self, page: int = 1, per_page: int = 20) -> tuple[list[dict], int]:
         series_list = self._load_series()
         # Recalculate book counts
         books = self.storage.load_books()
         for s in series_list:
             s["book_count"] = sum(
-                1
-                for b in books.values()
-                if not b.is_deleted and b.series_name == s["name"]
+                1 for b in books.values() if not b.is_deleted and b.series_name == s["name"]
             )
         series_list.sort(key=lambda s: s.get("book_count", 0), reverse=True)
         total = len(series_list)
@@ -188,8 +184,4 @@ class SeriesManager:
     def get_books_without_series(self) -> list[dict]:
         """Get books not assigned to any series."""
         books = self.storage.load_books()
-        return [
-            b.to_dict()
-            for b in books.values()
-            if not b.is_deleted and not b.series_name
-        ]
+        return [b.to_dict() for b in books.values() if not b.is_deleted and not b.series_name]

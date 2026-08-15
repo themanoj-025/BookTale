@@ -27,9 +27,7 @@ class User:
             datetime.now() + timedelta(days=MEMBERSHIP_VALIDITY_DAYS)
         ).isoformat()
     )
-    books_issued: list[str] = field(
-        default_factory=list
-    )  # list of book_ids currently issued
+    books_issued: list[str] = field(default_factory=list)  # list of book_ids currently issued
     unpaid_fine: float = 0.0
     registered_on: str = field(default_factory=lambda: datetime.now().isoformat())
     # ── Social profile fields ──

@@ -51,9 +51,7 @@ class LibraryService:
     # ISSUE / RETURN / RESERVE  (transactional core)
     # ═══════════════════════════════════════════════════════════
 
-    def issue_book(
-        self, user_id: str, book_id: str, actor: str = "Librarian"
-    ) -> tuple[bool, str]:
+    def issue_book(self, user_id: str, book_id: str, actor: str = "Librarian") -> tuple[bool, str]:
         """Check out a book atomically. Returns (ok, message).
 
         Exactly one concurrent caller can take the last available copy; the
@@ -75,8 +73,7 @@ class LibraryService:
                 return False, f"User membership is {user.membership_status}"
             if len(user.books_issued or []) >= Config.MAX_BORROW_LIMIT:
                 return False, (
-                    f"User has reached max borrow limit "
-                    f"({Config.MAX_BORROW_LIMIT} books)"
+                    f"User has reached max borrow limit " f"({Config.MAX_BORROW_LIMIT} books)"
                 )
             if book_id in (user.books_issued or []):
                 return False, "User already has this book issued"
@@ -165,9 +162,7 @@ class LibraryService:
             book.available_copies = min(book.total_copies, book.available_copies + 1)
 
             # Notify next reserved user (atomically with the return).
-            notify_msg = self._pop_reservation_queue(
-                db, book_id, book, return_date, user
-            )
+            notify_msg = self._pop_reservation_queue(db, book_id, book, return_date, user)
             db.commit()
             return True, f"Book returned. Fine: ₹{fine:.2f}" + notify_msg, fine
 
@@ -187,9 +182,7 @@ class LibraryService:
     # FINE PAYMENT
     # ═══════════════════════════════════════════════════════════
 
-    def pay_fine(
-        self, user_id: str, amount: float, actor: str = "Admin"
-    ) -> tuple[bool, str]:
+    def pay_fine(self, user_id: str, amount: float, actor: str = "Admin") -> tuple[bool, str]:
         with self._session_factory() as db:
             user = db.get(User, user_id)
             if user is None:
@@ -199,9 +192,7 @@ class LibraryService:
             paid = min(amount, user.unpaid_fine)
             user.unpaid_fine = round(float(user.unpaid_fine) - paid, 2)
             fines = db.scalars(
-                select(Fine)
-                .where(Fine.user_id == user_id, Fine.paid.is_(False))
-                .with_for_update()
+                select(Fine).where(Fine.user_id == user_id, Fine.paid.is_(False)).with_for_update()
             ).all()
             remaining = paid
             for f in fines:
@@ -214,9 +205,7 @@ class LibraryService:
                     f.fine -= remaining
                     remaining = 0
             db.commit()
-            return True, (
-                f"₹{paid:.2f} collected. Remaining fine: ₹{user.unpaid_fine:.2f}"
-            )
+            return True, (f"₹{paid:.2f} collected. Remaining fine: ₹{user.unpaid_fine:.2f}")
 
     # ═══════════════════════════════════════════════════════════
     # READS (delegated to indexed repositories)
@@ -246,9 +235,7 @@ class LibraryService:
     # INTERNAL HELPERS
     # ═══════════════════════════════════════════════════════════
 
-    def _enqueue_reservation(
-        self, db, user_id: str, book_id: str, book: Book
-    ) -> tuple[bool, str]:
+    def _enqueue_reservation(self, db, user_id: str, book_id: str, book: Book) -> tuple[bool, str]:
         """Add user to the reservation queue; commits its own write so the
         queue entry survives even though the issue itself is declined."""
         existing = db.scalar(
@@ -259,11 +246,7 @@ class LibraryService:
         if existing is not None:
             return False, "No copies available and user already in reservation queue"
         max_pos = (
-            db.scalar(
-                select(func.max(Reservation.position)).where(
-                    Reservation.book_id == book_id
-                )
-            )
+            db.scalar(select(func.max(Reservation.position)).where(Reservation.book_id == book_id))
             or 0
         )
         db.add(

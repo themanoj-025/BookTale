@@ -21,9 +21,7 @@ from app.routes import web_app as _web_app
 # import views, helpers, and module-level singletons directly from web_app).
 # This includes `app`, `socketio`, `storage`, `lib`, `asset`, views, and
 # underscore helpers such as `_user_key` that tests reference.
-globals().update(
-    {_k: _v for _k, _v in vars(_web_app).items() if not _k.startswith("__")}
-)
+globals().update({_k: _v for _k, _v in vars(_web_app).items() if not _k.startswith("__")})
 
 # Explicit bindings for the __main__ block below (self-documenting and
 # robust even if the re-export list changes).

@@ -22,9 +22,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 database_url = os.environ.get("DATABASE_URL", "")
 if not database_url:
     print("ERROR: DATABASE_URL env var is not set.")
-    print(
-        "Example: DATABASE_URL=postgresql+psycopg2://booktale:booktale@localhost:5432/booktale"
-    )
+    print("Example: DATABASE_URL=postgresql+psycopg2://booktale:booktale@localhost:5432/booktale")
     sys.exit(1)
 if "sqlite" in database_url.lower():
     print("WARNING: DATABASE_URL appears to be SQLite, not PostgreSQL.")
@@ -111,9 +109,7 @@ def main() -> int:
     print("\n-- Index spot-checks --")
     indexes = inspector.get_indexes("books")
     index_names = {idx["name"] for idx in indexes}
-    check(
-        "ix_books_title exists", "ix_books_title" in index_names, f"got: {index_names}"
-    )
+    check("ix_books_title exists", "ix_books_title" in index_names, f"got: {index_names}")
     check(
         "ix_books_author exists",
         "ix_books_author" in index_names,

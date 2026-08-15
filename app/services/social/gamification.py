@@ -262,9 +262,7 @@ class Gamification:
         posts = self.storage.load_posts()
         user_posts = [p for p in posts if p["user_id"] == user_id]
         follows = self.storage.load_follows()
-        followers = len(
-            set(f["follower_id"] for f in follows if f["following_id"] == user_id)
-        )
+        followers = len(set(f["follower_id"] for f in follows if f["following_id"] == user_id))
 
         clubs_file = os.path.join(Config.DATA_DIR, "clubs.json")
         clubs = []
@@ -355,9 +353,7 @@ class Gamification:
             review_counts = Counter(r["user_id"] for r in reviews)
             ranked = sorted(review_counts.items(), key=lambda x: x[1], reverse=True)
         else:
-            ranked = sorted(
-                data.items(), key=lambda x: x[1].get("points", 0), reverse=True
-            )
+            ranked = sorted(data.items(), key=lambda x: x[1].get("points", 0), reverse=True)
 
         result = []
         for rank, (uid, _) in enumerate(ranked[:top_n], 1):

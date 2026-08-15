@@ -34,17 +34,7 @@ _avatar_html = None
 def init_feature_routes(
     app, storage, lib, auth, notif_mgr, series, challenge, progress, wishlist, diary
 ):
-    global \
-        _storage, \
-        _lib, \
-        _notif_mgr, \
-        _series, \
-        _challenge, \
-        _progress, \
-        _wishlist, \
-        _h, \
-        _avatar_html, \
-        _diary
+    global _storage, _lib, _notif_mgr, _series, _challenge, _progress, _wishlist, _h, _avatar_html, _diary
     _storage = storage
     _lib = lib
     _notif_mgr = notif_mgr
@@ -76,9 +66,7 @@ def init_feature_routes(
         HTML attribute (onclick="..."). Escapes backslashes and single quotes
         for the JS string literal, and double quotes for the HTML attribute.
         """
-        return (
-            str(value).replace("\\", "\\\\").replace("'", "\\'").replace('"', "&quot;")
-        )
+        return str(value).replace("\\", "\\\\").replace("'", "\\'").replace('"', "&quot;")
 
     def _initials(name):
         parts = name.strip().split()
@@ -206,7 +194,7 @@ def init_feature_routes(
         if not CARDS:
             CARDS = '<div class="col-12"><div class="empty-state empty-state-variant"><div class="empty-icon"><i class="bi bi-collection"></i></div><div class="empty-title">No series yet</div><div class="empty-desc">Create your first book series to organize books.</div><a href="/series/create" class="empty-cta"><i class="bi bi-plus-lg"></i> Create Series</a></div></div>'
 
-        CONTENT = f'''
+        CONTENT = f"""
         <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2 animate-in">
             <h4 class="fw-bold mb-0"><i class="bi bi-collection-fill me-2 text-primary"></i>Book Series <span class="text-muted fw-normal" style="font-size:.9rem;">({total})</span></h4>
             <a href="/series/create" class="btn btn-primary btn-sm"><i class="bi bi-plus-lg"></i> New Series</a>
@@ -216,7 +204,7 @@ def init_feature_routes(
             <button class="btn btn-primary" type="submit"><i class="bi bi-search"></i></button>
             <a href="/series" class="btn btn-outline"><i class="bi bi-x-lg"></i></a>
         </div></form>
-        <div class="row g-3 animate-d2">{CARDS}</div>'''
+        <div class="row g-3 animate-d2">{CARDS}</div>"""
         return render_page("Book Series", CONTENT)
 
     @app.route("/series/create", methods=["GET", "POST"])
@@ -233,11 +221,7 @@ def init_feature_routes(
             try:
                 from flask_wtf.csrf import generate_csrf as _gen_csrf
 
-                csrf_field = (
-                    '<input type="hidden" name="csrf_token" value="'
-                    + _gen_csrf()
-                    + '">'
-                )
+                csrf_field = '<input type="hidden" name="csrf_token" value="' + _gen_csrf() + '">'
             except (ImportError, RuntimeError):
                 csrf_field = ""
             CONTENT = f"""
@@ -400,9 +384,7 @@ def init_feature_routes(
             lb_avatar = avatar_html(entry.get("name", "?"), 28)
             medal = {1: "🥇", 2: "🥈", 3: "🥉"}.get(rank, f"#{rank}")
             lb_bar_w = min(100, entry.get("percentage", 0))
-            lb_bar_c = (
-                "var(--success)" if entry["percentage"] >= 100 else "var(--primary)"
-            )
+            lb_bar_c = "var(--success)" if entry["percentage"] >= 100 else "var(--primary)"
             LB += f"""
             <div class="d-flex align-items-center gap-2 mb-2">
                 <span style="width:28px;text-align:center;font-weight:700;">{medal}</span>
@@ -596,9 +578,7 @@ def init_feature_routes(
 
         def render_book_list(books, empty_msg):
             if not books:
-                return (
-                    f'<div class="text-center text-muted small py-3">{empty_msg}</div>'
-                )
+                return f'<div class="text-center text-muted small py-3">{empty_msg}</div>'
             html = ""
             for b in books:
                 pct = b.get("percentage", 0)
@@ -621,9 +601,7 @@ def init_feature_routes(
         READING = render_book_list(
             rl.get("currently_reading", []), "No books being read right now."
         )
-        FINISHED = render_book_list(
-            rl.get("finished", [])[:5], "No finished books yet."
-        )
+        FINISHED = render_book_list(rl.get("finished", [])[:5], "No finished books yet.")
 
         time_h = stats.get("total_time_spent_minutes", 0) // 60
         time_m = stats.get("total_time_spent_minutes", 0) % 60
@@ -737,10 +715,12 @@ def init_feature_routes(
                 <button class="btn btn-sm btn-outline" onclick="removeBookmark(\'{bm["bookmark_id"]}\')"><i class="bi bi-trash"></i></button>
             </div>"""
         if not BM_HTML:
-            BM_HTML = '<div class="text-center text-muted small py-3">No bookmarks. Add one below!</div>'
+            BM_HTML = (
+                '<div class="text-center text-muted small py-3">No bookmarks. Add one below!</div>'
+            )
 
         cc = cat_color(book.category)
-        CONTENT = f'''
+        CONTENT = f"""
         <div class="animate-in">
             <div class="row">
                 <div class="col-lg-8">
@@ -837,7 +817,7 @@ def init_feature_routes(
             if(!confirm('Remove bookmark?'))return;
             fetch('/api/bookmarks/'+bid+'/remove',{{method:'POST'}}).then(r=>r.json()).then(d=>{{if(d.success){{showToast(d.message,'success');setTimeout(function(){{location.reload()}},1000)}}else{{showToast(d.error,'error')}}}})
         }}
-        </script>'''
+        </script>"""
         return render_page(f"Reading: {book.title}", CONTENT)
 
     @app.route("/reading-progress/history")
@@ -845,11 +825,7 @@ def init_feature_routes(
     def reading_progress_history():
         uid = session["user_id"]
         rl = _progress.get_user_reading_list(uid)
-        all_books = (
-            rl.get("currently_reading", [])
-            + rl.get("finished", [])
-            + rl.get("on_hold", [])
-        )
+        all_books = rl.get("currently_reading", []) + rl.get("finished", []) + rl.get("on_hold", [])
 
         ROWS = ""
         for b in all_books:
@@ -988,9 +964,7 @@ def init_feature_routes(
         status = request.args.get("status", "")
         sort_by = request.args.get("sort", "score")
         page = max(1, int(request.args.get("page", 1)))
-        suggestions, total = _wishlist.get_suggestions(
-            status=status, page=page, sort_by=sort_by
-        )
+        suggestions, total = _wishlist.get_suggestions(status=status, page=page, sort_by=sort_by)
         user_votes = {}  # Track user's votes on each suggestion
         for s in suggestions:
             if uid in s.get("upvotes", []):
@@ -1021,7 +995,9 @@ def init_feature_routes(
                 <span class="badge bg-warning text-dark">+{len(s.get("upvotes", []))}</span>
             </div>"""
         if not TRENDING_HTML:
-            TRENDING_HTML = '<div class="text-center text-muted small py-3">No trending suggestions.</div>'
+            TRENDING_HTML = (
+                '<div class="text-center text-muted small py-3">No trending suggestions.</div>'
+            )
 
         SUGGESTIONS_HTML = ""
         for s in suggestions:
@@ -1056,8 +1032,8 @@ def init_feature_routes(
             if session.get("role") == "admin" and s["status"] == "pending":
                 _sid = _js_str(s["suggestion_id"])
                 mod_buttons = (
-                    f"<button class=\"btn btn-sm btn-success\" onclick=\"moderateSuggestion('{_sid}','approved')\"><i class=\"bi bi-check-lg\"></i> Approve</button>"
-                    f"<button class=\"btn btn-sm btn-danger\" onclick=\"moderateSuggestion('{_sid}','rejected')\"><i class=\"bi bi-x-lg\"></i> Reject</button>"
+                    f'<button class="btn btn-sm btn-success" onclick="moderateSuggestion(\'{_sid}\',\'approved\')"><i class="bi bi-check-lg"></i> Approve</button>'
+                    f'<button class="btn btn-sm btn-danger" onclick="moderateSuggestion(\'{_sid}\',\'rejected\')"><i class="bi bi-x-lg"></i> Reject</button>'
                 )
             SUGGESTIONS_HTML += f"""
             <div class="glass-card p-3 mb-2">
@@ -1226,9 +1202,7 @@ def init_feature_routes(
     def api_vote_suggestion(suggestion_id):
         uid = session["user_id"]
         data = request.get_json() or {}
-        ok, msg, result = _wishlist.vote_suggestion(
-            suggestion_id, uid, data.get("vote", "up")
-        )
+        ok, msg, result = _wishlist.vote_suggestion(suggestion_id, uid, data.get("vote", "up"))
         return jsonify({"success": ok, "message": msg, **result})
 
     @app.route("/api/wishlist/<suggestion_id>/moderate", methods=["POST"])
@@ -1252,9 +1226,7 @@ def init_feature_routes(
     def api_suggestion_comment(suggestion_id):
         uid = session["user_id"]
         data = request.get_json() or {}
-        ok, msg = _wishlist.add_suggestion_comment(
-            suggestion_id, uid, data.get("content", "")
-        )
+        ok, msg = _wishlist.add_suggestion_comment(suggestion_id, uid, data.get("content", ""))
         return jsonify({"success": ok, "message": msg})
 
     @app.route("/api/wishlist/stats")
@@ -1349,7 +1321,7 @@ def init_feature_routes(
                     f'<span class="bt-vibe-tag">{h(t)} <small class="text-muted">({c})</small></span>'
                     for t, c in _vibe_tags
                 )
-                + '</div></div>'
+                + "</div></div>"
             )
         else:
             VIBE_TAGS_HTML = ""
@@ -1569,38 +1541,34 @@ def init_feature_routes(
         CONTENT = (
             _ed.replace("COVER_PLACEHOLDER", cover or "")
             .replace("DATE_PLACEHOLDER", str(entry.get("date_read", "")[:10]))
-            .replace(
-                "BOOK_TITLE_PLACEHOLDER", h(book.title) if book else "Unknown Book"
-            )
+            .replace("BOOK_TITLE_PLACEHOLDER", h(book.title) if book else "Unknown Book")
             .replace("BOOK_AUTHOR_PLACEHOLDER", h(book.author) if book else "")
             .replace(
                 "RATING_BADGE_PLACEHOLDER",
                 rating_badge_html(entry.get("rating_label", "timepass")),
             )
-            .replace(
-                "STAR_HTML_PLACEHOLDER", star_rating_html(entry.get("star_rating"))
-            )
+            .replace("STAR_HTML_PLACEHOLDER", star_rating_html(entry.get("star_rating")))
             .replace(
                 "REREAD_PLACEHOLDER",
-                '<span class="badge bg-info" style="font-size:.6rem;">\U0001f504 Reread</span>'
-                if entry.get("is_reread")
-                else "",
+                (
+                    '<span class="badge bg-info" style="font-size:.6rem;">\U0001f504 Reread</span>'
+                    if entry.get("is_reread")
+                    else ""
+                ),
             )
             .replace(
                 "SPOILER_PLACEHOLDER",
-                '<span class="badge bg-warning text-dark" style="font-size:.6rem;">\u26a0\ufe0f Spoiler</span>'
-                if entry.get("spoiler")
-                else "",
+                (
+                    '<span class="badge bg-warning text-dark" style="font-size:.6rem;">\u26a0\ufe0f Spoiler</span>'
+                    if entry.get("spoiler")
+                    else ""
+                ),
             )
             .replace("DIARY_TEXT_PLACEHOLDER", h(entry.get("diary_text", "")))
             .replace("ENTRY_ID_PLACEHOLDER", "\\'" + h(entry["id"]) + "\\'")
             .replace("DATE_READ_PLACEHOLDER", str(entry.get("date_read", "")[:10]))
-            .replace(
-                "REREAD_YESNO_PLACEHOLDER", "Yes" if entry.get("is_reread") else "No"
-            )
-            .replace(
-                "SPOILER_YESNO_PLACEHOLDER", "Yes" if entry.get("spoiler") else "No"
-            )
+            .replace("REREAD_YESNO_PLACEHOLDER", "Yes" if entry.get("is_reread") else "No")
+            .replace("SPOILER_YESNO_PLACEHOLDER", "Yes" if entry.get("spoiler") else "No")
             + _ej
         )
         return render_page("Diary Entry", CONTENT)
@@ -1647,9 +1615,7 @@ def init_feature_routes(
     @login_required
     def api_diary_book_logs(book_id):
         include_spoilers = request.args.get("spoilers", "0") == "1"
-        return jsonify(
-            {"logs": _diary.get_book_logs(book_id, include_spoilers=include_spoilers)}
-        )
+        return jsonify({"logs": _diary.get_book_logs(book_id, include_spoilers=include_spoilers)})
 
     # ═══════════════════════════════════════════════════════════
     # DASHBOARD WIDGET HELPERS

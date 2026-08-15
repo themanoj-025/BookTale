@@ -422,14 +422,10 @@ def test_library_issue_no_oversell_through_app_object(db_env):
     exactly one success, losers get a clean reservation message."""
     store = DbStorage()
     lib = Library(store)
-    lib.add_book(
-        "Only Copy", "Author", "111-222", "Fiction", 1, fetch_cover_async=False
-    )
+    lib.add_book("Only Copy", "Author", "111-222", "Fiction", 1, fetch_cover_async=False)
     book_id = list(store.load_books())[0]
     for i in range(20):
-        lib.register_user(
-            f"MEM-{i}", f"User{i}", f"u{i}@x.io", "", "user", "hash", actor="test"
-        )
+        lib.register_user(f"MEM-{i}", f"User{i}", f"u{i}@x.io", "", "user", "hash", actor="test")
 
     results = []  # (user_index, ok, msg) — index captured, NOT list position
     lock = threading.Lock()
@@ -448,9 +444,7 @@ def test_library_issue_no_oversell_through_app_object(db_env):
     winners = [r for r in results if r[1]]
     assert len(winners) == 1, f"expected 1 winner, got {len(winners)}: {results}"
     losers = [r for r in results if not r[1]]
-    assert all(
-        "reservation" in r[2].lower() or "already" in r[2].lower() for r in losers
-    )
+    assert all("reservation" in r[2].lower() or "already" in r[2].lower() for r in losers)
 
     # return path works through the service too (winner's real user index)
     winner_idx = winners[0][0]

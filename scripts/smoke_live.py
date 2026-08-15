@@ -228,9 +228,7 @@ meta_token = _csrf_meta(page.text)
 
 # Gate #43: a POST without a CSRF token is rejected. Empty body on purpose
 # (CSRFProtect rejects the tokenless POST before the view ever parses it).
-r = _post(
-    s, "/api/settings/save", data="", headers={"Content-Type": "application/json"}
-)
+r = _post(s, "/api/settings/save", data="", headers={"Content-Type": "application/json"})
 check(
     8,
     "POST /api/settings/save without CSRF token -> 400",
@@ -289,9 +287,7 @@ check(
 )
 
 # Gate #44: health endpoints.
-check(
-    13, "GET /healthz -> 200", _get(requests.Session(), "/healthz").status_code == 200
-)
+check(13, "GET /healthz -> 200", _get(requests.Session(), "/healthz").status_code == 200)
 check(14, "GET /readyz -> 200", _get(requests.Session(), "/readyz").status_code == 200)
 
 # ═══════════════════════════════════════════════════════════════════

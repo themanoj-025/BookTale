@@ -113,9 +113,7 @@ class Communities:
                 return True, "Left club"
         return False, "Club not found"
 
-    def set_club_book(
-        self, club_id: str, book_id: str, user_id: str
-    ) -> tuple[bool, str]:
+    def set_club_book(self, club_id: str, book_id: str, user_id: str) -> tuple[bool, str]:
         clubs = self._load_json("clubs.json")
         for c in clubs:
             if c["club_id"] == club_id and c["owner_id"] == user_id:
@@ -198,9 +196,7 @@ class Communities:
         self._save_json("forum_topics.json", topics)
         return True, "Topic created!", topic
 
-    def get_topics(
-        self, club_id: str, page: int = 1, per_page: int = 20
-    ) -> tuple[list[dict], int]:
+    def get_topics(self, club_id: str, page: int = 1, per_page: int = 20) -> tuple[list[dict], int]:
         topics = self._load_json("forum_topics.json")
         club_topics = [t for t in topics if t["club_id"] == club_id]
         club_topics.sort(
@@ -226,9 +222,7 @@ class Communities:
                 return t
         return None
 
-    def add_reply(
-        self, topic_id: str, user_id: str, content: str
-    ) -> tuple[bool, str, dict | None]:
+    def add_reply(self, topic_id: str, user_id: str, content: str) -> tuple[bool, str, dict | None]:
         if not content.strip():
             return False, "Reply cannot be empty", None
         replies = self._load_json("forum_replies.json")
@@ -247,9 +241,7 @@ class Communities:
         topics = self._load_json("forum_topics.json")
         for t in topics:
             if t["topic_id"] == topic_id:
-                t["replies_count"] = len(
-                    [r for r in replies if r["topic_id"] == topic_id]
-                )
+                t["replies_count"] = len([r for r in replies if r["topic_id"] == topic_id])
                 t["updated_at"] = now
                 self._save_json("forum_topics.json", topics)
                 break
@@ -301,9 +293,7 @@ class Communities:
         self._save_json("polls.json", polls)
         return True, "Poll created!", poll
 
-    def vote_poll(
-        self, poll_id: str, user_id: str, option_indices: list[int]
-    ) -> tuple[bool, str]:
+    def vote_poll(self, poll_id: str, user_id: str, option_indices: list[int]) -> tuple[bool, str]:
         polls = self._load_json("polls.json")
         for p in polls:
             if p["poll_id"] == poll_id:

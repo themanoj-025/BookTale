@@ -3,7 +3,7 @@
    ═══════════════════════════════════════════════════════════════════ */
 
 (function () {
-  'use strict';
+  "use strict";
 
   // ── Config ─────────────────────────────────────────────────────
   const DEFAULTS = {
@@ -20,10 +20,10 @@
   // ── Container Setup ─────────────────────────────────────────────
   function getContainer() {
     if (container) return container;
-    container = document.getElementById('bt-toast-container');
+    container = document.getElementById("bt-toast-container");
     if (!container) {
-      container = document.createElement('div');
-      container.id = 'bt-toast-container';
+      container = document.createElement("div");
+      container.id = "bt-toast-container";
       document.body.appendChild(container);
     }
     return container;
@@ -31,15 +31,18 @@
 
   // ── Icons ───────────────────────────────────────────────────────
   const ICONS = {
-    success: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>',
-    error:   '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>',
-    warning: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#D97706" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>',
-    info:    '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>',
+    success:
+      '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>',
+    error:
+      '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>',
+    warning:
+      '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#D97706" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>',
+    info: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>',
   };
 
   // ── Show Toast ──────────────────────────────────────────────────
   function showToast(message, type, duration) {
-    type = type || 'info';
+    type = type || "info";
     duration = duration || DEFAULTS.duration;
 
     // Add to queue
@@ -53,10 +56,10 @@
     const item = queue.shift();
     visibleCount++;
 
-    const el = document.createElement('div');
-    el.className = 'bt-toast';
-    el.setAttribute('role', 'alert');
-    el.setAttribute('aria-live', 'assertive');
+    const el = document.createElement("div");
+    el.className = "bt-toast";
+    el.setAttribute("role", "alert");
+    el.setAttribute("aria-live", "assertive");
     el.dataset.type = item.type;
 
     el.innerHTML = `
@@ -73,12 +76,12 @@
     // Trigger entrance animation (reflow needed)
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
-        el.classList.add('bt-toast-visible');
+        el.classList.add("bt-toast-visible");
       });
     });
 
     // Close button
-    el.querySelector('.bt-toast-close').addEventListener('click', function () {
+    el.querySelector(".bt-toast-close").addEventListener("click", function () {
       dismissToast(el, true);
     });
 
@@ -98,7 +101,7 @@
     el._dismissed = true;
 
     clearTimeout(el._autoTimer);
-    el.classList.remove('bt-toast-visible');
+    el.classList.remove("bt-toast-visible");
 
     // After animation ends, remove from DOM
     const animDuration = immediate ? 200 : DEFAULTS.animationDuration;
@@ -111,8 +114,8 @@
 
   // ── Escape HTML ─────────────────────────────────────────────────
   function escapeHtml(str) {
-    if (!str) return '';
-    const d = document.createElement('div');
+    if (!str) return "";
+    const d = document.createElement("div");
     d.textContent = str;
     return d.innerHTML;
   }
@@ -123,5 +126,4 @@
   // Also expose BookTale namespace
   window.BookTale = window.BookTale || {};
   window.BookTale.toast = { show: showToast };
-
 })();

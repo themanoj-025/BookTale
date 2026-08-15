@@ -40,21 +40,13 @@ class Book(Base):
     book_id: Mapped[str] = mapped_column(String(32), primary_key=True)
     title: Mapped[str] = mapped_column(String(255), nullable=False)
     author: Mapped[str] = mapped_column(String(255), nullable=False, default="")
-    isbn: Mapped[str] = mapped_column(
-        String(32), nullable=False, default="", index=True
-    )
+    isbn: Mapped[str] = mapped_column(String(32), nullable=False, default="", index=True)
     category: Mapped[str] = mapped_column(String(64), nullable=False, default="")
     total_copies: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
     available_copies: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
-    is_deleted: Mapped[bool] = mapped_column(
-        Boolean, nullable=False, default=False, index=True
-    )
-    issue_count: Mapped[int] = mapped_column(
-        Integer, nullable=False, default=0, index=True
-    )
-    added_on: Mapped[str] = mapped_column(
-        String(32), nullable=False, default=_now, index=True
-    )
+    is_deleted: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False, index=True)
+    issue_count: Mapped[int] = mapped_column(Integer, nullable=False, default=0, index=True)
+    added_on: Mapped[str] = mapped_column(String(32), nullable=False, default=_now, index=True)
 
     # Extended metadata (BookTale fields)
     publisher: Mapped[str] = mapped_column(String(255), nullable=False, default="")
@@ -87,27 +79,17 @@ class User(Base):
 
     user_id: Mapped[str] = mapped_column(String(64), primary_key=True)
     name: Mapped[str] = mapped_column(String(255), nullable=False)
-    email: Mapped[str] = mapped_column(
-        String(255), nullable=False, default="", index=True
-    )
+    email: Mapped[str] = mapped_column(String(255), nullable=False, default="", index=True)
     phone: Mapped[str] = mapped_column(String(32), nullable=False, default="")
-    role: Mapped[str] = mapped_column(
-        String(16), nullable=False, default="user", index=True
-    )
+    role: Mapped[str] = mapped_column(String(16), nullable=False, default="user", index=True)
     password_hash: Mapped[str] = mapped_column(String(128), nullable=False)
     membership_status: Mapped[str] = mapped_column(
         String(16), nullable=False, default="Active", index=True
     )
-    membership_expiry: Mapped[str] = mapped_column(
-        String(32), nullable=False, default=_now
-    )
+    membership_expiry: Mapped[str] = mapped_column(String(32), nullable=False, default=_now)
     books_issued: Mapped[list] = mapped_column(JSON, nullable=False, default=list)
-    unpaid_fine: Mapped[float] = mapped_column(
-        Float, nullable=False, default=0.0, index=True
-    )
-    registered_on: Mapped[str] = mapped_column(
-        String(32), nullable=False, default=_now, index=True
-    )
+    unpaid_fine: Mapped[float] = mapped_column(Float, nullable=False, default=0.0, index=True)
+    registered_on: Mapped[str] = mapped_column(String(32), nullable=False, default=_now, index=True)
 
     # Social profile
     bio: Mapped[str] = mapped_column(Text, nullable=False, default="")
@@ -119,62 +101,32 @@ class User(Base):
     favorite_books: Mapped[list] = mapped_column(JSON, nullable=False, default=list)
 
     # Security / rate limiting
-    failed_login_attempts: Mapped[int] = mapped_column(
-        Integer, nullable=False, default=0
-    )
-    lock_until: Mapped[str | None] = mapped_column(
-        String(32), nullable=True, default=None
-    )
+    failed_login_attempts: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    lock_until: Mapped[str | None] = mapped_column(String(32), nullable=True, default=None)
 
     # Settings
     theme: Mapped[str] = mapped_column(String(16), nullable=False, default="light")
     font_size: Mapped[str] = mapped_column(String(16), nullable=False, default="medium")
-    email_notifications: Mapped[bool] = mapped_column(
-        Boolean, nullable=False, default=True
-    )
-    push_notifications: Mapped[bool] = mapped_column(
-        Boolean, nullable=False, default=True
-    )
-    notify_on_comment: Mapped[bool] = mapped_column(
-        Boolean, nullable=False, default=True
-    )
+    email_notifications: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+    push_notifications: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+    notify_on_comment: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
     notify_on_like: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
-    notify_on_follow: Mapped[bool] = mapped_column(
-        Boolean, nullable=False, default=True
-    )
-    notify_on_issue_return: Mapped[bool] = mapped_column(
-        Boolean, nullable=False, default=True
-    )
-    notify_on_overdue: Mapped[bool] = mapped_column(
-        Boolean, nullable=False, default=True
-    )
-    notify_on_due_reminder: Mapped[bool] = mapped_column(
-        Boolean, nullable=False, default=True
-    )
-    privacy_show_activity: Mapped[bool] = mapped_column(
-        Boolean, nullable=False, default=True
-    )
-    privacy_show_wishlist: Mapped[bool] = mapped_column(
-        Boolean, nullable=False, default=True
-    )
-    privacy_show_bookmarks: Mapped[bool] = mapped_column(
-        Boolean, nullable=False, default=True
-    )
+    notify_on_follow: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+    notify_on_issue_return: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+    notify_on_overdue: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+    notify_on_due_reminder: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+    privacy_show_activity: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+    privacy_show_wishlist: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+    privacy_show_bookmarks: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
     privacy_profile_visibility: Mapped[str] = mapped_column(
         String(16), nullable=False, default="public"
     )
-    privacy_show_email: Mapped[bool] = mapped_column(
-        Boolean, nullable=False, default=False
-    )
+    privacy_show_email: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     reading_default_rating: Mapped[str] = mapped_column(
         String(16), nullable=False, default="worth_it"
     )
-    reading_goal_type: Mapped[str] = mapped_column(
-        String(16), nullable=False, default="books"
-    )
-    reading_default_goal: Mapped[int] = mapped_column(
-        Integer, nullable=False, default=12
-    )
+    reading_goal_type: Mapped[str] = mapped_column(String(16), nullable=False, default="books")
+    reading_default_goal: Mapped[int] = mapped_column(Integer, nullable=False, default=12)
 
     __table_args__ = (
         Index("ix_users_name", "name"),
@@ -191,18 +143,10 @@ class Transaction(Base):
 
     txn_id: Mapped[str] = mapped_column(String(64), primary_key=True)
     type: Mapped[str] = mapped_column(String(16), nullable=False, default="issue")
-    user_id: Mapped[str] = mapped_column(
-        ForeignKey("users.user_id"), nullable=False, index=True
-    )
-    book_id: Mapped[str] = mapped_column(
-        ForeignKey("books.book_id"), nullable=False, index=True
-    )
-    issue_date: Mapped[str] = mapped_column(
-        String(32), nullable=False, default=_now, index=True
-    )
-    due_date: Mapped[str] = mapped_column(
-        String(32), nullable=False, default=_now, index=True
-    )
+    user_id: Mapped[str] = mapped_column(ForeignKey("users.user_id"), nullable=False, index=True)
+    book_id: Mapped[str] = mapped_column(ForeignKey("books.book_id"), nullable=False, index=True)
+    issue_date: Mapped[str] = mapped_column(String(32), nullable=False, default=_now, index=True)
+    due_date: Mapped[str] = mapped_column(String(32), nullable=False, default=_now, index=True)
     return_date: Mapped[str | None] = mapped_column(
         String(32), nullable=True, default=None, index=True
     )
@@ -215,12 +159,8 @@ class Transaction(Base):
         Index("ix_txns_user_open", "user_id", "return_date"),
     )
 
-    user: Mapped["User"] = relationship(
-        back_populates="transactions", foreign_keys=[user_id]
-    )
-    book: Mapped["Book"] = relationship(
-        back_populates="transactions", foreign_keys=[book_id]
-    )
+    user: Mapped["User"] = relationship(back_populates="transactions", foreign_keys=[user_id])
+    book: Mapped["Book"] = relationship(back_populates="transactions", foreign_keys=[book_id])
 
 
 class Reservation(Base):
@@ -229,12 +169,8 @@ class Reservation(Base):
     __tablename__ = "reservations"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    book_id: Mapped[str] = mapped_column(
-        ForeignKey("books.book_id"), nullable=False, index=True
-    )
-    user_id: Mapped[str] = mapped_column(
-        ForeignKey("users.user_id"), nullable=False, index=True
-    )
+    book_id: Mapped[str] = mapped_column(ForeignKey("books.book_id"), nullable=False, index=True)
+    user_id: Mapped[str] = mapped_column(ForeignKey("users.user_id"), nullable=False, index=True)
     position: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     created_at: Mapped[str] = mapped_column(String(32), nullable=False, default=_now)
 
@@ -248,15 +184,11 @@ class Fine(Base):
     __tablename__ = "fines"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    user_id: Mapped[str] = mapped_column(
-        ForeignKey("users.user_id"), nullable=False, index=True
-    )
+    user_id: Mapped[str] = mapped_column(ForeignKey("users.user_id"), nullable=False, index=True)
     book_id: Mapped[str] = mapped_column(String(64), nullable=False, default="")
     fine: Mapped[float] = mapped_column(Float, nullable=False, default=0.0)
     date: Mapped[str] = mapped_column(String(32), nullable=False, default=_now)
-    paid: Mapped[bool] = mapped_column(
-        Boolean, nullable=False, default=False, index=True
-    )
+    paid: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False, index=True)
 
     __table_args__ = (Index("ix_fines_user_paid", "user_id", "paid"),)
 
@@ -265,17 +197,11 @@ class Notification(Base):
     __tablename__ = "notifications"
 
     notif_id: Mapped[str] = mapped_column(String(64), primary_key=True)
-    user_id: Mapped[str] = mapped_column(
-        ForeignKey("users.user_id"), nullable=False, index=True
-    )
+    user_id: Mapped[str] = mapped_column(ForeignKey("users.user_id"), nullable=False, index=True)
     type: Mapped[str] = mapped_column(String(32), nullable=False, default="")
     message: Mapped[str] = mapped_column(Text, nullable=False, default="")
-    created_at: Mapped[str] = mapped_column(
-        String(32), nullable=False, default=_now, index=True
-    )
-    read: Mapped[bool] = mapped_column(
-        Boolean, nullable=False, default=False, index=True
-    )
+    created_at: Mapped[str] = mapped_column(String(32), nullable=False, default=_now, index=True)
+    read: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False, index=True)
 
     __table_args__ = (Index("ix_notifs_user_read", "user_id", "read"),)
 
@@ -289,16 +215,12 @@ class Post(Base):
     __tablename__ = "posts"
 
     post_id: Mapped[str] = mapped_column(String(64), primary_key=True)
-    user_id: Mapped[str] = mapped_column(
-        ForeignKey("users.user_id"), nullable=False, index=True
-    )
+    user_id: Mapped[str] = mapped_column(ForeignKey("users.user_id"), nullable=False, index=True)
     content: Mapped[str] = mapped_column(Text, nullable=False, default="")
     type: Mapped[str] = mapped_column(String(32), nullable=False, default="post")
     book_ids: Mapped[list] = mapped_column(JSON, nullable=False, default=list)
     image_urls: Mapped[list] = mapped_column(JSON, nullable=False, default=list)
-    created_at: Mapped[str] = mapped_column(
-        String(32), nullable=False, default=_now, index=True
-    )
+    created_at: Mapped[str] = mapped_column(String(32), nullable=False, default=_now, index=True)
     updated_at: Mapped[str] = mapped_column(String(32), nullable=False, default=_now)
     likes: Mapped[list] = mapped_column(JSON, nullable=False, default=list)
     # Social extras (mirror the JSON post shape from social.py)
@@ -314,19 +236,11 @@ class Comment(Base):
     __tablename__ = "comments"
 
     comment_id: Mapped[str] = mapped_column(String(64), primary_key=True)
-    post_id: Mapped[str] = mapped_column(
-        ForeignKey("posts.post_id"), nullable=False, index=True
-    )
-    user_id: Mapped[str] = mapped_column(
-        ForeignKey("users.user_id"), nullable=False, index=True
-    )
+    post_id: Mapped[str] = mapped_column(ForeignKey("posts.post_id"), nullable=False, index=True)
+    user_id: Mapped[str] = mapped_column(ForeignKey("users.user_id"), nullable=False, index=True)
     content: Mapped[str] = mapped_column(Text, nullable=False, default="")
-    parent_id: Mapped[str | None] = mapped_column(
-        String(64), nullable=True, default=None
-    )
-    created_at: Mapped[str] = mapped_column(
-        String(32), nullable=False, default=_now, index=True
-    )
+    parent_id: Mapped[str | None] = mapped_column(String(64), nullable=True, default=None)
+    created_at: Mapped[str] = mapped_column(String(32), nullable=False, default=_now, index=True)
     likes: Mapped[list] = mapped_column(JSON, nullable=False, default=list)
 
     __table_args__ = (Index("ix_comments_post_created", "post_id", "created_at"),)
@@ -354,19 +268,13 @@ class Review(Base):
     __tablename__ = "reviews"
 
     review_id: Mapped[str] = mapped_column(String(64), primary_key=True)
-    user_id: Mapped[str] = mapped_column(
-        ForeignKey("users.user_id"), nullable=False, index=True
-    )
-    book_id: Mapped[str] = mapped_column(
-        ForeignKey("books.book_id"), nullable=False, index=True
-    )
+    user_id: Mapped[str] = mapped_column(ForeignKey("users.user_id"), nullable=False, index=True)
+    book_id: Mapped[str] = mapped_column(ForeignKey("books.book_id"), nullable=False, index=True)
     rating: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     content: Mapped[str] = mapped_column(Text, nullable=False, default="")
     spoiler: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     helpful_votes: Mapped[list] = mapped_column(JSON, nullable=False, default=list)
-    created_at: Mapped[str] = mapped_column(
-        String(32), nullable=False, default=_now, index=True
-    )
+    created_at: Mapped[str] = mapped_column(String(32), nullable=False, default=_now, index=True)
     updated_at: Mapped[str] = mapped_column(String(32), nullable=False, default=_now)
 
     __table_args__ = (
@@ -379,29 +287,21 @@ class Bookshelf(Base):
     __tablename__ = "bookshelves"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    user_id: Mapped[str] = mapped_column(
-        ForeignKey("users.user_id"), nullable=False, index=True
-    )
+    user_id: Mapped[str] = mapped_column(ForeignKey("users.user_id"), nullable=False, index=True)
     book_id: Mapped[str] = mapped_column(String(64), nullable=False, default="")
     shelf: Mapped[str] = mapped_column(String(32), nullable=False, default="")
     created_at: Mapped[str] = mapped_column(String(32), nullable=False, default=_now)
 
-    __table_args__ = (
-        UniqueConstraint("user_id", "book_id", name="uq_shelf_user_book"),
-    )
+    __table_args__ = (UniqueConstraint("user_id", "book_id", name="uq_shelf_user_book"),)
 
 
 class DiaryEntry(Base):
     __tablename__ = "diary_entries"
 
     entry_id: Mapped[str] = mapped_column(String(64), primary_key=True)
-    user_id: Mapped[str] = mapped_column(
-        ForeignKey("users.user_id"), nullable=False, index=True
-    )
+    user_id: Mapped[str] = mapped_column(ForeignKey("users.user_id"), nullable=False, index=True)
     book_id: Mapped[str] = mapped_column(String(64), nullable=False, default="")
-    date_read: Mapped[str] = mapped_column(
-        String(32), nullable=False, default="", index=True
-    )
+    date_read: Mapped[str] = mapped_column(String(32), nullable=False, default="", index=True)
     rating_label: Mapped[str] = mapped_column(String(32), nullable=False, default="")
     star_rating: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     diary_text: Mapped[str] = mapped_column(Text, nullable=False, default="")
@@ -415,24 +315,18 @@ class WishlistSuggestion(Base):
     __tablename__ = "wishlist_suggestions"
 
     suggestion_id: Mapped[str] = mapped_column(String(64), primary_key=True)
-    user_id: Mapped[str] = mapped_column(
-        ForeignKey("users.user_id"), nullable=False, index=True
-    )
+    user_id: Mapped[str] = mapped_column(ForeignKey("users.user_id"), nullable=False, index=True)
     title: Mapped[str] = mapped_column(String(255), nullable=False)
     author: Mapped[str] = mapped_column(String(255), nullable=False, default="")
     reason: Mapped[str] = mapped_column(Text, nullable=False, default="")
     isbn: Mapped[str] = mapped_column(String(32), nullable=False, default="")
     category: Mapped[str] = mapped_column(String(64), nullable=False, default="")
-    status: Mapped[str] = mapped_column(
-        String(16), nullable=False, default="pending", index=True
-    )
+    status: Mapped[str] = mapped_column(String(16), nullable=False, default="pending", index=True)
     upvotes: Mapped[list] = mapped_column(JSON, nullable=False, default=list)
     downvotes: Mapped[list] = mapped_column(JSON, nullable=False, default=list)
     comments: Mapped[list] = mapped_column(JSON, nullable=False, default=list)
     admin_notes: Mapped[str] = mapped_column(Text, nullable=False, default="")
-    created_at: Mapped[str] = mapped_column(
-        String(32), nullable=False, default=_now, index=True
-    )
+    created_at: Mapped[str] = mapped_column(String(32), nullable=False, default=_now, index=True)
 
 
 class Series(Base):
@@ -463,16 +357,12 @@ class ReadingChallenge(Base):
     __tablename__ = "reading_challenges"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    user_id: Mapped[str] = mapped_column(
-        ForeignKey("users.user_id"), nullable=False, index=True
-    )
+    user_id: Mapped[str] = mapped_column(ForeignKey("users.user_id"), nullable=False, index=True)
     year: Mapped[int] = mapped_column(Integer, nullable=False, index=True)
     goal: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     progress: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
 
-    __table_args__ = (
-        UniqueConstraint("user_id", "year", name="uq_challenge_user_year"),
-    )
+    __table_args__ = (UniqueConstraint("user_id", "year", name="uq_challenge_user_year"),)
 
 
 class GamificationState(Base):
@@ -497,9 +387,7 @@ class AuthToken(Base):
     __tablename__ = "auth_tokens"
 
     token: Mapped[str] = mapped_column(String(128), primary_key=True)
-    user_id: Mapped[str] = mapped_column(
-        ForeignKey("users.user_id"), nullable=False, index=True
-    )
+    user_id: Mapped[str] = mapped_column(ForeignKey("users.user_id"), nullable=False, index=True)
     purpose: Mapped[str] = mapped_column(
         String(16), nullable=False, index=True
     )  # "reset" | "verify"
@@ -521,19 +409,13 @@ class AuditLog(Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     admin_id: Mapped[str] = mapped_column(String(64), nullable=False, index=True)
-    action: Mapped[str] = mapped_column(
-        String(32), nullable=False, default="", index=True
-    )
+    action: Mapped[str] = mapped_column(String(32), nullable=False, default="", index=True)
     target: Mapped[str] = mapped_column(String(64), nullable=False, default="")
     old_value: Mapped[str] = mapped_column(Text, nullable=True, default=None)
     new_value: Mapped[str] = mapped_column(Text, nullable=True, default=None)
-    ip_address: Mapped[str] = mapped_column(
-        String(64), nullable=False, default="", index=True
-    )
+    ip_address: Mapped[str] = mapped_column(String(64), nullable=False, default="", index=True)
     user_agent: Mapped[str] = mapped_column(String(255), nullable=False, default="")
-    created_at: Mapped[str] = mapped_column(
-        String(32), nullable=False, default=_now, index=True
-    )
+    created_at: Mapped[str] = mapped_column(String(32), nullable=False, default=_now, index=True)
 
     __table_args__ = (
         # Admin-dashboard filters: who did what, newest first.

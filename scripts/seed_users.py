@@ -581,17 +581,13 @@ def generate_membership_expiry(reg_date_str: str) -> str:
         r = random.random()
         if r < 0.80:  # Active
             if random.random() < 0.7:  # Recently renewed
-                return (
-                    datetime.now() + timedelta(days=random.randint(30, 365))
-                ).isoformat()
+                return (datetime.now() + timedelta(days=random.randint(30, 365))).isoformat()
             else:
                 return (reg_date + timedelta(days=365)).isoformat()
         elif r < 0.95:  # Expired
             return (reg_date + timedelta(days=365)).isoformat()
         else:  # Blocked
-            return (
-                datetime.now() + timedelta(days=random.randint(-30, 30))
-            ).isoformat()
+            return (datetime.now() + timedelta(days=random.randint(-30, 30))).isoformat()
     except:
         return (datetime.now() + timedelta(days=365)).isoformat()
 
@@ -684,9 +680,7 @@ def generate_users(count: int = 5000) -> dict[str, User]:
         profile_picture = ""
 
         # 10% have a small unpaid fine
-        unpaid_fine = (
-            round(random.uniform(10, 200), 2) if random.random() < 0.1 else 0.0
-        )
+        unpaid_fine = round(random.uniform(10, 200), 2) if random.random() < 0.1 else 0.0
 
         # Books issued (0-2 for most, 3 for active readers, rarely max)
         books_issued = []

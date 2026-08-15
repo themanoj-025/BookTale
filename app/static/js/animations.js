@@ -5,43 +5,53 @@
    ═══════════════════════════════════════════════════════════════════ */
 
 (function () {
-  'use strict';
+  "use strict";
 
   // ── Motion guard ────────────────────────────────────────────────
   function prefersReducedMotion() {
-    return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   }
 
   // ── 1. Staggered reveal (IntersectionObserver) ──────────────────
   function staggerReveal(selector, opts) {
     if (prefersReducedMotion()) return;
     opts = opts || {};
-    const rootMargin = opts.rootMargin || '0px 0px -60px 0px';
+    const rootMargin = opts.rootMargin || "0px 0px -60px 0px";
     const threshold = opts.threshold || 0.05;
 
     const els = document.querySelectorAll(selector);
     if (!els.length) return;
 
-    const observer = new IntersectionObserver(function (entries) {
-      entries.forEach(function (entry) {
-        if (!entry.isIntersecting) return;
-        const el = entry.target;
-        const delay = parseFloat(el.dataset.staggerDelay) ||
-                      (parseFloat(el.style.getPropertyValue('--i')) || 0) * 40;
-        el.style.opacity = '0';
-        el.style.transform = 'translateY(20px)';
-        el.style.transition =
-          'opacity 500ms cubic-bezier(0.16,1,0.3,1) ' + delay + 'ms, ' +
-          'transform 500ms cubic-bezier(0.16,1,0.3,1) ' + delay + 'ms';
-        requestAnimationFrame(function () {
-          el.style.opacity = '1';
-          el.style.transform = 'translateY(0)';
+    const observer = new IntersectionObserver(
+      function (entries) {
+        entries.forEach(function (entry) {
+          if (!entry.isIntersecting) return;
+          const el = entry.target;
+          const delay =
+            parseFloat(el.dataset.staggerDelay) ||
+            (parseFloat(el.style.getPropertyValue("--i")) || 0) * 40;
+          el.style.opacity = "0";
+          el.style.transform = "translateY(20px)";
+          el.style.transition =
+            "opacity 500ms cubic-bezier(0.16,1,0.3,1) " +
+            delay +
+            "ms, " +
+            "transform 500ms cubic-bezier(0.16,1,0.3,1) " +
+            delay +
+            "ms";
+          requestAnimationFrame(function () {
+            el.style.opacity = "1";
+            el.style.transform = "translateY(0)";
+          });
+          observer.unobserve(el);
         });
-        observer.unobserve(el);
-      });
-    }, { rootMargin: rootMargin, threshold: threshold });
+      },
+      { rootMargin: rootMargin, threshold: threshold },
+    );
 
-    els.forEach(function (el) { observer.observe(el); });
+    els.forEach(function (el) {
+      observer.observe(el);
+    });
     return observer;
   }
 
@@ -54,7 +64,7 @@
     duration = duration || 1200;
     from = from || 0;
     const start = performance.now();
-    const isFloat = (to % 1 !== 0) || (from % 1 !== 0);
+    const isFloat = to % 1 !== 0 || from % 1 !== 0;
 
     function tick(now) {
       const elapsed = now - start;
@@ -81,27 +91,29 @@
       const rect = el.getBoundingClientRect();
       const scrollY = window.scrollY || window.pageYOffset;
       const offset = rect.top - scrollY;
-      el.style.transform = 'translateY(' + (offset * speed * 0.1) + 'px)';
+      el.style.transform = "translateY(" + offset * speed * 0.1 + "px)";
     }
 
-    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener("scroll", onScroll, { passive: true });
     onScroll();
-    return function cleanup() { window.removeEventListener('scroll', onScroll); };
+    return function cleanup() {
+      window.removeEventListener("scroll", onScroll);
+    };
   }
 
   // ── 4. Confetti burst (Canvas) ──────────────────────────────────
   function burstConfetti(x, y, colors) {
     if (prefersReducedMotion()) return;
-    colors = colors || ['#7c6af7', '#e8507a', '#0D9488', '#D97706', '#3B82F6'];
+    colors = colors || ["#7c6af7", "#e8507a", "#0D9488", "#D97706", "#3B82F6"];
 
-    const canvas = document.createElement('canvas');
+    const canvas = document.createElement("canvas");
     canvas.style.cssText =
-      'position:fixed;inset:0;z-index:99998;pointer-events:none;width:100vw;height:100vh;';
+      "position:fixed;inset:0;z-index:99998;pointer-events:none;width:100vw;height:100vh;";
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
     document.body.appendChild(canvas);
 
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext("2d");
     const particles = [];
     const count = 80;
 
@@ -117,7 +129,7 @@
         rotSpeed: (Math.random() - 0.5) * 10,
         life: 1,
         decay: 0.01 + Math.random() * 0.015,
-        shape: Math.random() > 0.5 ? 'rect' : 'circle',
+        shape: Math.random() > 0.5 ? "rect" : "circle",
       });
     }
 
@@ -142,7 +154,7 @@
         ctx.globalAlpha = Math.max(0, p.life);
         ctx.fillStyle = p.color;
 
-        if (p.shape === 'rect') {
+        if (p.shape === "rect") {
           ctx.fillRect(-p.size / 2, -p.size / 4, p.size, p.size / 2);
         } else {
           ctx.beginPath();
@@ -176,17 +188,17 @@
     if (!els.length) return;
 
     els.forEach(function (el) {
-      el.addEventListener('mousemove', function (e) {
+      el.addEventListener("mousemove", function (e) {
         const rect = el.getBoundingClientRect();
         const cx = rect.left + rect.width / 2;
         const cy = rect.top + rect.height / 2;
         const dx = (e.clientX - cx) * strength;
         const dy = (e.clientY - cy) * strength;
-        el.style.transform = 'translate(' + dx + 'px, ' + dy + 'px)';
+        el.style.transform = "translate(" + dx + "px, " + dy + "px)";
       });
 
-      el.addEventListener('mouseleave', function () {
-        el.style.transform = 'translate(0, 0)';
+      el.addEventListener("mouseleave", function () {
+        el.style.transform = "translate(0, 0)";
       });
     });
   }
@@ -196,26 +208,36 @@
     if (prefersReducedMotion()) return;
     // One-time setup: ensure position:relative for ripple containment
     if (!el._btRippleReady) {
-      if (getComputedStyle(el).position === 'static') {
-        el.style.position = 'relative';
+      if (getComputedStyle(el).position === "static") {
+        el.style.position = "relative";
       }
-      el.style.overflow = 'hidden';
+      el.style.overflow = "hidden";
       el._btRippleReady = true;
     }
-    el.addEventListener('click', function (e) {
+    el.addEventListener("click", function (e) {
       const rect = el.getBoundingClientRect();
       const size = Math.max(rect.width, rect.height);
       const x = e.clientX - rect.left - size / 2;
       const y = e.clientY - rect.top - size / 2;
 
-      const ripple = document.createElement('span');
+      const ripple = document.createElement("span");
       ripple.style.cssText =
-        'position:absolute;border-radius:50%;width:' + size + 'px;height:' + size + 'px;' +
-        'left:' + x + 'px;top:' + y + 'px;' +
-        'background:rgba(255,255,255,0.35);transform:scale(0);' +
-        'animation:bt-ripple-effect 600ms ease-out forwards;pointer-events:none;';
+        "position:absolute;border-radius:50%;width:" +
+        size +
+        "px;height:" +
+        size +
+        "px;" +
+        "left:" +
+        x +
+        "px;top:" +
+        y +
+        "px;" +
+        "background:rgba(255,255,255,0.35);transform:scale(0);" +
+        "animation:bt-ripple-effect 600ms ease-out forwards;pointer-events:none;";
       el.appendChild(ripple);
-      setTimeout(function () { if (ripple.parentNode) ripple.remove(); }, 700);
+      setTimeout(function () {
+        if (ripple.parentNode) ripple.remove();
+      }, 700);
     });
   }
 
@@ -224,34 +246,38 @@
     if (prefersReducedMotion()) return;
 
     // Add bt-page class to main content for entrance animation
-    const main = document.querySelector('.main-content');
+    const main = document.querySelector(".main-content");
     if (main) {
-      main.classList.add('bt-page');
+      main.classList.add("bt-page");
     }
 
     // Reading progress bar
-    let progressBar = document.getElementById('bt-progress-bar');
+    let progressBar = document.getElementById("bt-progress-bar");
     if (!progressBar) {
-      progressBar = document.createElement('div');
-      progressBar.id = 'bt-progress-bar';
+      progressBar = document.createElement("div");
+      progressBar.id = "bt-progress-bar";
       document.body.appendChild(progressBar);
     }
 
     function updateProgress() {
       const scrollTop = window.scrollY || window.pageYOffset;
       const docHeight = Math.max(
-        document.body.scrollHeight, document.documentElement.scrollHeight,
-        document.body.offsetHeight, document.documentElement.offsetHeight,
-        document.body.clientHeight, document.documentElement.clientHeight
+        document.body.scrollHeight,
+        document.documentElement.scrollHeight,
+        document.body.offsetHeight,
+        document.documentElement.offsetHeight,
+        document.body.clientHeight,
+        document.documentElement.clientHeight,
       );
       const winHeight = window.innerHeight;
       const scrollable = docHeight - winHeight;
-      const pct = scrollable > 0 ? Math.min((scrollTop / scrollable) * 100, 100) : 0;
-      progressBar.style.width = pct + '%';
-      progressBar.style.opacity = pct > 0 ? '1' : '0';
+      const pct =
+        scrollable > 0 ? Math.min((scrollTop / scrollable) * 100, 100) : 0;
+      progressBar.style.width = pct + "%";
+      progressBar.style.opacity = pct > 0 ? "1" : "0";
     }
 
-    window.addEventListener('scroll', updateProgress, { passive: true });
+    window.addEventListener("scroll", updateProgress, { passive: true });
     updateProgress();
   }
 
@@ -263,20 +289,27 @@
     if (!els.length) return;
 
     els.forEach(function (el) {
-      el.addEventListener('mousemove', function (e) {
+      el.addEventListener("mousemove", function (e) {
         const rect = el.getBoundingClientRect();
         const x = (e.clientX - rect.left) / rect.width;
         const y = (e.clientY - rect.top) / rect.height;
         const tiltX = (y - 0.5) * maxTilt;
         const tiltY = (x - 0.5) * -maxTilt;
         el.style.transform =
-          'perspective(800px) rotateX(' + tiltX + 'deg) rotateY(' + tiltY + 'deg) scale3d(1.02,1.02,1.02)';
+          "perspective(800px) rotateX(" +
+          tiltX +
+          "deg) rotateY(" +
+          tiltY +
+          "deg) scale3d(1.02,1.02,1.02)";
       });
 
-      el.addEventListener('mouseleave', function () {
-        el.style.transform = 'perspective(800px) rotateX(0) rotateY(0) scale3d(1,1,1)';
-        el.style.transition = 'transform 400ms cubic-bezier(0.16,1,0.3,1)';
-        setTimeout(function () { el.style.transition = ''; }, 400);
+      el.addEventListener("mouseleave", function () {
+        el.style.transform =
+          "perspective(800px) rotateX(0) rotateY(0) scale3d(1,1,1)";
+        el.style.transition = "transform 400ms cubic-bezier(0.16,1,0.3,1)";
+        setTimeout(function () {
+          el.style.transition = "";
+        }, 400);
       });
     });
   }
@@ -288,8 +321,8 @@
       return;
     }
     speed = speed || 50;
-    el.textContent = '';
-    el.style.visibility = 'visible';
+    el.textContent = "";
+    el.style.visibility = "visible";
 
     let i = 0;
     function type() {
@@ -308,19 +341,21 @@
     initPageTransitions();
 
     // Staggered reveal on any element with .bt-reveal class
-    const revealObserver = staggerReveal('.bt-reveal');
+    const revealObserver = staggerReveal(".bt-reveal");
 
     // Tilt on cover cards
-    initTilt('.bt-cover-card', 6);
+    initTilt(".bt-cover-card", 6);
 
     // Ripple on primary buttons
-    document.querySelectorAll('.btn-primary, .sidebar-post-btn').forEach(function (btn) {
-      addRipple(btn);
-    });
+    document
+      .querySelectorAll(".btn-primary, .sidebar-post-btn")
+      .forEach(function (btn) {
+        addRipple(btn);
+      });
   }
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', autoInit);
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", autoInit);
   } else {
     autoInit();
   }
@@ -338,5 +373,4 @@
     initTilt: initTilt,
     typewriter: typewriter,
   };
-
 })();

@@ -20,9 +20,7 @@ Three jobs today:
 from app.core.logger import log
 
 
-def job_fetch_book_cover(
-    book_id: str, title: str, author: str, isbn: str, storage=None
-) -> dict:
+def job_fetch_book_cover(book_id: str, title: str, author: str, isbn: str, storage=None) -> dict:
     """Fetch cover/metadata for one book and persist it (idempotent).
 
     `storage` is the caller's storage handle for the in-process pool path

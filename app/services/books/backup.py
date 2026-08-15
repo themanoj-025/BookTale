@@ -50,10 +50,6 @@ def restore_backup(backup_path: str) -> bool:
     if os.path.exists(Config.DATA_DIR):
         # Archive current data before restoring
         ts = datetime.now().strftime("%Y%m%d_%H%M%S")
-        shutil.move(
-            Config.DATA_DIR, os.path.join(Config.BACKUPS_DIR, f"pre_restore_{ts}")
-        )
-    shutil.copytree(
-        backup_path, Config.DATA_DIR, ignore=shutil.ignore_patterns("_meta.json")
-    )
+        shutil.move(Config.DATA_DIR, os.path.join(Config.BACKUPS_DIR, f"pre_restore_{ts}"))
+    shutil.copytree(backup_path, Config.DATA_DIR, ignore=shutil.ignore_patterns("_meta.json"))
     return True

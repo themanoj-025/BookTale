@@ -116,9 +116,7 @@ def _get_logger_locked() -> logging.Logger:
 
     # ── Console handler (dev convenience) ────────────────────────────────
     console = logging.StreamHandler(sys.stderr)
-    console.setLevel(
-        logging.DEBUG if getattr(Config, "FLASK_DEBUG", False) else logging.INFO
-    )
+    console.setLevel(logging.DEBUG if getattr(Config, "FLASK_DEBUG", False) else logging.INFO)
     console.setFormatter(
         logging.Formatter(
             "%(asctime)s %(levelname)-5s %(name)s: %(message)s",

@@ -31,14 +31,14 @@
 
 ## 1. Title & Badges
 
-| | |
-|---|---|
-| **Project Name** | Book-Tale |
-| **Tagline** | Community-driven library management system |
-| **License** | MIT |
-| **Tests** | 202 passing |
-| **Routes** | 132 registered |
-| **Seed Catalog** | 11,127 books |
+|                  |                                            |
+| ---------------- | ------------------------------------------ |
+| **Project Name** | Book-Tale                                  |
+| **Tagline**      | Community-driven library management system |
+| **License**      | MIT                                        |
+| **Tests**        | 202 passing                                |
+| **Routes**       | 132 registered                             |
+| **Seed Catalog** | 11,127 books                               |
 
 ![Tests](https://img.shields.io/badge/tests-202_passing-brightgreen)
 ![License](https://img.shields.io/badge/License-MIT-yellow)
@@ -54,6 +54,7 @@
 ### What it does:
 
 **Core Library Operations:**
+
 - Book catalog with search, filtering, and category browsing
 - Issue/return/reserve flows with concurrency-safe transactions
 - Borrow limits, membership expiry, fine calculation
@@ -61,6 +62,7 @@
 - Reports and statistics
 
 **Reader & Community Features:**
+
 - Reading progress tracking + reading challenges with streaks
 - Wishlist, reading lists, book reviews & ratings
 - Social feed with posts, comments, likes, and follows
@@ -70,6 +72,7 @@
 - Book recommendations — rule-based "for you" and trending
 
 **Accounts & Administration:**
+
 - Registration/login/logout with bcrypt password hashing
 - Email verification and password reset with expiring tokens
 - Role-based access: user, librarian, admin
@@ -77,12 +80,14 @@
 - Admin audit trail: append-only log of every admin-settings change
 
 **Operations:**
+
 - `/healthz` and `/readyz` probes
 - Background jobs (Redis + RQ): cover fetch, overdue emails, token purge
 - Structured logging with request IDs
 - Docker: multi-stage build + docker-compose
 
 ### Key Stats:
+
 - **202 tests** passing (unit + integration + security)
 - **132 routes** registered on the Flask app
 - **11,127 books** in seed catalog
@@ -91,28 +96,28 @@
 
 ## 3. Tech Stack & Core Technologies
 
-| Layer | Technology | Version | Purpose |
-|-------|-----------|---------|---------|
-| **Language** | Python | 3.10+ | Core runtime |
-| **Web Framework** | Flask | ≥3.1 | Web application |
-| **ORM** | SQLAlchemy | ≥2.0 | Database ORM |
-| **Migrations** | Alembic | ≥1.18 | Schema migrations |
-| **Templates** | Jinja2 | — | Server-side rendering |
-| **Realtime** | Flask-SocketIO | — | WebSocket communication |
-| **Background Jobs** | RQ | ≥1.15,<2.0 | Task queue |
-| **Cache/Queue** | Redis | ≥5.0 | Rate limiting, job queue |
-| **Auth** | bcrypt | ≥4.0 | Password hashing |
-| **CSRF** | Flask-WTF | ≥1.3 | CSRF protection |
-| **Rate Limiting** | Flask-Limiter | ≥4.1 | Request throttling |
-| **Database** | PostgreSQL | — | Production storage |
-| **Database** | SQLite | — | Development storage |
-| **Frontend Build** | esbuild | — | JS/CSS bundling |
-| **Testing** | pytest | ≥7.4 | Unit + integration |
-| **Coverage** | pytest-cov | ≥7.1 | Test coverage |
-| **Code Quality** | Ruff | — | Linting |
-| **Formatting** | Black | — | Code formatting |
-| **Containerization** | Docker | — | Multi-stage builds |
-| **CI/CD** | GitHub Actions | — | Automated pipeline |
+| Layer                | Technology     | Version    | Purpose                  |
+| -------------------- | -------------- | ---------- | ------------------------ |
+| **Language**         | Python         | 3.10+      | Core runtime             |
+| **Web Framework**    | Flask          | ≥3.1       | Web application          |
+| **ORM**              | SQLAlchemy     | ≥2.0       | Database ORM             |
+| **Migrations**       | Alembic        | ≥1.18      | Schema migrations        |
+| **Templates**        | Jinja2         | —          | Server-side rendering    |
+| **Realtime**         | Flask-SocketIO | —          | WebSocket communication  |
+| **Background Jobs**  | RQ             | ≥1.15,<2.0 | Task queue               |
+| **Cache/Queue**      | Redis          | ≥5.0       | Rate limiting, job queue |
+| **Auth**             | bcrypt         | ≥4.0       | Password hashing         |
+| **CSRF**             | Flask-WTF      | ≥1.3       | CSRF protection          |
+| **Rate Limiting**    | Flask-Limiter  | ≥4.1       | Request throttling       |
+| **Database**         | PostgreSQL     | —          | Production storage       |
+| **Database**         | SQLite         | —          | Development storage      |
+| **Frontend Build**   | esbuild        | —          | JS/CSS bundling          |
+| **Testing**          | pytest         | ≥7.4       | Unit + integration       |
+| **Coverage**         | pytest-cov     | ≥7.1       | Test coverage            |
+| **Code Quality**     | Ruff           | —          | Linting                  |
+| **Formatting**       | Black          | —          | Code formatting          |
+| **Containerization** | Docker         | —          | Multi-stage builds       |
+| **CI/CD**            | GitHub Actions | —          | Automated pipeline       |
 
 ---
 
@@ -270,6 +275,7 @@ Book-Tale/
 ### 6.1 Root Entry Points
 
 #### `web_app.py`
+
 - **Purpose:** Flask application factory + Socket.IO initialization
 - **Key Components:**
   - Security headers middleware
@@ -281,10 +287,12 @@ Book-Tale/
 - **Runs:** `python web_app.py`
 
 #### `main.py`
+
 - **Purpose:** CLI entry point
 - **Logic:** Imports CLI from `app/routes/main.py`
 
 #### `worker.py`
+
 - **Purpose:** RQ worker + cron scheduler
 - **Background Jobs:**
   - Cover/metadata fetch
@@ -307,20 +315,24 @@ Book-Tale/
 ### 6.3 `app/db/` — Database Layer
 
 #### `app/db/models.py`
+
 - **Purpose:** SQLAlchemy ORM models
 - **Key Models:** User, Book, Transaction, Reservation, Fine, Post, Comment, Review, Notification, AuditLog, etc.
 
 #### `app/db/repositories.py`
+
 - **Purpose:** Data access layer
 - **Pattern:** Repository pattern wrapping SQLAlchemy queries
 
 #### `app/db/storage_adapter.py`
+
 - **Purpose:** Storage adapter interface
 - **Role:** Routes → Services → Storage Adapter → ORM
 
 ### 6.4 `app/services/` — Business Logic
 
 #### `app/services/library.py`
+
 - **Purpose:** Core library operations
 - **Key Functions:**
   - `checkout_book()` — Issue book with concurrency safety
@@ -329,6 +341,7 @@ Book-Tale/
   - `search_books()` — Search with filtering
 
 #### `app/services/recommender.py`
+
 - **Purpose:** Rule-based recommendation engine
 - **Strategies:**
   - Personalized (reading history + category affinity)
@@ -336,30 +349,36 @@ Book-Tale/
   - All-time best
 
 #### `app/services/social.py`
+
 - **Purpose:** Social graph and feed generation
 - **Features:** Follows, posts, comments, likes, hashtags
 
 #### `app/services/gamification.py`
+
 - **Purpose:** XP, badges, streaks, achievements
 - **Gamification:** 50 levels, 20+ badges
 
 ### 6.5 `app/routes/` — Route Modules
 
 #### `app/routes/page_routes.py`
+
 - **Purpose:** Web page routes
 - **Key Routes:** `/explore`, `/shelves`, `/recommendations`, `/analytics`, `/admin/*`
 
 #### `app/routes/social_routes.py`
+
 - **Purpose:** Social API endpoints
 - **Key Routes:** `/api/feed`, `/api/posts`, `/api/follow/*`, `/api/search`
 
 #### `app/routes/new_features_routes.py`
+
 - **Purpose:** Challenges, lists, communities
 - **Key Routes:** `/api/challenges`, `/api/lists`, `/api/communities`
 
 ### 6.6 `app/jobs/` — Background Jobs
 
 #### `app/jobs/tasks.py`
+
 - **Purpose:** RQ task definitions
 - **Tasks:**
   - `fetch_book_cover()` — Async cover download
@@ -367,21 +386,22 @@ Book-Tale/
   - `purge_expired_tokens()` — Token cleanup
 
 #### `app/jobs/jobs.py`
+
 - **Purpose:** Job facade with bounded pool fallback
 - **Logic:** Uses RQ if Redis available, else bounded thread pool
 
 ### 6.7 `tests/` — Test Suite
 
-| File | Tests | Purpose |
-|------|-------|---------|
-| `security/test_web_security.py` | 90 | Privilege escalation, CSRF, XSS, rate limiting |
-| `test_auth_tokens.py` | 10 | DB-backed token lifecycle |
-| `test_jobs.py` | 16 | RQ job execution |
-| `test_db_wiring.py` | 18 | Storage adapter ↔ DB |
-| `test_library.py` | 53 | Core library operations |
-| `test_db_layer.py` | 14 | Concurrency, atomicity |
-| `test_reading_progress.py` | 2 | Progress tracking |
-| **Total** | **202** | |
+| File                            | Tests   | Purpose                                        |
+| ------------------------------- | ------- | ---------------------------------------------- |
+| `security/test_web_security.py` | 90      | Privilege escalation, CSRF, XSS, rate limiting |
+| `test_auth_tokens.py`           | 10      | DB-backed token lifecycle                      |
+| `test_jobs.py`                  | 16      | RQ job execution                               |
+| `test_db_wiring.py`             | 18      | Storage adapter ↔ DB                          |
+| `test_library.py`               | 53      | Core library operations                        |
+| `test_db_layer.py`              | 14      | Concurrency, atomicity                         |
+| `test_reading_progress.py`      | 2       | Progress tracking                              |
+| **Total**                       | **202** |                                                |
 
 ---
 
@@ -390,55 +410,60 @@ Book-Tale/
 ### Core Entities
 
 #### User
-| Field | Type | Description |
-|-------|------|-------------|
-| `id` | str | MEM-XXXX identifier |
-| `username` | str | Unique username |
-| `password_hash` | str | bcrypt hash |
-| `role` | str | user/librarian/admin |
-| `membership_expiry` | date | Membership validity |
+
+| Field               | Type | Description          |
+| ------------------- | ---- | -------------------- |
+| `id`                | str  | MEM-XXXX identifier  |
+| `username`          | str  | Unique username      |
+| `password_hash`     | str  | bcrypt hash          |
+| `role`              | str  | user/librarian/admin |
+| `membership_expiry` | date | Membership validity  |
 
 #### Book
-| Field | Type | Description |
-|-------|------|-------------|
-| `id` | int | Primary key |
-| `title` | str | Book title |
-| `author` | str | Author name |
-| `isbn` | str | ISBN-13 |
-| `category` | str | Genre/category |
-| `copies` | int | Total copies |
-| `available` | int | Available copies |
+
+| Field       | Type | Description      |
+| ----------- | ---- | ---------------- |
+| `id`        | int  | Primary key      |
+| `title`     | str  | Book title       |
+| `author`    | str  | Author name      |
+| `isbn`      | str  | ISBN-13          |
+| `category`  | str  | Genre/category   |
+| `copies`    | int  | Total copies     |
+| `available` | int  | Available copies |
 
 #### Transaction
-| Field | Type | Description |
-|-------|------|-------------|
-| `id` | int | Primary key |
-| `user_id` | FK → User | Borrower |
-| `book_id` | FK → Book | Book |
-| `issue_date` | datetime | When issued |
-| `due_date` | datetime | When due |
-| `return_date` | datetime | When returned (nullable) |
-| `fine` | float | Late fee |
+
+| Field         | Type      | Description              |
+| ------------- | --------- | ------------------------ |
+| `id`          | int       | Primary key              |
+| `user_id`     | FK → User | Borrower                 |
+| `book_id`     | FK → Book | Book                     |
+| `issue_date`  | datetime  | When issued              |
+| `due_date`    | datetime  | When due                 |
+| `return_date` | datetime  | When returned (nullable) |
+| `fine`        | float     | Late fee                 |
 
 #### Post (Social)
-| Field | Type | Description |
-|-------|------|-------------|
-| `id` | int | Primary key |
-| `user_id` | FK → User | Author |
-| `content` | text | Post content |
-| `created_at` | datetime | Timestamp |
-| `likes` | int | Like count |
+
+| Field        | Type      | Description  |
+| ------------ | --------- | ------------ |
+| `id`         | int       | Primary key  |
+| `user_id`    | FK → User | Author       |
+| `content`    | text      | Post content |
+| `created_at` | datetime  | Timestamp    |
+| `likes`      | int       | Like count   |
 
 #### AuditLog
-| Field | Type | Description |
-|-------|------|-------------|
-| `id` | int | Primary key |
-| `admin_id` | FK → User | Admin who made change |
-| `action` | str | What changed |
-| `old_value` | str | Previous value |
-| `new_value` | str | New value |
-| `ip_address` | str | Client IP |
-| `timestamp` | datetime | When |
+
+| Field        | Type      | Description           |
+| ------------ | --------- | --------------------- |
+| `id`         | int       | Primary key           |
+| `admin_id`   | FK → User | Admin who made change |
+| `action`     | str       | What changed          |
+| `old_value`  | str       | Previous value        |
+| `new_value`  | str       | New value             |
+| `ip_address` | str       | Client IP             |
+| `timestamp`  | datetime  | When                  |
 
 ---
 
@@ -446,33 +471,33 @@ Book-Tale/
 
 ### JSON Endpoints (`/api/*`)
 
-| Method | Path | Purpose |
-|--------|------|---------|
-| `GET` | `/api/feed` | Social feed |
-| `POST` | `/api/posts` | Create post |
-| `POST` | `/api/posts/<id>/like` | Like/unlike |
-| `POST` | `/api/follow/<user_id>` | Follow/unfollow |
-| `GET` | `/api/search` | Search books/users |
-| `POST` | `/api/reviews/<book_id>` | Add review |
-| `POST` | `/api/settings/save` | Save settings |
-| `GET` | `/api/analytics/monthly` | Monthly stats |
-| `POST` | `/api/ai/chat` | AI Reading Companion |
+| Method | Path                     | Purpose              |
+| ------ | ------------------------ | -------------------- |
+| `GET`  | `/api/feed`              | Social feed          |
+| `POST` | `/api/posts`             | Create post          |
+| `POST` | `/api/posts/<id>/like`   | Like/unlike          |
+| `POST` | `/api/follow/<user_id>`  | Follow/unfollow      |
+| `GET`  | `/api/search`            | Search books/users   |
+| `POST` | `/api/reviews/<book_id>` | Add review           |
+| `POST` | `/api/settings/save`     | Save settings        |
+| `GET`  | `/api/analytics/monthly` | Monthly stats        |
+| `POST` | `/api/ai/chat`           | AI Reading Companion |
 
 ### Page Routes
 
-| Path | Purpose |
-|------|---------|
-| `/` | Home dashboard |
-| `/books` | Book catalog |
-| `/explore` | Discover books/readers |
-| `/shelves` | Personal shelves |
-| `/recommendations` | Book recommendations |
-| `/analytics` | Reading analytics |
-| `/admin/users` | User management |
-| `/admin/audit` | Audit trail |
-| `/settings` | User settings |
-| `/healthz` | Liveness probe |
-| `/readyz` | Readiness probe |
+| Path               | Purpose                |
+| ------------------ | ---------------------- |
+| `/`                | Home dashboard         |
+| `/books`           | Book catalog           |
+| `/explore`         | Discover books/readers |
+| `/shelves`         | Personal shelves       |
+| `/recommendations` | Book recommendations   |
+| `/analytics`       | Reading analytics      |
+| `/admin/users`     | User management        |
+| `/admin/audit`     | Audit trail            |
+| `/settings`        | User settings          |
+| `/healthz`         | Liveness probe         |
+| `/readyz`          | Readiness probe        |
 
 ### OpenAPI
 
@@ -483,30 +508,31 @@ Book-Tale/
 
 ## 9. Configuration & Environment Variables
 
-| Variable | Purpose | Default | Required |
-|----------|---------|---------|----------|
-| `SECRET_KEY` | Flask session secret | — | **Yes (fail-fast)** |
-| `DEFAULT_ADMIN_PASSWORD` | Admin account password | — | **Yes (fail-fast)** |
-| `DATABASE_URL` | PostgreSQL connection | SQLite fallback | No |
-| `REDIS_URL` | Redis connection | `redis://localhost:6379/0` | No |
-| `SMTP_HOST` | SMTP server | — | Optional |
-| `SMTP_PORT` | SMTP port | `587` | Optional |
-| `SMTP_USER` | SMTP username | — | Optional |
-| `SMTP_PASSWORD` | SMTP password | — | Optional |
-| `SMTP_FROM` | Sender email | `noreply@libraryms.com` | Optional |
-| `FLASK_HOST` | Bind address | `0.0.0.0` | No |
-| `FLASK_PORT` | Server port | `5000` | No |
-| `FLASK_DEBUG` | Debug mode | `False` | No |
-| `RQ_QUEUE` | Job queue name | `booktale` | No |
-| `COVER_FETCH_WORKERS` | Background threads | `4` | No |
-| `CRON_OVERDUE_EMAILS` | Email cron | `0 9 * * *` | No |
-| `CRON_TOKEN_PURGE` | Token purge cron | `30 * * * *` | No |
+| Variable                 | Purpose                | Default                    | Required            |
+| ------------------------ | ---------------------- | -------------------------- | ------------------- |
+| `SECRET_KEY`             | Flask session secret   | —                          | **Yes (fail-fast)** |
+| `DEFAULT_ADMIN_PASSWORD` | Admin account password | —                          | **Yes (fail-fast)** |
+| `DATABASE_URL`           | PostgreSQL connection  | SQLite fallback            | No                  |
+| `REDIS_URL`              | Redis connection       | `redis://localhost:6379/0` | No                  |
+| `SMTP_HOST`              | SMTP server            | —                          | Optional            |
+| `SMTP_PORT`              | SMTP port              | `587`                      | Optional            |
+| `SMTP_USER`              | SMTP username          | —                          | Optional            |
+| `SMTP_PASSWORD`          | SMTP password          | —                          | Optional            |
+| `SMTP_FROM`              | Sender email           | `noreply@libraryms.com`    | Optional            |
+| `FLASK_HOST`             | Bind address           | `0.0.0.0`                  | No                  |
+| `FLASK_PORT`             | Server port            | `5000`                     | No                  |
+| `FLASK_DEBUG`            | Debug mode             | `False`                    | No                  |
+| `RQ_QUEUE`               | Job queue name         | `booktale`                 | No                  |
+| `COVER_FETCH_WORKERS`    | Background threads     | `4`                        | No                  |
+| `CRON_OVERDUE_EMAILS`    | Email cron             | `0 9 * * *`                | No                  |
+| `CRON_TOKEN_PURGE`       | Token purge cron       | `30 * * * *`               | No                  |
 
 ---
 
 ## 10. Build, Run & Deployment Instructions
 
 ### Prerequisites
+
 - Python 3.10+
 - PostgreSQL (prod) / SQLite (dev)
 - Redis (for rate limiting + jobs)
@@ -611,19 +637,19 @@ worker.py
 
 ### External Package Purposes
 
-| Package | Purpose |
-|---------|---------|
-| `flask` | Web framework |
-| `sqlalchemy` | ORM |
-| `alembic` | Migrations |
-| `flask-socketio` | WebSockets |
-| `flask-wtf` | CSRF protection |
-| `flask-limiter` | Rate limiting |
-| `rq` | Background jobs |
-| `redis` | Cache + job queue |
-| `bcrypt` | Password hashing |
-| `croniter` | Cron schedule parsing |
-| `esbuild` | Frontend bundling |
+| Package          | Purpose               |
+| ---------------- | --------------------- |
+| `flask`          | Web framework         |
+| `sqlalchemy`     | ORM                   |
+| `alembic`        | Migrations            |
+| `flask-socketio` | WebSockets            |
+| `flask-wtf`      | CSRF protection       |
+| `flask-limiter`  | Rate limiting         |
+| `rq`             | Background jobs       |
+| `redis`          | Cache + job queue     |
+| `bcrypt`         | Password hashing      |
+| `croniter`       | Cron schedule parsing |
+| `esbuild`        | Frontend bundling     |
 
 ---
 
@@ -631,18 +657,19 @@ worker.py
 
 ### Test Composition
 
-| Category | Files | Tests | Coverage |
-|----------|-------|-------|----------|
-| Security | `test_web_security.py` | 90 | Privilege escalation, CSRF, XSS |
-| Auth Tokens | `test_auth_tokens.py` | 10 | Token lifecycle |
-| Background Jobs | `test_jobs.py` | 16 | RQ execution |
-| DB Wiring | `test_db_wiring.py` | 18 | Storage adapter |
-| Library Core | `test_library.py` | 53 | Checkout, return, search |
-| DB Layer | `test_db_layer.py` | 14 | Concurrency, atomicity |
-| Progress | `test_reading_progress.py` | 2 | Reading totals |
-| **Total** | | **202** | |
+| Category        | Files                      | Tests   | Coverage                        |
+| --------------- | -------------------------- | ------- | ------------------------------- |
+| Security        | `test_web_security.py`     | 90      | Privilege escalation, CSRF, XSS |
+| Auth Tokens     | `test_auth_tokens.py`      | 10      | Token lifecycle                 |
+| Background Jobs | `test_jobs.py`             | 16      | RQ execution                    |
+| DB Wiring       | `test_db_wiring.py`        | 18      | Storage adapter                 |
+| Library Core    | `test_library.py`          | 53      | Checkout, return, search        |
+| DB Layer        | `test_db_layer.py`         | 14      | Concurrency, atomicity          |
+| Progress        | `test_reading_progress.py` | 2       | Reading totals                  |
+| **Total**       |                            | **202** |                                 |
 
 ### Coverage Gate
+
 - CI enforces ≥85% line coverage on `db` layer
 
 ### Running Tests
@@ -658,15 +685,18 @@ pytest tests/security/ -v
 ## 14. Known Issues, Technical Debt & Assumptions
 
 ### Known Issues
+
 1. **2 tests skipped:** Redis-dependent tests skipped when Redis unavailable
 2. **Search performance:** `search_books()` loads full catalog and filters in Python
 
 ### Technical Debt
+
 1. **App initialization:** Module-level init (not app-factory pattern)
 2. **Legacy storage:** `storage.py` JSON persistence still present
 3. **AI companion:** Keyword-intent, not true LLM
 
 ### Assumptions
+
 - PostgreSQL for production, SQLite for development
 - Redis available for rate limiting + job queue
 - SMTP configured for email notifications
@@ -675,19 +705,20 @@ pytest tests/security/ -v
 
 ## 15. Glossary
 
-| Term | Definition |
-|------|------------|
-| **RQ** | Redis Queue — Python job queue |
-| **Socket.IO** | Real-time WebSocket communication |
-| **CSRF** | Cross-Site Request Forgery |
-| **ADR** | Architecture Decision Record |
-| **SMOTE** | Synthetic Minority Over-sampling (not used here) |
+| Term          | Definition                                       |
+| ------------- | ------------------------------------------------ |
+| **RQ**        | Redis Queue — Python job queue                   |
+| **Socket.IO** | Real-time WebSocket communication                |
+| **CSRF**      | Cross-Site Request Forgery                       |
+| **ADR**       | Architecture Decision Record                     |
+| **SMOTE**     | Synthetic Minority Over-sampling (not used here) |
 
 ---
 
 ## 16. Changelog / Version History Summary
 
 Based on README.md and CHANGELOG.md:
+
 - **Current state:** 202 tests passing, 132 routes
 - **Recent additions:** RQ background jobs, admin audit trail, security headers
 - **Planned:** Versioned API, Redis-backed Socket.IO, Playwright E2E
@@ -697,14 +728,18 @@ Based on README.md and CHANGELOG.md:
 ## 17. Appendix
 
 ### License
+
 MIT — see LICENSE file
 
 ### Seed Data
+
 - **Books:** 11,127 entries from `app/services/recommendations/ml/Dataset/books.csv`
 - **Users:** Created via `seed_users.py`
 
 ### Architecture Decision Records
+
 Located in `docs/adr/`:
+
 - 0001: Fail-fast secrets
 - 0002: Registration role whitelist
 - 0003-0005: Template migration
@@ -748,4 +783,4 @@ Located in `docs/adr/`:
 
 ---
 
-*This document was auto-generated from comprehensive codebase analysis.*
+_This document was auto-generated from comprehensive codebase analysis._

@@ -78,9 +78,7 @@ def _get_pool() -> ThreadPoolExecutor:
         return _fallback_pool
 
 
-def _enqueue_or_fallback(
-    job_name: str, fn, args: tuple, pool_args: tuple | None = None
-) -> str:
+def _enqueue_or_fallback(job_name: str, fn, args: tuple, pool_args: tuple | None = None) -> str:
     """Enqueue fn(*args) to RQ; fall back to the bounded pool if Redis is
     unreachable or rq is not installed. Returns 'rq' or 'pool'.
 
@@ -121,9 +119,7 @@ def _enqueue_or_fallback(
 # ── Public helpers (single call sites) ───────────────────────────────────
 
 
-def enqueue_cover_fetch(
-    book_id: str, title: str, author: str, isbn: str, storage=None
-) -> str:
+def enqueue_cover_fetch(book_id: str, title: str, author: str, isbn: str, storage=None) -> str:
     """Fetch cover/metadata for a book off the request path.
 
     `storage` is used by the local-pool fallback so the cover write lands in
