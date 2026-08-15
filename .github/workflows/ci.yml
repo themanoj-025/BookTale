@@ -76,6 +76,29 @@ jobs:
         run: |
           python -m pytest tests/ -q --no-header --cov=app/db --cov-fail-under=85 --cov-report=term-missing
 
+  frontend-build-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+
+      - name: Install frontend deps
+        run: npm ci
+
+      - name: Rebuild committed dist and verify it matches sources
+        run: |
+          npm run build
+          if [ -n "$(git status --porcelain app/static/dist)" ]; then
+            echo "::error::app/static/dist is out of sync with app/static/js and app/static/css — run 'npm run build' and commit the result."
+            git status --porcelain app/static/dist
+            exit 1
+          fi
+          echo "Committed dist is up to date."
+
   link-check:
     runs-on: ubuntu-latest
     steps:
