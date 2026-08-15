@@ -9,7 +9,7 @@ pyqrcode>=1.2.1
 pypng>=0.20220715.0
 
 pandas>=3.0.5
-numpy>=2.5.1
+numpy>=2.5.2
 Pillow>=12.3.0
 
 pytest>=9.1.1
