@@ -16,6 +16,9 @@ repos:
     hooks:
       - id: prettier
         types_or: [javascript, jsx, ts, tsx, json, css, scss, markdown]
+        # app/static/dist/ is committed build output (hashed bundles); prettier
+        # must not reformat generated artifacts, only the sources in app/static/.
+        exclude: '^app/static/dist/'
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v5.0.0
