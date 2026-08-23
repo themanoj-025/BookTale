@@ -61,7 +61,7 @@ def _seed_users(store, *user_ids: str) -> None:
     """Seed users so FK-referencing rows can be inserted (mirrors the real app,
     where posts/comments/txns always reference existing users)."""
     users = {}
-    for i, uid in enumerate(user_ids):
+    for _i, uid in enumerate(user_ids):
         users[uid] = User(
             user_id=uid,
             name=f"User {uid}",
@@ -423,7 +423,7 @@ def test_library_issue_no_oversell_through_app_object(db_env):
     store = DbStorage()
     lib = Library(store)
     lib.add_book("Only Copy", "Author", "111-222", "Fiction", 1, fetch_cover_async=False)
-    book_id = list(store.load_books())[0]
+    book_id = next(iter(store.load_books()))
     for i in range(20):
         lib.register_user(f"MEM-{i}", f"User{i}", f"u{i}@x.io", "", "user", "hash", actor="test")
 
@@ -448,7 +448,7 @@ def test_library_issue_no_oversell_through_app_object(db_env):
 
     # return path works through the service too (winner's real user index)
     winner_idx = winners[0][0]
-    ok, msg, fine = lib.return_book(f"MEM-{winner_idx}", book_id, actor="Librarian")
+    ok, _msg, fine = lib.return_book(f"MEM-{winner_idx}", book_id, actor="Librarian")
     assert ok and fine == 0.0
     assert store.load_books()[book_id].available_copies == 1
 

@@ -37,7 +37,7 @@ class ReadingProgress:
     def _load_progress(self) -> dict:
         path = os.path.join(Config.DATA_DIR, "reading_progress.json")
         try:
-            with open(path, "r", encoding="utf-8") as f:
+            with open(path, encoding="utf-8") as f:
                 return json.load(f)
         except (FileNotFoundError, json.JSONDecodeError):
             return {}
@@ -51,7 +51,7 @@ class ReadingProgress:
     def _load_bookmarks(self) -> list:
         path = os.path.join(Config.DATA_DIR, "bookmarks.json")
         try:
-            with open(path, "r", encoding="utf-8") as f:
+            with open(path, encoding="utf-8") as f:
                 return json.load(f)
         except (FileNotFoundError, json.JSONDecodeError):
             return []
@@ -108,10 +108,10 @@ class ReadingProgress:
         self,
         user_id: str,
         book_id: str,
-        current_page: int = None,
-        time_spent_minutes: int = None,
-        notes: str = None,
-        finished: bool = None,
+        current_page: int | None = None,
+        time_spent_minutes: int | None = None,
+        notes: str | None = None,
+        finished: bool | None = None,
     ) -> tuple[bool, str, dict]:
         """Update reading progress for a book."""
         data = self._load_progress()

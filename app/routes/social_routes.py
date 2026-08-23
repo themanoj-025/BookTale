@@ -4,6 +4,7 @@ Integrates with the existing Flask web_app.py by registering routes on the app.
 Uses .replace() for Python variables instead of f-strings to avoid JS template literal conflicts.
 """
 
+import contextlib
 import html
 import io
 import json
@@ -81,10 +82,7 @@ def _magic_signature_ok(file) -> bool:
     head = file.read(16)
     file.seek(0)
     if (
-        head.startswith(b"\x89PNG\r\n\x1a\n")
-        or head.startswith(b"\xff\xd8\xff")
-        or head.startswith(b"GIF87a")
-        or head.startswith(b"GIF89a")
+        head.startswith((b"\x89PNG\r\n\x1a\n", b"\xff\xd8\xff", b"GIF87a", b"GIF89a"))
     ):
         return True
     return head[:4] == b"RIFF" and head[8:12] == b"WEBP"
@@ -326,21 +324,16 @@ def _render_fav_grid(fav_books: list, is_own: bool) -> str:
             b = favs[idx]
             cc = cat_color(b.category)
             if b.cover_url:
-                cover = '<img src="%s" alt="%s" class="bt-cover-img" loading="lazy">' % (
-                    _esc(b.cover_url),
-                    _esc(b.title),
-                )
+                cover = f'<img src="{_esc(b.cover_url)}" alt="{_esc(b.title)}" class="bt-cover-img" loading="lazy">'
             else:
                 cover = (
-                    '<div class="bt-cover-placeholder" style="background:linear-gradient(135deg,%s,%sdd);font-size:1.2rem;">%s</div>'
-                    % (cc, cc, _esc(b.title[:2].upper()))
+                    f'<div class="bt-cover-placeholder" style="background:linear-gradient(135deg,{cc},{cc}dd);font-size:1.2rem;">{_esc(b.title[:2].upper())}</div>'
                 )
             # NOTE: % binds tighter than +. The whole onclick+label must be ONE
             # format string (was split literals -> only last literal formatted ->
             # 'not all arguments converted' TypeError at runtime).
             rm = (
-                '<button class="bt-fav-remove" onclick="removeFav(\'%s\')" aria-label="Remove %s">&times;</button>'
-                % (b.book_id.replace("'", "\\'").replace('"', "&quot;"), _esc(b.title))
+                '<button class="bt-fav-remove" onclick="removeFav(\'{}\')" aria-label="Remove {}">&times;</button>'.format(b.book_id.replace("'", "\\'").replace('"', "&quot;"), _esc(b.title))
                 if is_own
                 else ""
             )
@@ -372,11 +365,11 @@ def _render_badges_grid(badges: list) -> str:
         name = badge.get("name", "")
         desc = badge.get("desc", "")
         h_out += (
-            '<div class="%s" title="%s">'
-            '<div class="bt-badge-icon"><i class="bi bi-%s-fill"></i></div>'
-            '<div class="bt-badge-name">%s</div>'
+            f'<div class="{cls}" title="{_esc(desc)}">'
+            f'<div class="bt-badge-icon"><i class="bi bi-{_esc(icon)}-fill"></i></div>'
+            f'<div class="bt-badge-name">{_esc(name)}</div>'
             "</div>"
-        ) % (cls, _esc(desc), _esc(icon), _esc(name))
+        )
     h_out += "</div>"
     return h_out
 
@@ -393,22 +386,21 @@ def _render_diary_entries(entries: list) -> str:
         rbadge = e.get("rating_badge", "")
         cov = e.get("book_cover", "")
         cov_html = (
-            '<img src="%s" alt="" class="bt-diary-cover" loading="lazy">' % _esc(cov)
+            f'<img src="{_esc(cov)}" alt="" class="bt-diary-cover" loading="lazy">'
             if cov
-            else '<div class="bt-diary-cover bt-diary-cover-placeholder">%s</div>'
-            % _esc(bt[:2].upper())
+            else f'<div class="bt-diary-cover bt-diary-cover-placeholder">{_esc(bt[:2].upper())}</div>'
         )
         tp = _esc(dtxt[:120]) + "..." if len(dtxt) > 120 else _esc(dtxt)
         h_out += (
             '<div class="bt-diary-entry">'
-            "%s"
+            f"{cov_html}"
             '<div class="bt-diary-body">'
-            '<div class="bt-diary-date">%s</div>'
-            '<a href="/diary" class="bt-diary-book-title">%s</a>'
-            '<div class="bt-diary-meta">%s</div>'
-            '<div class="bt-diary-text">%s</div>'
+            f'<div class="bt-diary-date">{dt}</div>'
+            f'<a href="/diary" class="bt-diary-book-title">{_esc(bt)}</a>'
+            f'<div class="bt-diary-meta">{rbadge}</div>'
+            f'<div class="bt-diary-text">{tp}</div>'
             "</div></div>"
-        ) % (cov_html, dt, _esc(bt), rbadge, tp)
+        )
     return h_out
 
 
@@ -531,13 +523,13 @@ def init_social_routes(
         ok, data, out_ext = _verify_and_reencode_image(file)
         if not ok:
             log(
-                "Upload rejected (not a valid image): %s (%s)" % (file.filename, utype),
+                f"Upload rejected (not a valid image): {file.filename} ({utype})",
                 uid,
             )
             return jsonify({"success": False, "error": "File is not a valid image"})
         if out_ext is None:
             out_ext = ext  # Pillow-less fallback: keep the validated extension
-        safe_name = "%s_%s%s" % (uid, uuid.uuid4().hex[:12], out_ext)
+        safe_name = f"{uid}_{uuid.uuid4().hex[:12]}{out_ext}"
         subdir = "avatars" if utype == "avatar" else "post_images"
         save_dir = os.path.join(Config.UPLOADS_DIR, subdir)
         os.makedirs(save_dir, exist_ok=True)
@@ -547,8 +539,8 @@ def init_social_routes(
         else:
             with open(dest_path, "wb") as f:
                 f.write(data)
-        url_path = "/uploads/%s/%s" % (subdir, safe_name)
-        log("Uploaded %s (%s, %s)" % (url_path, utype, file.filename), uid)
+        url_path = f"/uploads/{subdir}/{safe_name}"
+        log(f"Uploaded {url_path} ({utype}, {file.filename})", uid)
         return jsonify({"success": True, "url": url_path, "filename": safe_name})
 
     @app.route("/uploads/<path:filename>")
@@ -714,7 +706,7 @@ def init_social_routes(
     @_rate_limit("60 per minute")
     def api_helpful_review(review_id):
         uid = session["user_id"]
-        ok, msg, is_helpful = review_mgr.mark_helpful(review_id, uid)
+        ok, _msg, is_helpful = review_mgr.mark_helpful(review_id, uid)
         return jsonify({"success": ok, "is_helpful": is_helpful})
 
     @app.route("/api/bookshelves/<book_id>", methods=["POST"])
@@ -1462,8 +1454,7 @@ document.addEventListener("DOMContentLoaded", function(){
                 else '<span class="badge-red px-2 py-1 small">Out</span>'
             )
             BOOKS_GRID += (
-                '<a href="/books/%s" class="text-decoration-none col-6 col-md-4 col-lg-3 mb-2"><div class="glass-card p-2 text-center" style="cursor:pointer;"><div style="font-size:1.2rem;color:%s;"><i class="bi bi-book-fill"></i></div><div class="fw-bold small">%s</div><small class="text-muted">%s</small><div class="mt-1">%s</div></div></a>'
-                % (b.book_id, cc, h(b.title)[:40], h(b.category), avail)
+                f'<a href="/books/{b.book_id}" class="text-decoration-none col-6 col-md-4 col-lg-3 mb-2"><div class="glass-card p-2 text-center" style="cursor:pointer;"><div style="font-size:1.2rem;color:{cc};"><i class="bi bi-book-fill"></i></div><div class="fw-bold small">{h(b.title)[:40]}</div><small class="text-muted">{h(b.category)}</small><div class="mt-1">{avail}</div></div></a>'
             )
         if not BOOKS_GRID:
             BOOKS_GRID = '<div class="col-12"><div class="empty-state empty-state-variant"><div class="empty-icon"><i class="bi bi-book"></i></div><div class="empty-title">No books found</div><div class="empty-desc">This author has no books in the library yet.</div></div></div>'
@@ -1547,11 +1538,8 @@ document.addEventListener("DOMContentLoaded", function(){
         except Exception:  # nosec B110
             pass
         ds = {}
-        try:
+        with contextlib.suppress(Exception):
             ds = DiaryManager(storage).get_stats(user_id)
-        # Optional sub-feature: degrade gracefully, never break the request.
-        except Exception:  # nosec B110
-            pass
         favs = getattr(pu, "favorite_books", [])
         shelves = review_mgr.get_user_shelf(user_id)
         sc = review_mgr.get_shelf_counts(user_id)
@@ -1578,8 +1566,7 @@ document.addEventListener("DOMContentLoaded", function(){
         for r in rl:
             stars = "\u2605" * r["rating"] + "\u2606" * (5 - r["rating"])
             AH += (
-                '<div class="activity-item"><div class="activity-icon" style="background:#f59e0b20;color:#f59e0b;"><i class="bi bi-star-fill"></i></div><div class="flex-grow-1"><div style="font-size:.85rem;"><strong>%s</strong> %s</div><div style="font-size:.75rem;color:var(--text-muted);">Reviewed %s</div></div></div>'
-                % (h(r.get("book_title", "")), stars, r.get("time_ago", ""))
+                '<div class="activity-item"><div class="activity-icon" style="background:#f59e0b20;color:#f59e0b;"><i class="bi bi-star-fill"></i></div><div class="flex-grow-1"><div style="font-size:.85rem;"><strong>{}</strong> {}</div><div style="font-size:.75rem;color:var(--text-muted);">Reviewed {}</div></div></div>'.format(h(r.get("book_title", "")), stars, r.get("time_ago", ""))
             )
         if not AH:
             AH = '<div class="text-center text-muted small py-3">No reviews yet.</div>'
@@ -1594,7 +1581,7 @@ document.addEventListener("DOMContentLoaded", function(){
             hm_path = os.path.join(Config.DATA_DIR, "diary.json")
             he = []
             try:
-                with open(hm_path, "r", encoding="utf-8") as f:
+                with open(hm_path, encoding="utf-8") as f:
                     he = json.load(f)
             # Optional sub-feature: degrade gracefully, never break the request.
             except Exception:  # nosec B110
@@ -1619,19 +1606,16 @@ document.addEventListener("DOMContentLoaded", function(){
         if not is_own:
             if is_following:
                 FB = (
-                    '<button class="btn btn-outline btn-sm" onclick="toggleFollow(\'%s\',this)"><i class="bi bi-person-check"></i> Following</button>'
-                    % user_id
+                    f'<button class="btn btn-outline btn-sm" onclick="toggleFollow(\'{user_id}\',this)"><i class="bi bi-person-check"></i> Following</button>'
                 )
             else:
                 FB = (
-                    '<button class="btn btn-primary btn-sm" onclick="toggleFollow(\'%s\',this)"><i class="bi bi-person-plus"></i> Follow</button>'
-                    % user_id
+                    f'<button class="btn btn-primary btn-sm" onclick="toggleFollow(\'{user_id}\',this)"><i class="bi bi-person-plus"></i> Follow</button>'
                 )
 
         if pu.profile_picture:
             PA = (
-                '<div class="avatar" style="width:72px;height:72px;background-size:cover;background-image:url(%s);border-radius:50%%;border:3px solid var(--bg);box-shadow:0 4px 12px rgba(0,0,0,.1);" title="%s"></div>'
-                % (h(pu.profile_picture), h(pu.name))
+                f'<div class="avatar" style="width:72px;height:72px;background-size:cover;background-image:url({h(pu.profile_picture)});border-radius:50%;border:3px solid var(--bg);box-shadow:0 4px 12px rgba(0,0,0,.1);" title="{h(pu.name)}"></div>'
             )
         else:
             PA = avatar_html(pu.name, 72)
@@ -1673,8 +1657,7 @@ document.addEventListener("DOMContentLoaded", function(){
                     ""
                     if not bis
                     else "".join(
-                        '<a href="/books/%s" class="text-decoration-none"><div class="shelf-book" style="border-left:3px solid %s;"><div class="fw-bold" style="font-size:.8rem;">%s</div><small class="text-muted">%s</small></div></a>'
-                        % (h(b["book_id"]), col, h(b["title"]), h(b["author"]))
+                        '<a href="/books/{}" class="text-decoration-none"><div class="shelf-book" style="border-left:3px solid {};"><div class="fw-bold" style="font-size:.8rem;">{}</div><small class="text-muted">{}</small></div></a>'.format(h(b["book_id"]), col, h(b["title"]), h(b["author"]))
                         for b in bis
                     )
                 )
@@ -1698,22 +1681,19 @@ document.addEventListener("DOMContentLoaded", function(){
                 ""
                 if not bis
                 else "".join(
-                    '<a href="/books/%s" class="text-decoration-none"><div class="shelf-book" style="border-left:3px solid %s;"><div class="fw-bold" style="font-size:.8rem;">%s</div><small class="text-muted">%s</small></div></a>'
-                    % (h(b["book_id"]), col, h(b["title"]), h(b["author"]))
+                    '<a href="/books/{}" class="text-decoration-none"><div class="shelf-book" style="border-left:3px solid {};"><div class="fw-bold" style="font-size:.8rem;">{}</div><small class="text-muted">{}</small></div></a>'.format(h(b["book_id"]), col, h(b["title"]), h(b["author"]))
                     for b in bis
                 )
             )
             if not sh_section:
                 sh_section = '<div class="text-center text-muted small py-3">Empty shelf.</div>'
             db = (
-                '<button class="btn btn-sm" style="background:none;border:none;color:var(--text-dim);font-size:.65rem;padding:0;" onclick="deleteShelf(\'%s\')" title="Delete shelf"><i class="bi bi-trash"></i></button>'
-                % h(name)
+                f'<button class="btn btn-sm" style="background:none;border:none;color:var(--text-dim);font-size:.65rem;padding:0;" onclick="deleteShelf(\'{h(name)}\')" title="Delete shelf"><i class="bi bi-trash"></i></button>'
                 if is_own
                 else ""
             )
             eb = (
-                '<button class="btn btn-sm" style="background:none;border:none;color:var(--text-dim);font-size:.65rem;padding:0;" onclick="renameShelf(\'%s\')" title="Rename shelf"><i class="bi bi-pencil"></i></button>'
-                % h(name)
+                f'<button class="btn btn-sm" style="background:none;border:none;color:var(--text-dim);font-size:.65rem;padding:0;" onclick="renameShelf(\'{h(name)}\')" title="Rename shelf"><i class="bi bi-pencil"></i></button>'
                 if is_own
                 else ""
             )
@@ -1818,7 +1798,7 @@ document.addEventListener("DOMContentLoaded", function(){
             flc,
             stats.get("total_read", 0),
             stats.get("total_reviews", 0),
-            "%.1f" % stats["avg_rating"] if stats.get("avg_rating") else "-",
+            "{:.1f}".format(stats["avg_rating"]) if stats.get("avg_rating") else "-",
             gm_pts,
             h(gm_lev),
             gm_stk,

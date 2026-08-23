@@ -281,7 +281,7 @@ def _try_google_books(
         )
 
         # Upgrade thumbnail quality
-        if cover_url and "zoom=" in cover_url or "&edge=" in cover_url:
+        if (cover_url and "zoom=" in cover_url) or "&edge=" in cover_url:
             cover_url = cover_url.replace("zoom=1", "zoom=2").replace("&edge=curl", "")
         elif cover_url:
             cover_url = cover_url.replace("&zoom=1", "&zoom=2")

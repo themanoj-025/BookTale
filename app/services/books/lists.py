@@ -38,7 +38,7 @@ class BookLists:
     def _load_lists(self) -> list:
         path = self._get_lists_path()
         try:
-            with open(path, "r", encoding="utf-8") as f:
+            with open(path, encoding="utf-8") as f:
                 return json.load(f)
         except (FileNotFoundError, json.JSONDecodeError):
             return []
@@ -95,9 +95,9 @@ class BookLists:
         self,
         list_id: str,
         user_id: str,
-        name: str = None,
-        description: str = None,
-        is_public: bool = None,
+        name: str | None = None,
+        description: str | None = None,
+        is_public: bool | None = None,
     ) -> tuple[bool, str]:
         lists = self._load_lists()
         for lst in lists:

@@ -144,7 +144,7 @@ check(1, "Landing page loads (no auth)", r.status_code == 200)
 # scoped to POSTs only — this run proves the scoping holds.
 s = requests.Session()
 loads_ok = True
-for i in range(10):
+for _i in range(10):
     rr = _get(s, "/register")
     if rr.status_code != 200:
         loads_ok = False
@@ -191,7 +191,7 @@ check(
 # Login: page loads never 429; valid login works; failures cap at 10/min.
 s = requests.Session()
 loads_ok = True
-for i in range(10):
+for _i in range(10):
     rr = _get(s, "/login")
     if rr.status_code != 200:
         loads_ok = False
@@ -257,7 +257,7 @@ check(10, "Valid password change -> 200 (no budget consumed)", r.status_code == 
 
 # Wrong current password x10 -> 200 error each (allowed up to 10/min)...
 fails = []
-for i in range(10):
+for _i in range(10):
     rr = _post(
         s,
         "/api/settings/save",
@@ -296,7 +296,7 @@ print("== A (cont). Failure throttles fire only on abuse ==")
 # Login failures: 10 allowed, 11th -> 429 (deduct_when counts only failures).
 s = requests.Session()
 fails = []
-for i in range(10):
+for _i in range(10):
     page = _get(s, "/login")
     rr = _post(
         s,
@@ -335,7 +335,7 @@ check(
 # Forgot-password: page loads exempt; 5/min all-POST budget.
 s = requests.Session()
 loads_ok = True
-for i in range(10):
+for _i in range(10):
     rr = _get(s, "/forgot-password")
     if rr.status_code != 200:
         loads_ok = False
@@ -353,7 +353,7 @@ r = _post(
 check(18, "POST /forgot-password -> 200 anti-enumeration", r.status_code == 200)
 
 burst = []
-for i in range(5):
+for _i in range(5):
     page = _get(s, "/forgot-password")
     rr = _post(
         s,

@@ -270,13 +270,11 @@ class Recommender:
         # Find similar users (users who borrowed similar books)
         similar_user_books: Counter = Counter()
         for t in txns:
-            if t["type"] == "issue" and t["user_id"] != user_id:
-                if t["book_id"] in user_books:
-                    # This user borrowed the same book as our user
-                    for t2 in txns:
-                        if t2["type"] == "issue" and t2["user_id"] == t["user_id"]:
-                            if t2["book_id"] not in user_books:
-                                similar_user_books[t2["book_id"]] += 2
+            if t["type"] == "issue" and t["user_id"] != user_id and t["book_id"] in user_books:
+                # This user borrowed the same book as our user
+                for t2 in txns:
+                    if t2["type"] == "issue" and t2["user_id"] == t["user_id"] and t2["book_id"] not in user_books:
+                        similar_user_books[t2["book_id"]] += 2
 
         # Score candidate books
         scored: list[tuple[float, Book]] = []
@@ -363,9 +361,9 @@ class Recommender:
         txns = self.storage.load_transactions()
 
         # Find all users who borrowed this book
-        users_with_book = set(
+        users_with_book = {
             t["user_id"] for t in txns if t["type"] == "issue" and t["book_id"] == book_id
-        )
+        }
 
         if not users_with_book:
             # Try seed data fallback for similar books

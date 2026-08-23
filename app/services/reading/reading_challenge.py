@@ -31,7 +31,7 @@ class ReadingChallenge:
     def _load_challenges(self) -> dict:
         path = self._get_challenge_path()
         try:
-            with open(path, "r", encoding="utf-8") as f:
+            with open(path, encoding="utf-8") as f:
                 return json.load(f)
         except (FileNotFoundError, json.JSONDecodeError):
             return {}
@@ -67,7 +67,7 @@ class ReadingChallenge:
         log(f"Set reading goal: {goal} books for {year}", user_id)
         return True, f"Goal set to {goal} books for {year}!"
 
-    def get_goal(self, user_id: str, year: int = None) -> dict:
+    def get_goal(self, user_id: str, year: int | None = None) -> dict:
         """Get a user's reading goal for a given year (defaults to current year)."""
         if year is None:
             year = datetime.now().year
@@ -137,10 +137,7 @@ class ReadingChallenge:
         days_passed = max(1, (now - start_of_year).days)
         days_remaining = max(0, (datetime(year, 12, 31) - now).days)
 
-        if days_passed > 0:
-            pace = progress / days_passed * 30  # books per month
-        else:
-            pace = 0
+        pace = progress / days_passed * 30 if days_passed > 0 else 0  # books per month
 
         projected = round(pace / 30 * 365) if pace > 0 else 0
         needed_pace = (
@@ -158,7 +155,7 @@ class ReadingChallenge:
 
         return entry
 
-    def get_progress_chart_data(self, user_id: str, year: int = None) -> dict:
+    def get_progress_chart_data(self, user_id: str, year: int | None = None) -> dict:
         """Get monthly reading progress for chart visualization."""
         if year is None:
             year = datetime.now().year
@@ -196,7 +193,7 @@ class ReadingChallenge:
             cumulative.append(running)
         return {"labels": labels, "monthly": values, "cumulative": cumulative}
 
-    def get_leaderboard(self, year: int = None, top_n: int = 10) -> list[dict]:
+    def get_leaderboard(self, year: int | None = None, top_n: int = 10) -> list[dict]:
         """Get leaderboard of readers for a given year."""
         if year is None:
             year = datetime.now().year

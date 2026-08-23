@@ -42,7 +42,7 @@ class Wishlist:
     def _load_suggestions(self) -> list:
         path = self._get_wishlist_path()
         try:
-            with open(path, "r", encoding="utf-8") as f:
+            with open(path, encoding="utf-8") as f:
                 return json.load(f)
         except (FileNotFoundError, json.JSONDecodeError):
             return []
@@ -282,5 +282,5 @@ class Wishlist:
             "rejected": by_status.get("rejected", 0),
             "purchased": by_status.get("purchased", 0),
             "total_votes": total_votes,
-            "unique_suggesters": len(set(s["user_id"] for s in suggestions)),
+            "unique_suggesters": len({s["user_id"] for s in suggestions}),
         }

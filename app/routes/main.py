@@ -1417,7 +1417,7 @@ def seed_import_menu(lib: Library, auth: AuthManager) -> None:
         for book in books_to_import:
             isbn = book.get("isbn", "") or book.get("isbn13", "")
             cat = book["category"] if book["category"] in _BOOK_CATS else "Other"
-            ok, result = lib.add_book(
+            ok, _result = lib.add_book(
                 title=book["title"],
                 author=book["author"],
                 isbn=isbn,

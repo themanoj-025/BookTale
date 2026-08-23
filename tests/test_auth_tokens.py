@@ -62,7 +62,7 @@ def _isolated_db(tmp_path):
                     User(
                         user_id=uid,
                         name="Token Test User",
-                        email="%s@t.io" % uid.lower(),
+                        email=f"{uid.lower()}@t.io",
                         role="user",
                         password_hash="unused",
                         membership_status="Active",
@@ -149,13 +149,13 @@ class TestPersistenceAndCleanup:
         tok = authmod.generate_reset_token("MEM-RESTART")
         code = (
             "import sys\n"
-            "sys.path.insert(0, %r)\n"
+            f"sys.path.insert(0, {PROJECT_ROOT!r})\n"
             "from app.config.settings import Config\n"
-            "Config.DATA_DIR = %r\n"
+            f"Config.DATA_DIR = {_isolated_db!r}\n"
             "import app.services.auth.auth as auth\n"
-            "ok = auth.verify_reset_token(%r)\n"
+            f"ok = auth.verify_reset_token({tok!r})\n"
             "print('OK' if ok == 'MEM-RESTART' else 'MISSING:' + repr(ok))\n"
-        ) % (PROJECT_ROOT, _isolated_db, tok)
+        )
         r = subprocess.run(
             [_sys.executable, "-c", code],
             capture_output=True,

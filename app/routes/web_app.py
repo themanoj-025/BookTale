@@ -3,6 +3,7 @@ Modern features: issue/return modals, autocomplete search, keyboard shortcuts,
 loading skeletons, print-friendly CSS, avatar initials, PDF export.
 """
 
+import contextlib
 import html
 import os
 import random
@@ -18,11 +19,8 @@ if sys.platform == "win32":
     # underlying buffer, which breaks pytest's capture machinery (and any
     # other tool that has wrapped sys.stdout).
     for _stream in (sys.stdout, sys.stderr):
-        try:
+        with contextlib.suppress(AttributeError, OSError, ValueError):
             _stream.reconfigure(encoding="utf-8", errors="replace")
-        except (AttributeError, OSError, ValueError):
-            # Stream has no reconfigure (e.g. pytest capture) or is already closed.
-            pass
 
 from flask import (
     Flask,
@@ -423,7 +421,7 @@ def _library_stats():
     active_issues = [t for t in issues if t.get("return_date") is None]
     total_txns = len(txns)
     month_txns = sum(1 for t in txns if datetime.fromisoformat(t.get("issue_date", "")) >= tms)
-    unique_borrowers = len(set(t["user_id"] for t in issues))
+    unique_borrowers = len({t["user_id"] for t in issues})
     fines = storage.load_fines()
     total_fines = sum(f.get("amount", 0) for f in fines)
     paid_fines = sum(f.get("amount", 0) for f in fines if f.get("paid"))
@@ -815,9 +813,8 @@ def security_page():
         ),
     ]
     cards = "".join(
-        '<div class="col-md-6"><div class="glass-card p-4 h-100"><div style="font-size:1.8rem;margin-bottom:.5rem;">%s</div>'
-        '<h5 class="fw-bold mb-2">%s</h5><p class="mb-0" style="font-size:.9rem;color:var(--text-muted);">%s</p></div></div>'
-        % (icon, title, h(desc))
+        f'<div class="col-md-6"><div class="glass-card p-4 h-100"><div style="font-size:1.8rem;margin-bottom:.5rem;">{icon}</div>'
+        f'<h5 class="fw-bold mb-2">{title}</h5><p class="mb-0" style="font-size:.9rem;color:var(--text-muted);">{h(desc)}</p></div></div>'
         for icon, title, desc in items
     )
     CONTENT = (
@@ -1334,15 +1331,15 @@ def settings_page():
         n_html += (
             '<div class="settings-toggle-item">'
             '<div class="d-flex align-items-center gap-3">'
-            '<i class="bi bi-%s" style="font-size:1.2rem;color:var(--primary);width:24px;"></i>'
-            '<div><div class="fw-medium">%s</div></div>'
+            f'<i class="bi bi-{icon}" style="font-size:1.2rem;color:var(--primary);width:24px;"></i>'
+            f'<div><div class="fw-medium">{label}</div></div>'
             "</div>"
             '<label class="toggle-switch">'
-            '<input type="checkbox" name="%s" %s onchange="saveSetting(this)">'
+            f'<input type="checkbox" name="{key}" {chk} onchange="saveSetting(this)">'
             '<span class="toggle-slider"></span>'
             "</label>"
             "</div>"
-        ) % (icon, label, key, chk)
+        )
 
     # Privacy toggles
     p_checks = [
@@ -1377,20 +1374,20 @@ def settings_page():
         p_html += (
             '<div class="settings-toggle-item">'
             '<div class="d-flex align-items-center gap-3">'
-            '<i class="bi bi-%s" style="font-size:1.2rem;color:var(--primary);width:24px;"></i>'
-            '<div><div class="fw-medium">%s</div></div>'
+            f'<i class="bi bi-{icon}" style="font-size:1.2rem;color:var(--primary);width:24px;"></i>'
+            f'<div><div class="fw-medium">{label}</div></div>'
             "</div>"
             '<label class="toggle-switch">'
-            '<input type="checkbox" name="%s" %s onchange="saveSetting(this)">'
+            f'<input type="checkbox" name="{key}" {chk} onchange="saveSetting(this)">'
             '<span class="toggle-slider"></span>'
             "</label>"
             "</div>"
-        ) % (icon, label, key, chk)
+        )
 
     vis_opts = ""
     for v in ["public", "members", "private"]:
         sel = "selected" if user.privacy_profile_visibility == v else ""
-        vis_opts += '<option value="%s" %s>%s</option>' % (v, sel, v.title())
+        vis_opts += f'<option value="{v}" {sel}>{v.title()}</option>'
 
     rating_opts = ""
     for v in ["perfection", "worth_it", "timepass", "skip"]:
@@ -1401,12 +1398,12 @@ def settings_page():
             "timepass": "Timepass",
             "skip": "Skip",
         }[v]
-        rating_opts += '<option value="%s" %s>%s</option>' % (v, sel, label)
+        rating_opts += f'<option value="{v}" {sel}>{label}</option>'
 
     goal_opts = ""
     for v in ["books", "pages"]:
         sel = "selected" if user.reading_goal_type == v else ""
-        goal_opts += '<option value="%s" %s>%s</option>' % (v, sel, v.title())
+        goal_opts += f'<option value="{v}" {sel}>{v.title()}</option>'
 
     CONTENT = """<div class="animate-in">
 <div class="glass-card p-0 mb-4" style="overflow:hidden;">
@@ -1763,11 +1760,8 @@ def api_save_settings():
 
     # Integer fields
     if "reading_default_goal" in data:
-        try:
+        with contextlib.suppress(ValueError, TypeError):
             user.reading_default_goal = int(data["reading_default_goal"])
-        # Optional sub-feature: degrade gracefully, never break the request.
-        except Exception:  # nosec B110
-            pass
 
     # Password change
     if data.get("new_password"):
@@ -1930,7 +1924,7 @@ def admin_settings_page():
         h(lib_n),
         h(smtp_f),
         issue_d,
-        "%.1f" % fine_d,
+        f"{fine_d:.1f}",
         max_b,
         mem_v,
         max_u,
@@ -2167,11 +2161,8 @@ def api_users_suggested():
     users = storage.load_users()
     following_set = set()
     if social:
-        try:
+        with contextlib.suppress(Exception):
             following_set = set(social.get_following(uid))
-        # Optional sub-feature: degrade gracefully, never break the request.
-        except Exception:  # nosec B110
-            pass
     suggested = []
     for u in users.values():
         if u.user_id != uid and u.user_id not in following_set:
@@ -2277,7 +2268,7 @@ def api_reading_streak():
     try:
         entries, _ = diary_mgr.get_user_diary(uid, page=1, per_page=500) if diary_mgr else ([], 0)
         dates = sorted(
-            set(e.get("date_read", "")[:10] for e in entries if e.get("date_read")),
+            {e.get("date_read", "")[:10] for e in entries if e.get("date_read")},
             reverse=True,
         )
         streak = 0
@@ -2410,12 +2401,12 @@ def admin_fines_page():
             else '<span class="badge bg-warning text-dark">Pending</span>'
         )
         rows += """<tr>
-            <td>%s</td>
-            <td><a href="/profile/%s" class="fw-bold text-decoration-none">%s</a></td>
-            <td>&#8377; %.2f</td>
-            <td>%s</td>
-            <td>%s</td>
-        </tr>""" % (
+            <td>{}</td>
+            <td><a href="/profile/{}" class="fw-bold text-decoration-none">{}</a></td>
+            <td>&#8377; {:.2f}</td>
+            <td>{}</td>
+            <td>{}</td>
+        </tr>""".format(
             paid_badge,
             h(f["user_id"]),
             uname,

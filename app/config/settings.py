@@ -5,6 +5,7 @@ config.py - Centralized configuration with .env support
 import os
 
 from dotenv import load_dotenv
+import contextlib
 
 load_dotenv()
 
@@ -122,25 +123,21 @@ def _load_settings_overrides() -> None:
     try:
         import json as _json
 
-        with open(override_path, "r", encoding="utf-8") as _f:
+        with open(override_path, encoding="utf-8") as _f:
             _overrides = _json.load(_f)
         for _key, _val in _overrides.items():
             if not hasattr(Config, _key):
                 continue
             _attr_type = type(getattr(Config, _key))
-            if _attr_type == bool:
+            if _attr_type is bool:
                 setattr(Config, _key, str(_val).lower() == "true")
-            elif _attr_type == int:
-                try:
+            elif _attr_type is int:
+                with contextlib.suppress(TypeError, ValueError):
                     setattr(Config, _key, int(_val))
-                except (TypeError, ValueError):
-                    pass
-            elif _attr_type == float:
-                try:
+            elif _attr_type is float:
+                with contextlib.suppress(TypeError, ValueError):
                     setattr(Config, _key, float(_val))
-                except (TypeError, ValueError):
-                    pass
-            elif _attr_type == set:
+            elif _attr_type is set:
                 if isinstance(_val, list):
                     setattr(Config, _key, set(_val))
                 elif isinstance(_val, str):

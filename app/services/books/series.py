@@ -36,7 +36,7 @@ class SeriesManager:
     def _load_series(self) -> list:
         path = self._get_series_path()
         try:
-            with open(path, "r", encoding="utf-8") as f:
+            with open(path, encoding="utf-8") as f:
                 return json.load(f)
         except (FileNotFoundError, json.JSONDecodeError):
             return []
@@ -82,10 +82,10 @@ class SeriesManager:
     def update_series(
         self,
         series_id: str,
-        name: str = None,
-        description: str = None,
-        category: str = None,
-        total_books: int = None,
+        name: str | None = None,
+        description: str | None = None,
+        category: str | None = None,
+        total_books: int | None = None,
     ) -> tuple[bool, str]:
         series_list = self._load_series()
         for s in series_list:

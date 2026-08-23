@@ -9,6 +9,7 @@ import subprocess  # nosec B404 (launcher uses list-form Popen with constant arg
 import sys
 import time
 import webbrowser
+import contextlib
 
 # Ensure we're in the project directory
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -138,7 +139,7 @@ def main():
         # Health check: wait for port to be ready before opening browser
         print(f"  [WAIT] Waiting for server on port {FLASK_PORT}...", end="", flush=True)
         port_ready = False
-        for attempt in range(30):  # Up to 60 seconds
+        for _attempt in range(30):  # Up to 60 seconds
             time.sleep(2)
             sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             sock.settimeout(2)
@@ -161,10 +162,8 @@ def main():
         if port_ready:
             safe_print(" READY!")
             print(f"  [WEB] Opening browser at {FLASK_URL}")
-            try:
+            with contextlib.suppress(Exception):
                 webbrowser.open(FLASK_URL)
-            except Exception:
-                pass
         else:
             print()
             if web_proc.poll() is None:
@@ -220,7 +219,7 @@ def main():
                     return
                 # Check if any process exited on its own
                 all_dead = True
-                for n, proc in processes:
+                for _n, proc in processes:
                     if proc.poll() is None:
                         all_dead = False
                         break
@@ -238,7 +237,7 @@ def main():
                     shutdown_all()
                     return
                 all_dead = True
-                for n, proc in processes:
+                for _n, proc in processes:
                     if proc.poll() is None:
                         all_dead = False
                         break
@@ -250,7 +249,7 @@ def main():
     except ImportError:
         # Fallback if msvcrt/select not available
         try:
-            for name, proc in processes:
+            for _name, proc in processes:
                 proc.wait()
         except KeyboardInterrupt:
             shutdown_all()

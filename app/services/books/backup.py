@@ -37,7 +37,7 @@ def list_backups() -> list[dict[str, Any]]:
             meta_file = os.path.join(full, "_meta.json")
             meta: dict[str, Any] = {}
             if os.path.exists(meta_file):
-                with open(meta_file, "r", encoding="utf-8") as f:
+                with open(meta_file, encoding="utf-8") as f:
                     meta = json.load(f)
             entries.append({"name": name, "path": full, **meta})
     return entries

@@ -639,10 +639,7 @@ def hybrid_model(X: np.ndarray, X_tfidf: np.ndarray, df: pd.DataFrame) -> ModelR
     result = ModelResult("Hybrid", ALGORITHM_COLORS["Hybrid"])
 
     # Content-based similarity
-    if X_tfidf.shape[1] > 1:
-        content_sim = cosine_similarity(X_tfidf)
-    else:
-        content_sim = cosine_similarity(X)
+    content_sim = cosine_similarity(X_tfidf) if X_tfidf.shape[1] > 1 else cosine_similarity(X)
 
     # Collaborative: cluster-based co-occurrence
     kmeans = KMeans(n_clusters=N_CLUSTERS, random_state=RANDOM_STATE, n_init=10)
@@ -796,18 +793,18 @@ def save_radar_chart(results: list[ModelResult], filename: str = "radar_comparis
 
     # Normalize each metric to [0, 1]
     for i in range(n_metrics):
-        vals = [data[name][i] for name in data]
+        vals = [row[i] for row in data.values()]
         min_v, max_v = min(vals), max(vals)
         if max_v > min_v:
             # For Davies-Bouldin, lower is better
             if available_metrics[i] == "Davies-Bouldin":
-                for name in data:
-                    data[name][i] = 1 - (data[name][i] - min_v) / (max_v - min_v)
+                for row in data.values():
+                    row[i] = 1 - (row[i] - min_v) / (max_v - min_v)
             else:
-                for name in data:
-                    data[name][i] = (data[name][i] - min_v) / (max_v - min_v)
+                for row in data.values():
+                    row[i] = (row[i] - min_v) / (max_v - min_v)
 
-    fig, ax = plt.subplots(figsize=(12, 10), subplot_kw=dict(polar=True))
+    _fig, ax = plt.subplots(figsize=(12, 10), subplot_kw={"polar": True})
 
     angles = np.linspace(0, 2 * np.pi, n_metrics, endpoint=False).tolist()
     angles += angles[:1]  # Close the circle
@@ -836,17 +833,17 @@ def save_radar_chart(results: list[ModelResult], filename: str = "radar_comparis
     print(f"  ✅ Radar chart saved: {path}")
 
 
-def save_bar_comparison(results: list[ModelResult], metric: str, filename: str = None):
+def save_bar_comparison(results: list[ModelResult], metric: str, filename: str | None = None):
     """Create a bar chart comparing a specific metric across algorithms."""
     names = [r.name for r in results]
     values = [r.metrics.get(metric, 0) for r in results]
     colors = [ALGORITHM_COLORS.get(n, f"C{i}") for i, n in enumerate(names)]
 
-    fig, ax = plt.subplots(figsize=(14, 6))
+    _fig, ax = plt.subplots(figsize=(14, 6))
     bars = ax.bar(range(len(names)), values, color=colors, edgecolor="white", linewidth=0.5)
 
     # Add value labels on bars
-    for bar, val in zip(bars, values):
+    for bar, val in zip(bars, values, strict=False):
         if val != 0:
             ax.text(
                 bar.get_x() + bar.get_width() / 2,
@@ -876,7 +873,7 @@ def save_bar_comparison(results: list[ModelResult], metric: str, filename: str =
 
 def save_elbow_plot(inertias, k_range, filename: str = "elbow_curve.png"):
     """Save elbow curve for K selection."""
-    fig, ax = plt.subplots(figsize=(10, 6))
+    _fig, ax = plt.subplots(figsize=(10, 6))
     ax.plot(list(k_range), inertias, "bo-", linewidth=2, markersize=8, color="#2196F3")
     ax.set_xlabel("Number of Clusters (K)", fontsize=12)
     ax.set_ylabel("Inertia (Within-cluster Sum of Squares)", fontsize=12)
@@ -909,7 +906,7 @@ def save_elbow_plot(inertias, k_range, filename: str = "elbow_curve.png"):
 
 def save_k_distance_plot(k_dist: np.ndarray, filename: str = "k_distance_plot.png"):
     """Save k-distance plot for DBSCAN eps tuning."""
-    fig, ax = plt.subplots(figsize=(10, 6))
+    _fig, ax = plt.subplots(figsize=(10, 6))
     ax.plot(range(len(k_dist)), k_dist, "b-", linewidth=1.5, alpha=0.7)
     ax.set_xlabel("Points Sorted by Distance", fontsize=12)
     ax.set_ylabel("k-Distance", fontsize=12)
@@ -939,7 +936,7 @@ def save_k_distance_plot(k_dist: np.ndarray, filename: str = "k_distance_plot.pn
 def save_cluster_visualization(X_2d: np.ndarray, labels: np.ndarray, title: str, filename: str):
     """Save 2D cluster visualization."""
     n_clusters = len(set(labels)) - (1 if -1 in labels else 0)
-    fig, ax = plt.subplots(figsize=(12, 8))
+    _fig, ax = plt.subplots(figsize=(12, 8))
 
     scatter = ax.scatter(
         X_2d[:, 0],
@@ -999,7 +996,7 @@ def save_heatmap_comparison(results: list[ModelResult], filename: str = "perform
         data.append(row)
 
     data = np.array(data)
-    fig, ax = plt.subplots(figsize=(12, max(6, len(results) * 0.5)))
+    _fig, ax = plt.subplots(figsize=(12, max(6, len(results) * 0.5)))
 
     cmap = sns.diverging_palette(240, 10, as_cmap=True)
     im = ax.imshow(data, cmap=cmap, aspect="auto")
@@ -1062,7 +1059,7 @@ def save_interactive_radar(results: list[ModelResult], filename: str = "interact
         fig.add_trace(
             go.Scatterpolar(
                 r=vals,
-                theta=available_metrics + [available_metrics[0]],
+                theta=[*available_metrics, available_metrics[0]],
                 name=r.name,
                 line_color=ALGORITHM_COLORS.get(r.name, "#000"),
                 fill="toself",
@@ -1071,10 +1068,10 @@ def save_interactive_radar(results: list[ModelResult], filename: str = "interact
         )
 
     fig.update_layout(
-        polar=dict(radialaxis=dict(visible=True, range=[0, 1])),
+        polar={"radialaxis": {"visible": True, "range": [0, 1]}},
         title="📊 Interactive Algorithm Comparison (Normalized)",
-        font=dict(size=11),
-        legend=dict(x=1.1, y=0.5),
+        font={"size": 11},
+        legend={"x": 1.1, "y": 0.5},
         width=1000,
         height=700,
     )
@@ -1103,7 +1100,7 @@ def save_summary_report(results: list[ModelResult], df: pd.DataFrame):
         # Sort by best Silhouette Score (or first avail metric)
         sort_key = "Silhouette Score"
         if not any(sort_key in r.metrics for r in results):
-            sort_key = results[0].metrics and list(results[0].metrics.keys())[0]
+            sort_key = results[0].metrics and next(iter(results[0].metrics.keys()))
 
         sorted_results = sorted(
             [r for r in results if sort_key in r.metrics],
@@ -1171,7 +1168,7 @@ def run_comparison():
     print("\n" + "-" * 70)
     print("  🛠️  FEATURE ENGINEERING")
     print("-" * 70)
-    X_num, feature_names = get_numerical_features(df)
+    X_num, _feature_names = get_numerical_features(df)
     X_tfidf = get_tfidf_features(df)
     print(f"  ✅ Numerical features: {X_num.shape[1]} dimensions")
     print(f"  ✅ TF-IDF features: {X_tfidf.shape[1]} dimensions")
@@ -1218,7 +1215,7 @@ def run_comparison():
     results.append(svd_model(X_combined, df))
 
     # 8. XGBoost
-    xgb_result, xgb_model_obj = xgboost_model(df, X_combined)
+    xgb_result, _xgb_model_obj = xgboost_model(df, X_combined)
     results.append(xgb_result)
 
     # 9. Hybrid
