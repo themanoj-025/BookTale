@@ -65,3 +65,6 @@ node_modules/
 /.cursorrules
 
 CLAUDE.md
+
+# Runtime balance log
+radar_balance.txt
