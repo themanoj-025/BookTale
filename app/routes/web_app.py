@@ -375,6 +375,30 @@ def admin_required(f):
     return d
 
 
+def api_key_required(f):
+    """Protect API endpoints with Bearer token auth.
+
+    Enabled when BOOKTALE_API_KEY env var is set. When unset, all API
+    endpoints remain open (backward compatible).
+    """
+    import secrets as _secrets
+
+    @wraps(f)
+    def d(*a, **k):
+        api_key = os.environ.get("BOOKTALE_API_KEY", "")
+        if not api_key:
+            return f(*a, **k)
+        auth = request.headers.get("Authorization", "")
+        if not auth.startswith("Bearer "):
+            return jsonify({"error": "Missing Authorization header"}), 401
+        token = auth[7:]
+        if not _secrets.compare_digest(token, api_key):
+            return jsonify({"error": "Invalid API key"}), 403
+        return f(*a, **k)
+
+    return d
+
+
 def get_current_user():
     if "user_id" not in session:
         return None
@@ -2173,6 +2197,7 @@ def api_users_suggested():
 
 
 @app.route("/api/seed/stats")
+@api_key_required
 def api_seed_stats():
     """Get stats including Goodreads seed dataset counts for landing page."""
     s = _library_stats() if "storage" in dir() else {}
@@ -2294,6 +2319,7 @@ def api_reading_streak():
 
 
 @app.route("/api/analytics/monthly")
+@api_key_required
 def api_analytics_monthly():
     """Get monthly analytics data for charts (no login required for landing page)."""
     books = storage.load_books()
@@ -2324,6 +2350,7 @@ def api_analytics_monthly():
 
 
 @app.route("/api/analytics/categories")
+@api_key_required
 def api_analytics_categories():
     """Get category distribution for charts."""
     books = storage.load_books()
@@ -2334,6 +2361,7 @@ def api_analytics_categories():
 
 
 @app.route("/api/analytics/activity")
+@api_key_required
 def api_analytics_activity():
     """Get recent activity for 'Who to Follow' sidebar."""
     txns = storage.load_transactions()
