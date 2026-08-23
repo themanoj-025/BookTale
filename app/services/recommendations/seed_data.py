@@ -302,7 +302,7 @@ def _load_seed_data(force: bool = False) -> None:
     _SEED_BY_CATEGORY = defaultdict(list)
 
     try:
-        with open(csv_path, "r", encoding="utf-8", errors="replace") as f:
+        with open(csv_path, encoding="utf-8", errors="replace") as f:
             reader = csv.DictReader(f)
             for row in reader:
                 try:
@@ -391,7 +391,7 @@ def get_seed_stats() -> dict:
     if not _SEED_BOOKS:
         return {"total": 0, "categories": [], "authors": 0, "avg_rating": 0}
     avg_rating = round(sum(b["average_rating"] for b in _SEED_BOOKS) / len(_SEED_BOOKS), 2)
-    unique_authors = len(set(b["author"].lower() for b in _SEED_BOOKS))
+    unique_authors = len({b["author"].lower() for b in _SEED_BOOKS})
     return {
         "total": len(_SEED_BOOKS),
         "categories": _SEED_CATEGORIES,
@@ -499,9 +499,9 @@ def recommend_seed_similar(title: str, author: str = "", top_n: int = 5) -> list
             score += 5.0
 
         # Shared co-authors
-        shared_authors = set(a.lower() for a in book["authors"]) & set(
+        shared_authors = {a.lower() for a in book["authors"]} & {
             a.lower() for a in target["authors"]
-        )
+        }
         score += len(shared_authors) * 5.0
 
         # Rating bonus

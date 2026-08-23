@@ -129,7 +129,7 @@ class BookRepository:
             .group_by(Book.category)
             .order_by(func.count(Book.book_id).desc())
         ).all()
-        return {cat: cnt for cat, cnt in rows}
+        return dict(rows)
 
     def most_issued(self, top: int = 10) -> list[dict]:
         rows = (

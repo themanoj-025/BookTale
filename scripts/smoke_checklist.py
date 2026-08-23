@@ -183,7 +183,7 @@ check(14, "Issue a book (available) -> success", ok, msg)
 
 # #15: drain the last copy (Neuromancer has 1 copy) with a fresh user, then a
 # second fresh user must be offered the reservation queue.
-neuromancer = [b for b in books.values() if b.title == "Neuromancer"][0].book_id
+neuromancer = next(b for b in books.values() if b.title == "Neuromancer").book_id
 lib.register_user("MEM-RESERVED", "Reserved", "rv@x.io", "", "user", "hash", actor="test")
 ok1, m1 = lib.issue_book("MEM-RESERVED", neuromancer, actor="Librarian")
 ok2, m2 = lib.issue_book("MEM-ADMINWANNABE", neuromancer, actor="Librarian")
@@ -226,7 +226,7 @@ r = client.get("/admin/overdue")
 check(18, "Overdue list page renders", r.status_code == 200)
 
 ok, msg = lib.add_book("Temp Book", "T", "9780000000000", "Other", 1, fetch_cover_async=False)
-tb = [b for b in storage.load_books().values() if b.title == "Temp Book"][0]
+tb = next(b for b in storage.load_books().values() if b.title == "Temp Book")
 ok2, _ = lib.delete_book(tb.book_id, actor="ADMIN001")
 check(
     19,
@@ -344,7 +344,7 @@ check(
 )
 
 lib.add_book("Rare Book", "R", "9789999999999", "Other", 1, fetch_cover_async=False)
-rare_id = [b for b in storage.load_books().values() if b.title == "Rare Book"][0].book_id
+rare_id = next(b for b in storage.load_books().values() if b.title == "Rare Book").book_id
 for i in range(20):
     lib.register_user(f"MEM-RACE{i}", f"Race{i}", f"r{i}@x.io", "", "user", "hash", actor="test")
 race_results = []
@@ -352,7 +352,7 @@ lock = threading.Lock()
 
 
 def _race(i: int):
-    ok, msg = lib.issue_book(f"MEM-RACE{i}", rare_id, actor="Librarian")
+    ok, _msg = lib.issue_book(f"MEM-RACE{i}", rare_id, actor="Librarian")
     with lock:
         race_results.append(ok)
 

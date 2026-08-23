@@ -6,6 +6,34 @@ target-version = ["py310"]
 profile = "black"
 line_length = 100
 
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "B", "BLE", "UP", "SIM", "C4", "RUF", "PLC", "PIE"]
+ignore = [
+    "DTZ005",  # datetime.now() without tz — Flask app convention
+    "DTZ001",  # datetime() without tz — Flask app convention
+    "DTZ011",  # date.today() — acceptable in Flask templates
+    "DTZ006",  # datetime.fromtimestamp — acceptable
+    "DTZ007",  # strptime without tz — acceptable
+    "DTZ901",  # datetime.min/max — acceptable
+    "S110",    # try-except-pass — defensive coding in Flask routes
+    "E501",    # line too long — style preference
+    "PLW0603", # global statement — Flask app pattern
+    "RUF012",  # mutable class default — Flask/SQLAlchemy pattern
+    "UP031",   # printf formatting — large legacy codebase
+    "PLC0415", # import-outside-top-level — Flask lazy imports
+    "E402",    # module-import-not-at-top — Flask app pattern
+    "BLE001",  # blind-except — defensive coding throughout app
+    "E722",    # bare-except — legacy code
+    "E741",    # ambiguous variable name — legacy code
+    "RUF001",  # ambiguous unicode — intentional
+    "RUF002",  # ambiguous unicode in docstrings — intentional
+    "PLC0206", # dict-index-missing-items — Jupyter notebook cells
+]
+
 [tool.pytest.ini_options]
 minversion = "7.0"
 testpaths = ["tests"]

@@ -38,19 +38,19 @@ def _read_json(path: str, force: bool = False) -> Any:
 
         os.makedirs(os.path.dirname(path), exist_ok=True)
         if not os.path.exists(path):
-            data: Any = {} if path.endswith(".json") else {}
+            data: Any = {}
             _cache[path] = data
             _cache_timestamps[path] = now
             return data
 
         try:
-            with open(path, "r", encoding="utf-8") as f:
+            with open(path, encoding="utf-8") as f:
                 data = json.load(f)
             _cache[path] = data
             _cache_timestamps[path] = now
             return data
         except (json.JSONDecodeError, FileNotFoundError) as e:
-            raise StorageError("read", str(e))
+            raise StorageError("read", str(e)) from e
 
 
 def _write_json(path: str, data: Any) -> None:
@@ -64,7 +64,7 @@ def _write_json(path: str, data: Any) -> None:
             _cache[path] = data
             _cache_timestamps[path] = time.time()
         except (OSError, TypeError) as e:
-            raise StorageError("write", str(e))
+            raise StorageError("write", str(e)) from e
 
 
 def _invalidate_cache() -> None:

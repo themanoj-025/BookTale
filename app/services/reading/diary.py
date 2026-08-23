@@ -57,7 +57,7 @@ def _gen_id() -> str:
 def _load_diary(storage: Storage) -> list:
     path = os.path.join(storage_lib.Config.DATA_DIR, DIARY_FILE)
     try:
-        with open(path, "r", encoding="utf-8") as f:
+        with open(path, encoding="utf-8") as f:
             return json.load(f)
     except (FileNotFoundError, json.JSONDecodeError):
         return []
@@ -127,9 +127,8 @@ class DiaryManager:
         # Check for duplicate entry (user + book on same date or without date)
         entries = _load_diary(self.storage)
         for e in entries:
-            if e["user_id"] == user_id and e["book_id"] == book_id:
-                if not date_read or e.get("date_read", "") == date_read:
-                    # Update existing entry
+            if (e["user_id"] == user_id and e["book_id"] == book_id and (not date_read or e.get("date_read", "") == date_read)):
+                # Update existing entry
                     e["rating_label"] = rating_label
                     if star_rating is not None:
                         e["star_rating"] = star_rating

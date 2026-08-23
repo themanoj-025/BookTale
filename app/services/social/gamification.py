@@ -151,7 +151,7 @@ class Gamification:
     def _load_gamification(self) -> dict:
         path = self._get_gamification_path()
         try:
-            with open(path, "r", encoding="utf-8") as f:
+            with open(path, encoding="utf-8") as f:
                 return json.load(f)
         except (FileNotFoundError, json.JSONDecodeError):
             return {}
@@ -262,12 +262,12 @@ class Gamification:
         posts = self.storage.load_posts()
         user_posts = [p for p in posts if p["user_id"] == user_id]
         follows = self.storage.load_follows()
-        followers = len(set(f["follower_id"] for f in follows if f["following_id"] == user_id))
+        followers = len({f["follower_id"] for f in follows if f["following_id"] == user_id})
 
         clubs_file = os.path.join(Config.DATA_DIR, "clubs.json")
         clubs = []
         try:
-            with open(clubs_file, "r", encoding="utf-8") as f:
+            with open(clubs_file, encoding="utf-8") as f:
                 clubs = json.load(f)
         except Exception:
             pass
@@ -276,7 +276,7 @@ class Gamification:
         lists_file = os.path.join(Config.DATA_DIR, "book_lists.json")
         user_lists = []
         try:
-            with open(lists_file, "r", encoding="utf-8") as f:
+            with open(lists_file, encoding="utf-8") as f:
                 all_lists = json.load(f)
             user_lists = [l for l in all_lists if l["owner_id"] == user_id]
         except Exception:
@@ -285,7 +285,7 @@ class Gamification:
         polls_file = os.path.join(Config.DATA_DIR, "polls.json")
         user_polls = []
         try:
-            with open(polls_file, "r", encoding="utf-8") as f:
+            with open(polls_file, encoding="utf-8") as f:
                 all_polls = json.load(f)
             user_polls = [p for p in all_polls if p["user_id"] == user_id]
         except Exception:

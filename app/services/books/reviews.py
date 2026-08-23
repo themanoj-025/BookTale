@@ -36,7 +36,7 @@ def _load_custom_shelves(storage: Storage) -> list:
     """Load custom shelf definitions from storage."""
     path = os.path.join(storage_lib.Config.DATA_DIR, CUSTOM_SHELVES_FILE)
     try:
-        with open(path, "r", encoding="utf-8") as f:
+        with open(path, encoding="utf-8") as f:
             return json.load(f)
     except:
         return []
@@ -148,7 +148,7 @@ class ReviewManager:
 
         comments_path = os.path.join(storage_lib.Config.DATA_DIR, "review_comments.json")
         try:
-            with open(comments_path, "r", encoding="utf-8") as f:
+            with open(comments_path, encoding="utf-8") as f:
                 comments = json.load(f)
         except:
             comments = []
@@ -170,7 +170,7 @@ class ReviewManager:
         """Get all comments on a review."""
         comments_path = os.path.join(storage_lib.Config.DATA_DIR, "review_comments.json")
         try:
-            with open(comments_path, "r", encoding="utf-8") as f:
+            with open(comments_path, encoding="utf-8") as f:
                 all_comments = json.load(f)
         except:
             return []
@@ -375,7 +375,7 @@ class ReviewManager:
 
     def move_to_shelf(self, user_id: str, book_id: str, shelf: str) -> tuple[bool, str]:
         """Move a book from one shelf to another."""
-        ok, msg = self.remove_from_shelf(user_id, book_id)
+        ok, _msg = self.remove_from_shelf(user_id, book_id)
         if not ok:
             # It's okay if the book wasn't on any shelf
             pass

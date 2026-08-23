@@ -322,7 +322,7 @@ class TestLibrary:
 
     def test_get_book(self, lib: Library):
         """Test retrieving a book."""
-        ok, bid = lib.add_book("Test", "Author", "1111111111", "Fiction", 1, actor="test")
+        _ok, bid = lib.add_book("Test", "Author", "1111111111", "Fiction", 1, actor="test")
         book = lib.get_book(bid)
         assert book is not None
         assert book.title == "Test"
@@ -348,7 +348,7 @@ class TestLibrary:
     def test_update_book(self, lib: Library):
         """Test updating a book."""
         ok, bid = lib.add_book("Original", "Author", "1111111111", "Fiction", 1, actor="test")
-        ok, msg = lib.update_book(bid, title="Updated")
+        ok, _msg = lib.update_book(bid, title="Updated")
         assert ok is True
         book = lib.get_book(bid)
         assert book.title == "Updated"
@@ -356,14 +356,14 @@ class TestLibrary:
     def test_delete_book(self, lib: Library):
         """Test soft-deleting a book."""
         ok, bid = lib.add_book("Test", "Author", "1111111111", "Fiction", 1, actor="test")
-        ok, msg = lib.delete_book(bid, actor="test")
+        ok, _msg = lib.delete_book(bid, actor="test")
         assert ok is True
         book = lib.get_book(bid)
         assert book.is_deleted is True
 
     def test_register_user(self, lib: Library):
         """Test user registration."""
-        ok, msg = lib.register_user(
+        ok, _msg = lib.register_user(
             "U001",
             "User",
             "u@test.com",
@@ -409,12 +409,12 @@ class TestLibrary:
             actor="test",
         )
 
-        ok, msg = lib.block_user("U001", actor="admin")
+        ok, _msg = lib.block_user("U001", actor="admin")
         assert ok is True
         user = lib.get_user("U001")
         assert user.membership_status == "Blocked"
 
-        ok, msg = lib.unblock_user("U001", actor="admin")
+        ok, _msg = lib.unblock_user("U001", actor="admin")
         assert ok is True
         user = lib.get_user("U001")
         assert user.membership_status == "Active"
@@ -502,7 +502,7 @@ class TestLibrary:
         )
         ok, bid = lib.add_book("Test", "Author", "1111111111", "Fiction", 2, actor="test")
         lib.issue_book("U001", bid, actor="librarian")
-        ok, msg, fine = lib.return_book("U001", bid, actor="librarian")
+        ok, _msg, fine = lib.return_book("U001", bid, actor="librarian")
         assert ok is True
         assert fine >= 0
 
@@ -518,7 +518,7 @@ class TestLibrary:
             actor="test",
         )
         ok, bid = lib.add_book("Test", "Author", "1111111111", "Fiction", 1, actor="test")
-        ok, msg, fine = lib.return_book("U001", bid, actor="librarian")
+        ok, msg, _fine = lib.return_book("U001", bid, actor="librarian")
         assert ok is False
         assert "not issued" in msg.lower()
 
@@ -539,7 +539,7 @@ class TestLibrary:
         users = {user.user_id: user}
         lib.storage.save_users(users)
 
-        ok, msg = lib.pay_fine("U001", 50.0, actor="admin")
+        ok, _msg = lib.pay_fine("U001", 50.0, actor="admin")
         assert ok is True
 
         user = lib.get_user("U001")
@@ -556,7 +556,7 @@ class TestLibrary:
             hash_password("pass"),
             actor="test",
         )
-        ok, bid = lib.add_book("Test", "Author", "1111111111", "Fiction", 1, actor="test")
+        _ok, bid = lib.add_book("Test", "Author", "1111111111", "Fiction", 1, actor="test")
 
         # Issue and make it overdue by manipulating the transaction
         lib.issue_book("U001", bid, actor="librarian")
@@ -579,10 +579,10 @@ class TestLibrary:
 class TestRecommender:
     def test_recommend_similar_books(self, lib: Library, storage: Storage):
         """Test content-based recommendations."""
-        ok1, bid1 = lib.add_book(
+        _ok1, bid1 = lib.add_book(
             "Harry Potter 1", "J.K. Rowling", "1111111111", "Fiction", 2, actor="test"
         )
-        ok2, bid2 = lib.add_book(
+        _ok2, bid2 = lib.add_book(
             "Harry Potter 2", "J.K. Rowling", "2222222222", "Fiction", 2, actor="test"
         )
         lib.add_book("Science Book", "S. Author", "3333333333", "Science", 2, actor="test")
@@ -595,7 +595,7 @@ class TestRecommender:
 
     def test_recommend_trending(self, lib: Library, storage: Storage):
         """Test trending recommendations."""
-        ok, bid1 = lib.add_book("Popular Book", "Author", "1111111111", "Fiction", 5, actor="test")
+        _ok, bid1 = lib.add_book("Popular Book", "Author", "1111111111", "Fiction", 5, actor="test")
         lib.add_book("Unpopular Book", "Author2", "2222222222", "Science", 5, actor="test")
 
         # Make first book popular
@@ -637,7 +637,7 @@ class TestRecommender:
             hash_password("pass"),
             actor="test",
         )
-        ok, bid = lib.add_book(
+        _ok, bid = lib.add_book(
             "Fiction Book", "Fav Author", "1111111111", "Fiction", 5, actor="test"
         )
 

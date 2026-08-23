@@ -224,14 +224,14 @@ class Library:
                 by_category = q in b.category.lower()
                 by_id = q.upper() in b.book_id.upper()
                 if (
-                    search_by == "title"
-                    and not by_title
-                    or search_by == "author"
-                    and not by_author
-                    or search_by == "isbn"
-                    and not by_isbn
-                    or search_by == "all"
-                    and not any([by_title, by_author, by_isbn, by_category, by_id])
+                    (search_by == "title"
+                    and not by_title)
+                    or (search_by == "author"
+                    and not by_author)
+                    or (search_by == "isbn"
+                    and not by_isbn)
+                    or (search_by == "all"
+                    and not any([by_title, by_author, by_isbn, by_category, by_id]))
                 ):
                     continue
 
@@ -267,9 +267,8 @@ class Library:
         q = query.lower().strip()
         results = []
         for u in users.values():
-            if q:
-                if not (q in u.name.lower() or q in u.user_id.lower() or q in u.email.lower()):
-                    continue
+            if q and not (q in u.name.lower() or q in u.user_id.lower() or q in u.email.lower()):
+                continue
             if role and u.role.lower() != role.lower():
                 continue
             if status and u.membership_status.lower() != status.lower():

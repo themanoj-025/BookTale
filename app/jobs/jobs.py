@@ -129,7 +129,7 @@ def enqueue_cover_fetch(book_id: str, title: str, author: str, isbn: str, storag
     from app.jobs.tasks import job_fetch_book_cover
 
     args = (book_id, title, author, isbn)
-    pool_args = args if storage is None else args + (storage,)
+    pool_args = args if storage is None else (*args, storage)
     return _enqueue_or_fallback("cover_fetch", job_fetch_book_cover, args, pool_args)
 
 

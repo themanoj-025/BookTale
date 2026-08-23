@@ -221,7 +221,7 @@ def get_logs(limit: int = 50) -> list[str]:
     """Get the last N log lines from the text log file."""
     if not os.path.exists(Config.LOG_FILE):
         return []
-    with open(Config.LOG_FILE, "r", encoding="utf-8") as f:
+    with open(Config.LOG_FILE, encoding="utf-8") as f:
         lines = f.readlines()
     return [line.strip() for line in lines[-limit:]]
 

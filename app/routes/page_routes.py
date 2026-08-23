@@ -16,6 +16,7 @@ from urllib.parse import quote
 from flask import jsonify, redirect, render_template, request, session, url_for
 
 from app.models.book import CATEGORIES as BOOK_CATEGORIES
+import contextlib
 
 _storage = None
 _lib = None
@@ -67,7 +68,7 @@ def _library_stats():
     active_issues = [t for t in issues if t.get("return_date") is None]
     total_txns = len(txns)
     month_txns = sum(1 for t in txns if datetime.fromisoformat(t.get("issue_date", "")) >= tms)
-    unique_borrowers = len(set(t["user_id"] for t in issues))
+    unique_borrowers = len({t["user_id"] for t in issues})
     fines = _storage.load_fines()
     total_fines = sum(f.get("amount", 0) for f in fines)
     paid_fines = sum(f.get("amount", 0) for f in fines if f.get("paid"))
@@ -296,21 +297,14 @@ def init_page_routes(
                 if b.available_copies > 0
                 else '<span class="badge bg-danger">Out</span>'
             )
-            trending_html += """<div class="col-6 col-md-4 col-lg-2 mb-2">
-                <div class="glass-card p-2 text-center h-100" onclick="window.location.href='/books/%s'" style="cursor:pointer;">
-                    <div style="width:40px;height:56px;border-radius:8px;background:linear-gradient(135deg,%s,%sdd);display:flex;align-items:center;justify-content:center;margin:0 auto .3rem;">
+            trending_html += f"""<div class="col-6 col-md-4 col-lg-2 mb-2">
+                <div class="glass-card p-2 text-center h-100" onclick="window.location.href='/books/{b.book_id}'" style="cursor:pointer;">
+                    <div style="width:40px;height:56px;border-radius:8px;background:linear-gradient(135deg,{cc},{cc}dd);display:flex;align-items:center;justify-content:center;margin:0 auto .3rem;">
                         <i class="bi bi-book-fill" style="color:white;font-size:.9rem;"></i></div>
-                    <div style="font-size:.75rem;font-weight:600;line-height:1.2;">%s</div>
-                    <small style="font-size:.6rem;color:var(--text-muted);">%s</small>
-                    <div class="mt-1">%s</div>
-                </div></div>""" % (
-                b.book_id,
-                cc,
-                cc,
-                h(b.title[:35]),
-                h(b.author[:25]),
-                avail,
-            )
+                    <div style="font-size:.75rem;font-weight:600;line-height:1.2;">{h(b.title[:35])}</div>
+                    <small style="font-size:.6rem;color:var(--text-muted);">{h(b.author[:25])}</small>
+                    <div class="mt-1">{avail}</div>
+                </div></div>"""
         if not trending_html:
             trending_html = (
                 '<div class="col-12 text-center text-muted py-4">No books available yet.</div>'
@@ -329,18 +323,13 @@ def init_page_routes(
         readers_html = ""
         for u in suggested_users:
             av = avatar_html(u.name, 40)
-            readers_html += """<div class="col-6 col-md-4 mb-2">
+            readers_html += f"""<div class="col-6 col-md-4 mb-2">
                 <div class="glass-card p-3 text-center h-100">
-                    %s
-                    <div class="fw-bold small mt-2">%s</div>
-                    <small class="text-muted">@%s</small>
-                    <button class="btn btn-primary btn-sm mt-2 w-100" onclick="followUser('%s',this)"><i class="bi bi-person-plus"></i> Follow</button>
-                </div></div>""" % (
-                av,
-                h(u.name),
-                h(u.user_id),
-                h(u.user_id),
-            )
+                    {av}
+                    <div class="fw-bold small mt-2">{h(u.name)}</div>
+                    <small class="text-muted">@{h(u.user_id)}</small>
+                    <button class="btn btn-primary btn-sm mt-2 w-100" onclick="followUser('{h(u.user_id)}',this)"><i class="bi bi-person-plus"></i> Follow</button>
+                </div></div>"""
         if not readers_html:
             readers_html = '<div class="col-12 text-center text-muted py-4">No readers to suggest right now.</div>'
 
@@ -353,8 +342,7 @@ def init_page_routes(
                     if isinstance(tag, dict):
                         tag = tag.get("tag", "")
                     hashtag_html += (
-                        '<a href="/search?tag=%s" class="btn btn-outline btn-sm mb-1" style="border-radius:50px;">#%s</a> '
-                        % (h(tag.strip("#")), h(tag.strip("#")))
+                        '<a href="/search?tag={}" class="btn btn-outline btn-sm mb-1" style="border-radius:50px;">#{}</a> '.format(h(tag.strip("#")), h(tag.strip("#")))
                     )
             except Exception:
                 pass
@@ -368,11 +356,11 @@ def init_page_routes(
                 clubs_data, _ = _communities.get_clubs(page=1)
                 for c in clubs_data[:3]:
                     clubs_html += """<div class="col-md-4 mb-2">
-                        <div class="glass-card p-3 h-100" onclick="window.location.href='/clubs/%s'" style="cursor:pointer;">
-                            <div class="fw-bold small">%s</div>
-                            <small class="text-muted">%s members</small>
-                            <div style="font-size:.75rem;color:var(--text-muted);margin-top:.3rem;">%s</div>
-                        </div></div>""" % (
+                        <div class="glass-card p-3 h-100" onclick="window.location.href='/clubs/{}'" style="cursor:pointer;">
+                            <div class="fw-bold small">{}</div>
+                            <small class="text-muted">{} members</small>
+                            <div style="font-size:.75rem;color:var(--text-muted);margin-top:.3rem;">{}</div>
+                        </div></div>""".format(
                         h(c["club_id"]),
                         h(c["name"]),
                         len(c.get("members", [])),
@@ -391,16 +379,16 @@ def init_page_routes(
                 cc = cat_color(r.get("category", ""))
                 reason = h(r.get("reason", "Recommended"))[:60]
                 for_you_html += """<div class="col-md-3 col-6 mb-2">
-                    <div class="glass-card p-2 text-center h-100" onclick="window.location.href='/books/%s'" style="cursor:pointer;">
+                    <div class="glass-card p-2 text-center h-100" onclick="window.location.href='/books/{}'" style="cursor:pointer;">
                         <div style="position:relative;">
-                            <div style="width:40px;height:56px;border-radius:8px;background:linear-gradient(135deg,%s,%sdd);display:flex;align-items:center;justify-content:center;margin:0 auto .3rem;">
+                            <div style="width:40px;height:56px;border-radius:8px;background:linear-gradient(135deg,{},{}dd);display:flex;align-items:center;justify-content:center;margin:0 auto .3rem;">
                                 <i class="bi bi-book-fill" style="color:white;font-size:.9rem;"></i></div>
                             <span class="badge bg-warning text-dark" style="position:absolute;top:-4px;right:10px;font-size:.5rem;">AI</span>
                         </div>
-                        <div style="font-size:.7rem;font-weight:600;line-height:1.2;">%s</div>
-                        <small style="font-size:.6rem;color:var(--text-muted);">%s</small>
-                        <div style="font-size:.55rem;color:var(--text-muted);margin-top:.2rem;">%s</div>
-                    </div></div>""" % (
+                        <div style="font-size:.7rem;font-weight:600;line-height:1.2;">{}</div>
+                        <small style="font-size:.6rem;color:var(--text-muted);">{}</small>
+                        <div style="font-size:.55rem;color:var(--text-muted);margin-top:.2rem;">{}</div>
+                    </div></div>""".format(
                     h(r.get("book_id", "")),
                     cc,
                     cc,
@@ -646,20 +634,14 @@ def init_page_routes(
                     fav_books.append(b)
             for b in fav_books:
                 cc = cat_color(b.category)
-                books_html += """<div class="col-6 col-md-4 col-lg-3 mb-2">
+                books_html += f"""<div class="col-6 col-md-4 col-lg-3 mb-2">
                     <div class="glass-card p-2 text-center h-100" draggable="true">
-                        <div style="width:40px;height:56px;border-radius:8px;background:linear-gradient(135deg,%s,%sdd);display:flex;align-items:center;justify-content:center;margin:0 auto .3rem;">
+                        <div style="width:40px;height:56px;border-radius:8px;background:linear-gradient(135deg,{cc},{cc}dd);display:flex;align-items:center;justify-content:center;margin:0 auto .3rem;">
                             <i class="bi bi-book-fill" style="color:white;font-size:.9rem;"></i></div>
-                        <div style="font-size:.75rem;font-weight:600;">%s</div>
-                        <small style="font-size:.6rem;color:var(--text-muted);">%s</small>
-                        <div class="mt-1"><button class="btn btn-sm btn-outline" onclick="removeFromShelf('%s')"><i class="bi bi-x"></i></button></div>
-                    </div></div>""" % (
-                    cc,
-                    cc,
-                    h(b.title[:35]),
-                    h(b.author[:20]),
-                    h(b.book_id),
-                )
+                        <div style="font-size:.75rem;font-weight:600;">{h(b.title[:35])}</div>
+                        <small style="font-size:.6rem;color:var(--text-muted);">{h(b.author[:20])}</small>
+                        <div class="mt-1"><button class="btn btn-sm btn-outline" onclick="removeFromShelf('{h(b.book_id)}')"><i class="bi bi-x"></i></button></div>
+                    </div></div>"""
             if not books_html:
                 books_html = """<div class="col-12"><div class="empty-state py-4"><div class="empty-icon"><i class="bi bi-star" style="font-size:2rem;"></i></div><h5>No favorites yet</h5><p class="text-muted small">Search to add your favorite books!</p><button class="btn btn-primary btn-sm" onclick="openSearchOverlay()"><i class="bi bi-search"></i> Find Books</button></div></div>"""
         else:
@@ -669,23 +651,16 @@ def init_page_routes(
                 if not b or b.is_deleted:
                     continue
                 cc = cat_color(b.category)
-                books_html += """<div class="col-6 col-md-4 col-lg-3 mb-2">
+                books_html += f"""<div class="col-6 col-md-4 col-lg-3 mb-2">
                     <div class="glass-card p-2 text-center h-100">
-                        <a href="/books/%s" style="text-decoration:none;color:inherit;">
-                            <div style="width:40px;height:56px;border-radius:8px;background:linear-gradient(135deg,%s,%sdd);display:flex;align-items:center;justify-content:center;margin:0 auto .3rem;">
+                        <a href="/books/{h(b.book_id)}" style="text-decoration:none;color:inherit;">
+                            <div style="width:40px;height:56px;border-radius:8px;background:linear-gradient(135deg,{cc},{cc}dd);display:flex;align-items:center;justify-content:center;margin:0 auto .3rem;">
                                 <i class="bi bi-book-fill" style="color:white;font-size:.9rem;"></i></div>
-                            <div style="font-size:.75rem;font-weight:600;">%s</div>
-                            <small style="font-size:.6rem;color:var(--text-muted);">%s</small>
+                            <div style="font-size:.75rem;font-weight:600;">{h(b.title[:35])}</div>
+                            <small style="font-size:.6rem;color:var(--text-muted);">{h(b.author[:20])}</small>
                         </a>
-                        <div class="mt-1"><button class="btn btn-sm btn-outline" onclick="removeFromShelf('%s')"><i class="bi bi-x"></i></button></div>
-                    </div></div>""" % (
-                    h(b.book_id),
-                    cc,
-                    cc,
-                    h(b.title[:35]),
-                    h(b.author[:20]),
-                    h(b.book_id),
-                )
+                        <div class="mt-1"><button class="btn btn-sm btn-outline" onclick="removeFromShelf('{h(b.book_id)}')"><i class="bi bi-x"></i></button></div>
+                    </div></div>"""
 
         empty_states = {
             "want_to_read": """<div class="col-12"><div class="empty-state py-4"><div class="empty-icon"><i class="bi bi-bookmark-heart" style="font-size:2rem;"></i></div><h5>Your want to read list is empty</h5><p class="text-muted small">Add books you are interested in reading!</p><button class="btn btn-primary btn-sm" onclick="openSearchOverlay()"><i class="bi bi-search"></i> Browse Books</button></div></div>""",
@@ -745,17 +720,12 @@ function createCustomShelf() {
                 if not b:
                     continue
                 cc = cat_color(b.category)
-                cs_books_html += """<div class="col-3 col-md-2 mb-1">
-                    <div class="glass-card p-1 text-center" style="cursor:pointer;" onclick="window.location.href='/books/%s'">
-                        <div style="width:30px;height:40px;border-radius:4px;background:linear-gradient(135deg,%s,%sdd);display:flex;align-items:center;justify-content:center;margin:0 auto .2rem;">
+                cs_books_html += f"""<div class="col-3 col-md-2 mb-1">
+                    <div class="glass-card p-1 text-center" style="cursor:pointer;" onclick="window.location.href='/books/{h(b.book_id)}'">
+                        <div style="width:30px;height:40px;border-radius:4px;background:linear-gradient(135deg,{cc},{cc}dd);display:flex;align-items:center;justify-content:center;margin:0 auto .2rem;">
                             <i class="bi bi-book-fill" style="color:white;font-size:.6rem;"></i></div>
-                        <div style="font-size:.55rem;font-weight:600;line-height:1.1;">%s</div>
-                    </div></div>""" % (
-                    h(b.book_id),
-                    cc,
-                    cc,
-                    h(b.title[:20]),
-                )
+                        <div style="font-size:.55rem;font-weight:600;line-height:1.1;">{h(b.title[:20])}</div>
+                    </div></div>"""
             if not cs_books_html:
                 cs_books_html = (
                     '<div class="col-12 text-center text-muted small py-2">Empty shelf.</div>'
@@ -802,10 +772,8 @@ function createCustomShelf() {
 
         # Personalized
         for_you = []
-        try:
+        with contextlib.suppress(Exception):
             for_you = _recommender.recommend_for_user(uid, top_n=6) if _recommender else []
-        except Exception:
-            pass
 
         def render_book_grid(books, cols=6, show_ai=False):
             if not books:
@@ -830,45 +798,32 @@ function createCustomShelf() {
                     else '<span class="badge bg-danger" style="font-size:.5rem;">Out</span>'
                 )
                 reason = h(r.get("reason", ""))[:40] if r.get("reason") else ""
-                html += """<div class="col-md-3 col-6 mb-2">
-                    <div class="glass-card p-2 text-center h-100" onclick="window.location.href='/books/%s'" style="cursor:pointer;">
+                html += f"""<div class="col-md-3 col-6 mb-2">
+                    <div class="glass-card p-2 text-center h-100" onclick="window.location.href='/books/{h(bid)}'" style="cursor:pointer;">
                         <div style="position:relative;">
-                            <div style="width:40px;height:56px;border-radius:8px;background:linear-gradient(135deg,%s,%sdd);display:flex;align-items:center;justify-content:center;margin:0 auto .3rem;">
+                            <div style="width:40px;height:56px;border-radius:8px;background:linear-gradient(135deg,{cc},{cc}dd);display:flex;align-items:center;justify-content:center;margin:0 auto .3rem;">
                                 <i class="bi bi-book-fill" style="color:white;font-size:.9rem;"></i></div>
-                            %s
+                            {ai_badge}
                         </div>
-                        <div style="font-size:.7rem;font-weight:600;line-height:1.2;">%s</div>
-                        <small style="font-size:.6rem;color:var(--text-muted);">%s</small>
-                        <div class="mt-1">%s</div>
-                        <div style="font-size:.5rem;color:var(--text-muted);margin-top:.2rem;">%s</div>
-                    </div></div>""" % (
-                    h(bid),
-                    cc,
-                    cc,
-                    ai_badge,
-                    h(title),
-                    h(author),
-                    avail_badge,
-                    reason,
-                )
+                        <div style="font-size:.7rem;font-weight:600;line-height:1.2;">{h(title)}</div>
+                        <small style="font-size:.6rem;color:var(--text-muted);">{h(author)}</small>
+                        <div class="mt-1">{avail_badge}</div>
+                        <div style="font-size:.5rem;color:var(--text-muted);margin-top:.2rem;">{reason}</div>
+                    </div></div>"""
             return html
 
         for_you_html = render_book_grid(for_you, show_ai=True)
 
         # Trending
         trending = []
-        try:
+        with contextlib.suppress(Exception):
             trending = _recommender.recommend_trending(top_n=8) if _recommender else []
-        except Exception:
-            pass
         trending_html = render_book_grid(trending, show_ai=False)
 
         # Bestsellers
         bestsellers = []
-        try:
+        with contextlib.suppress(Exception):
             bestsellers = _recommender.recommend_all_time_best(top_n=8) if _recommender else []
-        except Exception:
-            pass
         bestsellers_html = render_book_grid(bestsellers)
 
         # By genre
@@ -881,25 +836,16 @@ function createCustomShelf() {
                 html = ""
                 for b in cat_books:
                     cc = cat_color(cat)
-                    html += """<div class="col-3 mb-1">
-                        <div class="glass-card p-1 text-center" onclick="window.location.href='/books/%s'" style="cursor:pointer;">
-                            <div style="width:30px;height:40px;border-radius:4px;background:linear-gradient(135deg,%s,%sdd);display:flex;align-items:center;justify-content:center;margin:0 auto .2rem;">
+                    html += f"""<div class="col-3 mb-1">
+                        <div class="glass-card p-1 text-center" onclick="window.location.href='/books/{h(b.book_id)}'" style="cursor:pointer;">
+                            <div style="width:30px;height:40px;border-radius:4px;background:linear-gradient(135deg,{cc},{cc}dd);display:flex;align-items:center;justify-content:center;margin:0 auto .2rem;">
                                 <i class="bi bi-book-fill" style="color:white;font-size:.6rem;"></i></div>
-                            <div style="font-size:.55rem;font-weight:600;line-height:1.1;">%s</div>
-                        </div></div>""" % (
-                        h(b.book_id),
-                        cc,
-                        cc,
-                        h(b.title[:20]),
-                    )
-                genre_html += """<div class="glass-card p-3 mb-2">
-                    <div class="section-title mb-2"><i class="bi bi-tag-fill" style="color:%s;"></i> %s</div>
-                    <div class="row g-1">%s</div>
-                </div>""" % (
-                    cat_color(cat),
-                    h(cat),
-                    html,
-                )
+                            <div style="font-size:.55rem;font-weight:600;line-height:1.1;">{h(b.title[:20])}</div>
+                        </div></div>"""
+                genre_html += f"""<div class="glass-card p-3 mb-2">
+                    <div class="section-title mb-2"><i class="bi bi-tag-fill" style="color:{cat_color(cat)};"></i> {h(cat)}</div>
+                    <div class="row g-1">{html}</div>
+                </div>"""
 
         if not genre_html:
             genre_html = (
@@ -960,13 +906,12 @@ function createCustomShelf() {
         for c in clubs_data:
             member_count = len(c.get("members", []))
             is_member = uid in c.get("members", [])
-            btn = '<a href="/clubs/%s" class="btn btn-primary btn-sm w-100">View Club</a>' % h(
+            btn = '<a href="/clubs/{}" class="btn btn-primary btn-sm w-100">View Club</a>'.format(h(
                 c["club_id"]
-            )
+            ))
             if is_member:
                 btn = (
-                    '<div class="d-flex gap-1"><a href="/clubs/%s" class="btn btn-primary btn-sm flex-grow-1">View</a><span class="badge bg-success" style="display:flex;align-items:center;padding:.3rem .6rem;">Member</span></div>'
-                    % h(c["club_id"])
+                    '<div class="d-flex gap-1"><a href="/clubs/{}" class="btn btn-primary btn-sm flex-grow-1">View</a><span class="badge bg-success" style="display:flex;align-items:center;padding:.3rem .6rem;">Member</span></div>'.format(h(c["club_id"]))
                 )
             clubs_html += """<div class="col-md-6 col-lg-4 mb-3">
                 <div class="glass-card p-3 h-100">
@@ -1114,10 +1059,7 @@ function submitCreateClub(){
             if year > today.year and m > today.month:
                 break
             first = date(year, m, 1)
-            if m == 12:
-                last = date(year, 12, 31)
-            else:
-                last = date(year, m + 1, 1) - timedelta(days=1)
+            last = date(year, 12, 31) if m == 12 else date(year, m + 1, 1) - timedelta(days=1)
 
             month_name = MONTHS[m - 1]
             cells = ""
@@ -1440,14 +1382,14 @@ function showDayEntries(ds) {
                 if f.get("user_id") == u.user_id and not f.get("paid")
             )
             rows += """<tr>
-                <td>%s</td>
-                <td><div class="d-flex align-items-center gap-2"><div>%s</div><div><div class="fw-bold small">%s</div><small class="text-muted">@%s</small></div></div></td>
-                <td>%s</td>
-                <td><span class="%s">%s</span></td>
-                <td><span class="%s">%s</span></td>
-                <td><span class="fw-bold">&#8377;%.0f</span></td>
-                <td><a href="/profile/%s" class="btn btn-sm btn-outline"><i class="bi bi-eye"></i></a></td>
-            </tr>""" % (
+                <td>{}</td>
+                <td><div class="d-flex align-items-center gap-2"><div>{}</div><div><div class="fw-bold small">{}</div><small class="text-muted">@{}</small></div></div></td>
+                <td>{}</td>
+                <td><span class="{}">{}</span></td>
+                <td><span class="{}">{}</span></td>
+                <td><span class="fw-bold">&#8377;{:.0f}</span></td>
+                <td><a href="/profile/{}" class="btn btn-sm btn-outline"><i class="bi bi-eye"></i></a></td>
+            </tr>""".format(
                 av,
                 av,
                 h(u.name),
@@ -1596,14 +1538,14 @@ function showDayEntries(ds) {
             new_txt = h(r["new_value"] or "—")
             ts = h((r["created_at"] or "")[:19])
             rows_html += """<tr>
-                <td class="text-nowrap small">%s</td>
-                <td><span class="fw-bold small">%s</span></td>
-                <td><span class="%s">%s</span></td>
-                <td class="small"><code>%s</code></td>
-                <td class="small text-muted">%s</td>
-                <td class="small text-muted">%s</td>
-                <td class="small text-muted text-nowrap">%s</td>
-            </tr>""" % (
+                <td class="text-nowrap small">{}</td>
+                <td><span class="fw-bold small">{}</span></td>
+                <td><span class="{}">{}</span></td>
+                <td class="small"><code>{}</code></td>
+                <td class="small text-muted">{}</td>
+                <td class="small text-muted">{}</td>
+                <td class="small text-muted text-nowrap">{}</td>
+            </tr>""".format(
                 ts,
                 h(r["admin_id"]),
                 badge,
@@ -2078,8 +2020,8 @@ function showDayEntries(ds) {
         total = len(all_books)
         available = sum(1 for b in all_books if b.available_copies > 0)
         checked_out = total - available
-        cats = len(set(b.category for b in all_books))
-        categories = sorted(set(b.category for b in books_data.values() if not b.is_deleted))
+        cats = len({b.category for b in all_books})
+        categories = sorted({b.category for b in books_data.values() if not b.is_deleted})
 
         return render_template(
             "books.html",
@@ -2328,7 +2270,7 @@ function showDayEntries(ds) {
         # Forum topics
         forum_html = ""
         try:
-            topics, t_total = _communities.get_topics(club_id)
+            topics, _t_total = _communities.get_topics(club_id)
             for t in topics[:8]:
                 forum_html += (
                     '<div class="d-flex align-items-center gap-2 mb-2 p-2" style="border-radius:8px;border:1px solid var(--border);cursor:pointer;" onclick="showToast(\'Topic view coming soon\',\'info\')"><div style="width:32px;height:32px;border-radius:50%;background:var(--primary-light);display:flex;align-items:center;justify-content:center;"><i class="bi bi-chat-dots" style="color:var(--primary);"></i></div><div class="flex-grow-1" style="min-width:0;"><div class="fw-bold small">'
@@ -2628,7 +2570,7 @@ function leaveClub(cid) {
                 + '">'
                 + str(o["days_overdue"])
                 + " days</span></td><td>&#8377;"
-                + ("%.2f" % o["fine"])
+                + ("{:.2f}".format(o["fine"]))
                 + '</td><td><button class="btn btn-sm btn-outline" onclick="showToast(\'Return processing coming soon\',\'info\')"><i class="bi bi-arrow-return-left"></i></button></td></tr>'
             )
 
@@ -2699,10 +2641,8 @@ function leaveClub(cid) {
         total_books = diary_stats.get("total_books", 0)
         total_pages = diary_stats.get("total_pages_read", 0)
         streak_info = {}
-        try:
+        with contextlib.suppress(Exception):
             streak_info = _gamification.get_user_gamification(uid) if _gamification else {}
-        except Exception:
-            pass
 
         entries_html = ""
         for e in diary_entries[-10:]:  # Last 10 entries

@@ -773,13 +773,12 @@ class TestRateLimiting:
         )
         def save_settings():
             data = request.get_json() or {}
-            if data.get("new_password"):
-                # Mirrors api_save_settings exactly: a wrong current password
-                # flags a failed attempt but still returns HTTP 200 with
-                # success: False in the body (same as the real endpoint).
-                if data.get("current_password") != "ok":
-                    g._pw_change_failed = True
-                    return {"success": False}
+            # Mirrors api_save_settings exactly: a wrong current password
+            # flags a failed attempt but still returns HTTP 200 with
+            # success: False in the body (same as the real endpoint).
+            if data.get("new_password") and data.get("current_password") != "ok":
+                g._pw_change_failed = True
+                return {"success": False}
             return {"success": True}
 
         return probe
@@ -1393,8 +1392,8 @@ class TestRedisLimiterStorage:
 
             return probe, lim
 
-        app_a, lim_a = _build()
-        app_b, lim_b = _build()  # independent instance = a second "worker"
+        app_a, _lim_a = _build()
+        app_b, _lim_b = _build()  # independent instance = a second "worker"
 
         with app_a.test_client() as c_a, app_b.test_client() as c_b:
             # Worker A burns its budget: 3 allowed, 4th -> 429.

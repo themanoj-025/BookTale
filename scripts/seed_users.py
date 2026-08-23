@@ -608,7 +608,7 @@ def generate_membership_status(reg_date_str: str, expiry_str: str) -> str:
 
 def generate_website(name: str) -> str:
     """Generate a personal website/blog URL."""
-    first_lower = name.split()[0].lower()
+    first_lower = name.split(maxsplit=1)[0].lower()
     return random.choice(
         [
             f"https://{first_lower}.blogspot.com",
@@ -644,7 +644,7 @@ def generate_users(count: int = 5000) -> dict[str, User]:
                 break
 
         # Generate name
-        first, last, gender = generate_name()
+        first, last, _gender = generate_name()
         name = f"{first} {last}"
 
         # Generate unique email
@@ -659,10 +659,7 @@ def generate_users(count: int = 5000) -> dict[str, User]:
 
         # Determine role (mostly users, 2% librarians, 0.2% admin - but keep existing admins)
         role_roll = random.random()
-        if role_roll < 0.002:  # 0.2%
-            role = "librarian"
-        else:
-            role = "user"
+        role = "librarian" if role_roll < 0.002 else "user"
 
         # Registration date spread over last 3 years
         registered_on = generate_registration_date(i)
@@ -737,10 +734,7 @@ def main():
     new_users = generate_users(5000)
 
     # Merge
-    if keep_existing:
-        all_users = {**existing_users, **new_users}
-    else:
-        all_users = new_users
+    all_users = {**existing_users, **new_users} if keep_existing else new_users
         # Ensure admin exists
         # Check if we need to preserve the default admin
         # Actually, let the web_app.py recreation handle it

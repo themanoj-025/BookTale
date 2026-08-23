@@ -19,6 +19,7 @@ from app.services.reading.diary import (
     rating_badge_html,
     star_rating_html,
 )
+import contextlib
 
 _series = None
 _challenge = None
@@ -895,14 +896,12 @@ def init_feature_routes(
         uid = session["user_id"]
         ok, msg, progress = _progress.mark_as_finished(uid, book_id)
         # Also update reading challenge
-        try:
+        with contextlib.suppress(Exception):
             _challenge.set_goal(
                 uid,
                 datetime.now().year,
                 _challenge.get_goal(uid, datetime.now().year).get("goal", 0),
             )
-        except Exception:
-            pass
         return jsonify({"success": ok, "message": msg, "progress": progress})
 
     @app.route("/api/reading-progress/<book_id>")
@@ -964,7 +963,7 @@ def init_feature_routes(
         status = request.args.get("status", "")
         sort_by = request.args.get("sort", "score")
         page = max(1, int(request.args.get("page", 1)))
-        suggestions, total = _wishlist.get_suggestions(status=status, page=page, sort_by=sort_by)
+        suggestions, _total = _wishlist.get_suggestions(status=status, page=page, sort_by=sort_by)
         user_votes = {}  # Track user's votes on each suggestion
         for s in suggestions:
             if uid in s.get("upvotes", []):
@@ -1243,7 +1242,7 @@ def init_feature_routes(
     def diary_page():
         uid = session["user_id"]
         page = max(1, int(request.args.get("page", 1)))
-        entries, total = _diary.get_user_diary(uid, page=page)
+        entries, _total = _diary.get_user_diary(uid, page=page)
         stats = _diary.get_stats(uid)
 
         # Stats overview

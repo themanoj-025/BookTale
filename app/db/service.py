@@ -90,7 +90,7 @@ class LibraryService:
             due_date = issue_date + timedelta(days=Config.ISSUE_DAYS)
             book.available_copies -= 1
             book.issue_count += 1
-            user.books_issued = list(user.books_issued or []) + [book_id]
+            user.books_issued = [*list(user.books_issued or []), book_id]
             db.add(
                 Transaction(
                     txn_id=_new_id("TXN"),

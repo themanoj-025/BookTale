@@ -76,7 +76,7 @@ def init_site_pages(app, storage, lib, recommender, social, review_mgr, notif_mg
         active_issues = [t for t in issues if t.get("return_date") is None]
         total_txns = len(txns)
         month_txns = sum(1 for t in txns if datetime.fromisoformat(t.get("issue_date", "")) >= tms)
-        unique_borrowers = len(set(t["user_id"] for t in issues))
+        unique_borrowers = len({t["user_id"] for t in issues})
         fines = storage.load_fines()
         total_fines = sum(f.get("amount", 0) for f in fines)
         paid_fines = sum(f.get("amount", 0) for f in fines if f.get("paid"))

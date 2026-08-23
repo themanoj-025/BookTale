@@ -293,7 +293,7 @@ def _percentiles(samples: list) -> dict:
     s = sorted(samples)
 
     def pct(p):
-        idx = min(len(s) - 1, int(round((p / 100.0) * (len(s) - 1))))
+        idx = min(len(s) - 1, round((p / 100.0) * (len(s) - 1)))
         return s[idx]
 
     return {
