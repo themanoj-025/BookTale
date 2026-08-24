@@ -89,7 +89,7 @@ class Book:
             # Guard against null or non-list values from external data
             try:
                 data["genres"] = list(data["genres"]) if data["genres"] else []
-            except Exception:
+            except (TypeError, ValueError):
                 data["genres"] = []
         return cls(**data)
 

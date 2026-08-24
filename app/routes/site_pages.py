@@ -155,7 +155,7 @@ def init_site_pages(app, storage, lib, recommender, social, review_mgr, notif_mg
             try:
                 following_count = social.get_following_count(uid)
                 follower_count = social.get_follower_count(uid)
-            except Exception:
+            except (AttributeError, TypeError):
                 pass
 
         greeting = "Welcome to BookSocial!" + (", " + user.name if user else "")

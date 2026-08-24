@@ -1190,7 +1190,7 @@ def init_feature_routes(
 
             g = Gamification(_storage)
             g.add_points(uid, 5, "Suggested a book")
-        except Exception:
+        except (ImportError, AttributeError):
             pass
         return jsonify({"success": ok, "message": msg, "suggestion": suggestion})
 

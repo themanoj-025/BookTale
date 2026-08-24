@@ -44,7 +44,7 @@ def _redis_reachable(force: bool = False) -> bool:
                 Config.REDIS_URL, socket_connect_timeout=0.5, socket_timeout=0.5
             )
             ok = bool(_r.ping())
-        except Exception:
+        except (OSError, ConnectionError, ImportError):
             ok = False
         _probe_cache.update(ok=ok, at=now)
         return ok

@@ -172,7 +172,7 @@ class DiaryManager:
             goal = rc.get_goal(user_id, year)
             if goal.get("goal", 0) > 0:
                 rc.set_goal(user_id, year, goal["goal"])
-        except Exception:
+        except (ImportError, AttributeError, ValueError):
             pass
 
         return True, "Book logged in your reading diary!", entry

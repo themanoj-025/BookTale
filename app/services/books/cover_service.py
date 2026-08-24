@@ -227,7 +227,7 @@ def _try_openlibrary(
                 subjects = info.get("subjects", [])
                 if subjects and isinstance(subjects, list):
                     genres = [s for s in subjects if isinstance(s, str)][:8]
-        except Exception:
+        except (KeyError, TypeError, AttributeError):
             pass
 
         # Extract dominant color from the cover image
