@@ -1,21 +1,30 @@
 """
-page_routes.py - Missing Page Routes for BookTale v5.0
+page_routes.py - Page Routes for BookTale v5.0
 
-Registeres routes: /explore, /notifications, /shelves, /recommendations,
-/clubs, /reading-calendar, /analytics, /admin/users
+Registers routes: /explore, /notifications, /shelves, /recommendations,
+/clubs, /reading-calendar, /analytics, /admin/users, /profile, /dashboard,
+/books, /reports, /gamification, /admin/overdue
 """
 
-import html
 import logging
-import zlib
 from collections import Counter, defaultdict
 from datetime import date, datetime, timedelta
-from functools import wraps
 from urllib.parse import quote
 
 from flask import jsonify, redirect, render_template, request, session, url_for
 
 from app.models.book import CATEGORIES as BOOK_CATEGORIES
+from app.routes.helpers import (
+    avatar_html,
+    cat_color,
+    get_current_user,
+    h,
+    library_stats,
+    login_required,
+    admin_required,
+    render_page,
+    time_ago,
+)
 import contextlib
 
 _storage = None
@@ -37,187 +46,9 @@ _diary_mgr = None
 logger = logging.getLogger(__name__)
 
 
-def h(text):
-    return html.escape(str(text))
-
-
 def _library_stats():
-    """Calculate library-wide statistics for dashboard, reports, and admin pages."""
-    if not _storage:
-        return {}
-    books = _storage.load_books()
-    users = _storage.load_users()
-    txns = _storage.load_transactions()
-    all_books = [b for b in books.values() if not b.is_deleted]
-    now = datetime.now()
-    tms = datetime(now.year, now.month, 1)
-    total_books = len(all_books)
-    total_copies = sum(b.total_copies for b in all_books)
-    avail_copies = sum(b.available_copies for b in all_books)
-    avail_rate = (avail_copies / total_copies * 100) if total_copies else 0
-    new_books_month = sum(1 for b in all_books if datetime.fromisoformat(b.added_on) >= tms)
-    total_users = len(users)
-    active_users = sum(1 for u in users.values() if u.membership_status == "Active")
-    blocked_users = sum(1 for u in users.values() if u.membership_status == "Blocked")
-    new_users_month = sum(
-        1
-        for u in users.values()
-        if hasattr(u, "added_on") and u.added_on and datetime.fromisoformat(u.added_on) >= tms
-    )
-    issues = [t for t in txns if t["type"] == "issue"]
-    active_issues = [t for t in issues if t.get("return_date") is None]
-    total_txns = len(txns)
-    month_txns = sum(1 for t in txns if datetime.fromisoformat(t.get("issue_date", "")) >= tms)
-    unique_borrowers = len({t["user_id"] for t in issues})
-    fines = _storage.load_fines()
-    total_fines = sum(f.get("amount", 0) for f in fines)
-    paid_fines = sum(f.get("amount", 0) for f in fines if f.get("paid"))
-    pending_fines = total_fines - paid_fines
-    avg_bpu = round(len(issues) / total_users, 1) if total_users else 0
-    return {
-        "total_books": total_books,
-        "total_copies": total_copies,
-        "avail_copies": avail_copies,
-        "active_issues": len(active_issues),
-        "total_issues": len(issues),
-        "avail_rate": round(avail_rate, 1),
-        "new_books_month": new_books_month,
-        "total_users": total_users,
-        "active_users": active_users,
-        "blocked_users": blocked_users,
-        "new_users_month": new_users_month,
-        "total_txns": total_txns,
-        "month_txns": month_txns,
-        "unique_borrowers": unique_borrowers,
-        "avg_books_per_user": avg_bpu,
-        "total_fines": round(total_fines, 2),
-        "paid_fines": round(paid_fines, 2),
-        "pending_fines": round(pending_fines, 2),
-    }
-
-
-def cat_color(c):
-    colors = {
-        "Fiction": "#4f46e5",
-        "Non-Fiction": "#059669",
-        "Science": "#0891b2",
-        "Technology": "#7c3aed",
-        "History": "#d97706",
-        "Philosophy": "#be185d",
-        "Art": "#db2777",
-        "Biography": "#ca8a04",
-        "Children": "#16a34a",
-        "Comics": "#e11d48",
-        "Poetry": "#9333ea",
-        "Drama": "#ea580c",
-        "Education": "#2563eb",
-        "Reference": "#64748b",
-        "Religion": "#78716c",
-        "Self-Help": "#0d9488",
-        "Cooking": "#f97316",
-        "Travel": "#0ea5e9",
-        "Music": "#8b5cf6",
-        "Sports": "#22c55e",
-        "Other": "#6b7280",
-    }
-    return colors.get(c, colors["Other"])
-
-
-def avatar_html(name, size=32):
-    parts = name.strip().split()
-    if not parts:
-        initials = "?"
-    elif len(parts) >= 2:
-        initials = (parts[0][0] + parts[-1][0]).upper()
-    else:
-        initials = parts[0][:2].upper()
-    clrs = [
-        "#4f46e5",
-        "#059669",
-        "#d97706",
-        "#dc2626",
-        "#0891b2",
-        "#7c3aed",
-        "#db2777",
-        "#ca8a04",
-    ]
-    c = clrs[zlib.crc32(str(name).encode("utf-8")) % len(clrs)]
-    return (
-        '<div class="avatar" style="width:%dpx;height:%dpx;background:%s20;color:%s;font-size:%dpx;font-weight:700;border-radius:50%%;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;" title="%s">%s</div>'
-        % (size, size, c, c, size // 2, h(name), h(initials))
-    )
-
-
-def time_ago(iso_str):
-    try:
-        dt = datetime.fromisoformat(iso_str)
-        now = datetime.now()
-        diff = now - dt
-        seconds = int(diff.total_seconds())
-        if seconds < 60:
-            return "just now"
-        minutes = seconds // 60
-        if minutes < 60:
-            return "%dm ago" % minutes
-        hours = minutes // 60
-        if hours < 24:
-            return "%dh ago" % hours
-        days = hours // 24
-        if days < 7:
-            return "%dd ago" % days
-        weeks = days // 7
-        if weeks < 4:
-            return "%dw ago" % weeks
-        months = days // 30
-        if months < 12:
-            return "%dmo ago" % months
-        years = days // 365
-        return "%dy ago" % years
-    except Exception:
-        return iso_str[:10] if iso_str else ""
-
-
-def render_page(title, content, **kw):
-    user = get_current_user()
-    return render_template(
-        "base.html",
-        title=title,
-        content=content,
-        session=session,
-        notif_count=_notif_mgr.get_unread_count(user.user_id) if user else 0,
-        **kw,
-    )
-
-
-def get_current_user():
-    if "user_id" not in session:
-        return None
-    return _storage.load_users().get(session["user_id"])
-
-
-def login_required(f):
-    @wraps(f)
-    def d(*a, **k):
-        if "user_id" not in session:
-            return redirect(url_for("login_page"))
-        return f(*a, **k)
-
-    return d
-
-
-def admin_required(f):
-    @wraps(f)
-    def d(*a, **k):
-        if "user_id" not in session:
-            return redirect(url_for("login_page"))
-        if session.get("role") != "admin":
-            return render_page(
-                "Forbidden",
-                """<div class="text-center py-5"><div style="font-size:4rem;margin-bottom:1rem;">🔒</div><h3>Admin Access Required</h3><p class="text-muted">This page requires admin privileges.</p></div>""",
-            )
-        return f(*a, **k)
-
-    return d
+    """Calculate library-wide statistics (delegates to helpers.library_stats)."""
+    return library_stats(_storage)
 
 
 def init_page_routes(
@@ -344,7 +175,7 @@ def init_page_routes(
                     hashtag_html += (
                         '<a href="/search?tag={}" class="btn btn-outline btn-sm mb-1" style="border-radius:50px;">#{}</a> '.format(h(tag.strip("#")), h(tag.strip("#")))
                     )
-            except Exception:
+            except (AttributeError, TypeError, KeyError):
                 pass
         if not hashtag_html:
             hashtag_html = '<a href="/search?tag=fantasy" class="btn btn-outline btn-sm mb-1" style="border-radius:50px;">#fantasy</a> <a href="/search?tag=scifi" class="btn btn-outline btn-sm mb-1" style="border-radius:50px;">#scifi</a> <a href="/search?tag=romance" class="btn btn-outline btn-sm mb-1" style="border-radius:50px;">#romance</a>'
@@ -366,7 +197,7 @@ def init_page_routes(
                         len(c.get("members", [])),
                         h(c.get("category", "General")),
                     )
-            except Exception:
+            except (AttributeError, TypeError, KeyError):
                 pass
         if not clubs_html:
             clubs_html = '<div class="col-12 text-center text-muted py-3">No clubs yet. Create the first one!</div>'
@@ -396,7 +227,7 @@ def init_page_routes(
                     h(r.get("author", "")[:20]),
                     reason,
                 )
-        except Exception:
+        except (AttributeError, TypeError, KeyError):
             pass
 
         # Challenge widget
@@ -422,7 +253,7 @@ def init_page_routes(
                     goal.get("progress", 0),
                     goal.get("goal", 0),
                 )
-        except Exception:
+        except (AttributeError, TypeError, KeyError):
             pass
         if not challenge_html:
             challenge_html = """<div class="glass-card p-3">
@@ -545,7 +376,7 @@ def init_page_routes(
                     groups["This Week"].append(n)
                 else:
                     groups["Earlier"].append(n)
-            except:
+            except (ValueError, TypeError, KeyError):
                 groups["Earlier"].append(n)
 
         notif_icons = {
@@ -1023,7 +854,7 @@ function submitCreateClub(){
                 _diary_mgr.get_user_diary(uid, page=1, per_page=5000) if _diary_mgr else ([], 0)
             )
             diary_entries = all_entries
-        except Exception:
+        except (AttributeError, TypeError, KeyError):
             pass
 
         # Build date->count map
@@ -1033,7 +864,7 @@ function submitCreateClub(){
                 dr = e.get("date_read", "")
                 if dr[:4] == str(year):
                     date_counts[dr[:10]] += 1
-            except Exception:
+            except (ValueError, TypeError):
                 pass
 
         # Generate calendar grid
@@ -1521,7 +1352,7 @@ function showDayEntries(ds) {
                     per_page=per_page,
                 )
                 total = repo.count(query=q, admin_id=admin_filter, action=action_filter)
-        except Exception as e:
+        except (TypeError, KeyError, AttributeError) as e:
             logger.warning("admin audit page query failed: %s", e)
             rows, total = [], 0
 
@@ -2103,7 +1934,7 @@ function showDayEntries(ds) {
                         "created_at": r.get("created_at", "") or "",
                     }
                 )
-        except Exception as exc:
+        except (AttributeError, TypeError, KeyError) as exc:
             logger.warning("book detail %s: reviews unavailable: %s", book_id, exc)
             reviews = []
 
@@ -2120,7 +1951,7 @@ function showDayEntries(ds) {
                 for r in sim
                 if r and r.get("book_id")
             ]
-        except Exception as exc:
+        except (AttributeError, TypeError, KeyError) as exc:
             logger.warning("book detail %s: similar books unavailable: %s", book_id, exc)
             similar = []
 
@@ -2281,7 +2112,7 @@ function showDayEntries(ds) {
                     + str(t.get("replies_count", 0))
                     + " replies</small></div></div>"
                 )
-        except Exception:
+        except (AttributeError, TypeError, KeyError):
             pass
         if not forum_html:
             forum_html = '<div class="text-center text-muted small py-3">No discussions yet. Start one!</div>'
@@ -2542,7 +2373,7 @@ function leaveClub(cid) {
                                 "fine": fine_amount,
                             }
                         )
-                except Exception:
+                except (TypeError, KeyError, ValueError):
                     pass
 
         overdue.sort(key=lambda x: x["days_overdue"], reverse=True)
@@ -2625,7 +2456,7 @@ function leaveClub(cid) {
             if _diary_mgr:
                 diary_entries, _ = _diary_mgr.get_user_diary(uid, page=1, per_page=500)
                 diary_stats = _diary_mgr.get_stats(uid) if _diary_mgr else {}
-        except Exception:
+        except (AttributeError, TypeError, KeyError):
             pass
 
         reading_stats = {}
@@ -2633,7 +2464,7 @@ function leaveClub(cid) {
         try:
             reading_stats = _review_mgr.get_user_reading_stats(uid) if _review_mgr else {}
             challenge_data = _challenge.get_goal(uid, datetime.now().year) if _challenge else {}
-        except Exception:
+        except (AttributeError, TypeError, KeyError):
             pass
 
         # Build report
