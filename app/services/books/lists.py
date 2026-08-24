@@ -295,7 +295,7 @@ class BookLists:
                 dt = datetime.fromisoformat(t.get("issue_date", ""))
                 if dt >= week_ago and t["type"] == "issue":
                     book_scores[t["book_id"]] += 3
-            except Exception:
+            except (ValueError, TypeError):
                 pass
 
         # Posts mentioning books this week
@@ -305,7 +305,7 @@ class BookLists:
                 if dt >= week_ago:
                     for bid in p.get("book_ids", []):
                         book_scores[bid] += 1
-            except Exception:
+            except (ValueError, TypeError):
                 pass
 
         # Reviews this week
@@ -315,7 +315,7 @@ class BookLists:
                 dt = datetime.fromisoformat(r.get("created_at", ""))
                 if dt >= week_ago:
                     book_scores[r["book_id"]] += 2
-            except Exception:
+            except (ValueError, TypeError):
                 pass
 
         books_data = self.storage.load_books()

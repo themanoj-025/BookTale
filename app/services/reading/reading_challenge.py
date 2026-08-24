@@ -122,7 +122,7 @@ class ReadingChallenge:
                         updated = datetime.fromisoformat(pdata.get("updated_at", ""))
                         if updated.year == year and pdata.get("finished", False):
                             books_set.add(parts[1])
-                    except Exception:
+                    except (ValueError, TypeError):
                         pass
         except ImportError:
             pass
@@ -167,7 +167,7 @@ class ReadingChallenge:
                     dt = datetime.fromisoformat(t.get("return_date", ""))
                     if dt.year == year:
                         monthly[dt.month] += 1
-                except Exception:
+                except (ValueError, TypeError):
                     pass
 
         months = [
@@ -210,7 +210,7 @@ class ReadingChallenge:
                     dt = datetime.fromisoformat(t.get("return_date", ""))
                     if dt.year == year:
                         user_counts[t["user_id"]].add(t["book_id"])
-                except Exception:
+                except (ValueError, TypeError):
                     pass
 
         for uid, books_set in user_counts.items():
