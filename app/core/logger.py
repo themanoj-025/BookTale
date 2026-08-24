@@ -155,7 +155,7 @@ def _reset_logger_locked() -> None:
                 ):
                     h.stream.close()
                 h.close()
-            except Exception:
+            except (OSError, ValueError):
                 pass
         _logger.handlers.clear()
     _logger = None
