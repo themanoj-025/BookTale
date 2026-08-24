@@ -20,19 +20,19 @@ _storage = None
 _notif_mgr = None
 
 
-def init_helpers(storage, notif_mgr):
+def init_helpers(storage, notif_mgr) -> None:
     """Initialize shared dependencies. Called once at app startup."""
     global _storage, _notif_mgr
     _storage = storage
     _notif_mgr = notif_mgr
 
 
-def h(text):
+def h(text) -> str:
     """HTML-escape text for safe rendering in templates."""
     return html.escape(str(text))
 
 
-def cat_color(c):
+def cat_color(c) -> str:
     """Return a hex color for a book category."""
     colors = {
         "Fiction": "#4f46e5",
@@ -60,7 +60,7 @@ def cat_color(c):
     return colors.get(c, colors["Other"])
 
 
-def avatar_html(name, size=32):
+def avatar_html(name, size=32) -> str:
     """Generate an avatar div with initials and a deterministic color."""
     parts = name.strip().split()
     if not parts:
@@ -83,7 +83,7 @@ def avatar_html(name, size=32):
     )
 
 
-def time_ago(iso_str):
+def time_ago(iso_str) -> str:
     """Convert an ISO datetime string to a human-readable relative time."""
     try:
         dt = datetime.fromisoformat(iso_str)
@@ -113,7 +113,7 @@ def time_ago(iso_str):
         return iso_str[:10] if iso_str else ""
 
 
-def render_page(title, content, **kw):
+def render_page(title, content, **kw) -> str:
     """Render a page with the base template, injecting notification count."""
     user = get_current_user()
     return render_template(
@@ -160,7 +160,7 @@ def admin_required(f):
     return d
 
 
-def library_stats(storage):
+def library_stats(storage) -> dict:
     """Calculate library-wide statistics for dashboard, reports, and admin pages."""
     if not storage:
         return {}
