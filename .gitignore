@@ -32,9 +32,6 @@ ENV/
 *.log
 logs/
 
-# Documentation
-/docs/
-
 # Project data (user-generated)
 data/
 backups/
