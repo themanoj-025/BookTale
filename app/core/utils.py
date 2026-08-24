@@ -17,9 +17,11 @@ console = Console()
 
 
 def clear() -> None:
-    """Clear the terminal screen."""
-    # nosec B605: constant command string ("cls"/"clear"), no injection surface.
-    os.system("cls" if os.name == "nt" else "clear")  # nosec B605
+    """Clear the terminal screen safely via subprocess."""
+    import subprocess
+
+    cmd = "cls" if os.name == "nt" else "clear"
+    subprocess.run([cmd], check=False, shell=False)
 
 
 def header(title: str) -> None:
