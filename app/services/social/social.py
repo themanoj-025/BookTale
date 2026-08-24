@@ -529,7 +529,7 @@ class SocialFeed:
                 return f"{months}mo ago"
             years = days // 365
             return f"{years}y ago"
-        except Exception:
+        except (ValueError, TypeError, AttributeError):
             return iso_str[:10]
 
     def search_posts(

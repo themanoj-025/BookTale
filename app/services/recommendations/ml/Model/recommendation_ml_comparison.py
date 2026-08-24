@@ -270,19 +270,19 @@ def evaluate_clustering(X: np.ndarray, labels: np.ndarray, result: ModelResult):
         try:
             sil = silhouette_score(X, labels)
             result.add_metric("Silhouette Score", sil)
-        except Exception:
+        except (ValueError, TypeError):
             result.add_metric("Silhouette Score", -1.0)
 
         try:
             db = davies_bouldin_score(X, labels)
             result.add_metric("Davies-Bouldin", db)
-        except Exception:
+        except (ValueError, TypeError):
             result.add_metric("Davies-Bouldin", -1.0)
 
         try:
             ch = calinski_harabasz_score(X, labels)
             result.add_metric("Calinski-Harabasz", ch)
-        except Exception:
+        except (ValueError, TypeError):
             result.add_metric("Calinski-Harabasz", -1.0)
 
 

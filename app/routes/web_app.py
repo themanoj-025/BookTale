@@ -181,7 +181,7 @@ def _audit_log(admin_id, action, target="", old_value=None, new_value=None):
                 ip_address=request.remote_addr or "",
                 user_agent=request.headers.get("User-Agent", ""),
             )
-    except Exception as e:
+    except (OSError, ValueError) as e:
         log(
             f"audit write failed (admin={admin_id}, action={action}, " f"target={target}): {e}",
             "audit",
@@ -2134,7 +2134,7 @@ def api_books_trending():
             recs = recommender.recommend_trending(top_n=limit)
             return jsonify(recs)
         # Optional sub-feature: degrade gracefully, never break the request.
-        except Exception:  # nosec B110
+        except (OSError, ValueError, KeyError):
             pass
     books = storage.load_books()
     all_books = [b for b in books.values() if not b.is_deleted]
@@ -2313,7 +2313,7 @@ def api_reading_streak():
                 elif d_date < check_date - timedelta(days=1):
                     break
             # Optional sub-feature: degrade gracefully, never break the request.
-            except Exception:  # nosec B110
+            except (ValueError, TypeError):
                 pass
         return jsonify({"streak": streak, "total_days": len(dates)})
     except:
@@ -2346,7 +2346,7 @@ def api_analytics_monthly():
             dt = datetime.fromisoformat(b.added_on)
             monthly[dt.month - 1] += 1
         # Optional sub-feature: degrade gracefully, never break the request.
-        except Exception:  # nosec B110
+        except (ValueError, TypeError):
             pass
     return jsonify({"labels": months, "values": monthly})
 

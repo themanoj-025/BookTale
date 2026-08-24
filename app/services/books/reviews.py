@@ -545,7 +545,7 @@ class ReviewManager:
             try:
                 month_key = s["created_at"][:7]  # YYYY-MM
                 monthly[month_key] += 1
-            except Exception:
+            except (ValueError, TypeError):
                 pass
 
         avg_rating = round(total_rating / len(user_reviews), 1) if user_reviews else 0
@@ -587,5 +587,5 @@ class ReviewManager:
                 return f"{months}mo ago"
             years = days // 365
             return f"{years}y ago"
-        except Exception:
+        except (ValueError, TypeError, AttributeError):
             return iso_str[:10]

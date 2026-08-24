@@ -488,7 +488,7 @@ def init_social_routes(
             if gamification:
                 gamification.on_post_created(uid)
         # Optional sub-feature: degrade gracefully, never break the request.
-        except Exception:  # nosec B110
+        except (OSError, ValueError, KeyError):
             pass
         return jsonify({"success": True, "post": post})
 
@@ -642,7 +642,7 @@ def init_social_routes(
                     if gamification:
                         gamification.on_comment_created(uid)
                 # Optional sub-feature: degrade gracefully, never break the request.
-                except Exception:  # nosec B110
+                except (OSError, ValueError, KeyError):
                     pass
                 return jsonify({"success": True, "comment": comment, "message": msg})
             return jsonify({"success": False, "error": msg})
@@ -1513,7 +1513,7 @@ document.addEventListener("DOMContentLoaded", function(){
                 gm_pts = gd.get("points", 0)
                 gm_stk = gd.get("streak_days", 0)
             # Optional sub-feature: degrade gracefully, never break the request.
-            except Exception:  # nosec B110
+            except (OSError, ValueError, KeyError):
                 pass
         # Diary
         de = []
@@ -1523,7 +1523,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
             de, dtot = DiaryManager(storage).get_user_diary(user_id, page=1, per_page=5)
         # Optional sub-feature: degrade gracefully, never break the request.
-        except Exception:  # nosec B110
+        except (OSError, ValueError, KeyError):
             pass
         # Challenge
         cd = {}
@@ -1532,7 +1532,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
             cd = ReadingChallenge(storage).get_goal(user_id, datetime.now().year)
         # Optional sub-feature: degrade gracefully, never break the request.
-        except Exception:  # nosec B110
+        except (OSError, ValueError, KeyError):
             pass
         ds = {}
         with contextlib.suppress(Exception):
@@ -1581,7 +1581,7 @@ document.addEventListener("DOMContentLoaded", function(){
                 with open(hm_path, encoding="utf-8") as f:
                     he = json.load(f)
             # Optional sub-feature: degrade gracefully, never break the request.
-            except Exception:  # nosec B110
+            except (OSError, json.JSONDecodeError):
                 pass
             from datetime import date as d2
 
