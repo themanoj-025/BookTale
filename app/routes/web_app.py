@@ -326,8 +326,10 @@ init_feature_routes(
     wishlist,
     diary_mgr,
 )
+from app.routes.helpers import init_helpers
 from app.routes.page_routes import init_page_routes
 
+init_helpers(storage, notif_mgr)
 init_page_routes(
     app,
     storage,

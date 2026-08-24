@@ -19,6 +19,7 @@ from flask import g, jsonify, redirect, request, session, url_for
 from app.config.settings import Config
 from app.core.logger import log
 from app.realtime.realtime import get_realtime
+from app.routes.helpers import h, avatar_html as _shared_avatar_html, time_ago as _shared_time_ago, cat_color as _shared_cat_color
 
 # BASE_HTML/FOOTER_HTML imported lazily in render_page
 
@@ -32,10 +33,6 @@ notif_mgr = None
 book_lists = None
 communities = None
 gamification = None
-
-
-def h(text):
-    return html.escape(str(text))
 
 
 def _verify_and_reencode_image(file):

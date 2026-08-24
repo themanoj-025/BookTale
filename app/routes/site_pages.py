@@ -13,33 +13,7 @@ from flask import redirect, render_template, session, url_for
 
 from app.config.settings import Config
 from app.models.book import CATEGORIES as BOOK_CATEGORIES
-
-
-def cat_color(c):
-    colors = {
-        "Fiction": "#4f46e5",
-        "Non-Fiction": "#059669",
-        "Science": "#0891b2",
-        "Technology": "#7c3aed",
-        "History": "#d97706",
-        "Philosophy": "#be185d",
-        "Art": "#db2777",
-        "Biography": "#ca8a04",
-        "Children": "#16a34a",
-        "Comics": "#e11d48",
-        "Poetry": "#9333ea",
-        "Drama": "#ea580c",
-        "Education": "#2563eb",
-        "Reference": "#64748b",
-        "Religion": "#78716c",
-        "Self-Help": "#0d9488",
-        "Cooking": "#f97316",
-        "Travel": "#0ea5e9",
-        "Music": "#8b5cf6",
-        "Sports": "#22c55e",
-        "Other": "#6b7280",
-    }
-    return colors.get(c, colors["Other"])
+from app.routes.helpers import cat_color
 
 
 def init_site_pages(app, storage, lib, recommender, social, review_mgr, notif_mgr):
