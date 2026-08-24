@@ -35,7 +35,7 @@ communities = None
 gamification = None
 
 
-def _verify_and_reencode_image(file):
+def _verify_and_reencode_image(file) -> tuple[bool, bytes | None, str]:
     """Verify image content; return (ok, reencoded_bytes, dot_extension).
 
     Phase 4 (P1) upload hardening: extension-only checks let an attacker
