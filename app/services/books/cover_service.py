@@ -177,7 +177,7 @@ def _extract_dominant_from_url(cover_url: str) -> str | None:
         data = _fetch_url(cover_url, timeout=5)
         if data:
             return _extract_dominant_color(data)
-    except Exception:
+    except (OSError, ValueError, TypeError):
         pass
     return None
 
@@ -329,7 +329,7 @@ def _try_google_books(
             genres,
         )
 
-    except Exception:
+    except (ValueError, KeyError, TypeError, OSError):
         return None, None, None, None, None, []
 
 
