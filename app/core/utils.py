@@ -62,7 +62,7 @@ def format_date(iso_str: str) -> str:
     """Format ISO date string to human-readable format."""
     try:
         return datetime.fromisoformat(iso_str).strftime("%d %b %Y %H:%M")
-    except Exception:
+    except (ValueError, TypeError, AttributeError):
         return iso_str
 
 
