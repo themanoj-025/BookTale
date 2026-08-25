@@ -288,7 +288,7 @@ def evaluate_clustering(X: np.ndarray, labels: np.ndarray, result: ModelResult):
 
 def evaluate_recommendation(
     df: pd.DataFrame, scores: np.ndarray, result: ModelResult, top_n: int = TOP_N_RECS
-):
+) -> dict:
     """Evaluate recommendation quality."""
     if scores is None or len(scores) == 0:
         return

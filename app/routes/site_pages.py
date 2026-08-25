@@ -19,7 +19,7 @@ from app.routes.helpers import cat_color
 def init_site_pages(app, storage, lib, recommender, social, review_mgr, notif_mgr):
     """Register site pages on the Flask app."""
 
-    def get_current_user():
+    def get_current_user() -> dict:
         if "user_id" not in session:
             return None
         return storage.load_users().get(session["user_id"])

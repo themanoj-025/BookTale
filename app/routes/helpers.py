@@ -133,7 +133,7 @@ def get_current_user():
     return _storage.load_users().get(session["user_id"])
 
 
-def login_required(f):
+def login_required(f) -> dict:
     """Decorator: redirect to login if user is not authenticated."""
     @wraps(f)
     def d(*a, **k):
@@ -146,7 +146,7 @@ def login_required(f):
 def admin_required(f):
     """Decorator: require admin role, show forbidden page if not."""
     @wraps(f)
-    def d(*a, **k):
+    def d(*a, **k) -> dict:
         if "user_id" not in session:
             return redirect(url_for("login_page"))
         if session.get("role") != "admin":

@@ -521,7 +521,7 @@ def view_user_flow(storage: Storage):
     pause()
 
 
-def block_unblock_user_flow(lib: Library, auth: AuthManager):
+def block_unblock_user_flow(lib: Library, auth: AuthManager) -> dict:
     header("🔒 BLOCK / UNBLOCK USER")
     uid = input("  User ID   : ").strip()
     user = lib.get_user(uid)
@@ -587,7 +587,7 @@ def issue_return_menu(lib: Library, auth: AuthManager):
             break
 
 
-def issue_book_flow(lib: Library, auth: AuthManager):
+def issue_book_flow(lib: Library, auth: AuthManager) -> dict:
     header("📤 ISSUE BOOK")
     uid = input("  User ID   : ").strip()
     bid = input("  Book ID   : ").strip()

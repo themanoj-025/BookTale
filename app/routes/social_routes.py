@@ -99,7 +99,7 @@ def render_page(title, content, **kw):
     )
 
 
-def get_current_user():
+def get_current_user() -> dict:
     if "user_id" not in session:
         return None
     return storage.load_users().get(session["user_id"])
@@ -107,7 +107,7 @@ def get_current_user():
 
 def login_required(f):
     @wraps(f)
-    def d(*a, **k):
+    def d(*a, **k) -> dict:
         if "user_id" not in session:
             return redirect(url_for("login_page"))
         return f(*a, **k)
@@ -413,7 +413,7 @@ def init_social_routes(
     _book_lists=None,
     _communities=None,
     _gamification=None,
-):
+) -> dict:
     global storage, lib, auth, social, review_mgr, recommender, notif_mgr, book_lists, communities, gamification
     storage = _storage
     lib = _lib
