@@ -39,7 +39,7 @@ def safe_print(text):
         print(text.encode("ascii", errors="replace").decode("ascii"))
 
 
-def print_banner():
+def print_banner() -> dict:
     """Display a clean launch banner."""
     safe_print(
         """

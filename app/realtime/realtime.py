@@ -191,7 +191,7 @@ def init_socketio(app, storage: Storage):
     realtime_manager = RealtimeManager(storage)
 
     @socketio.on("connect", namespace="/social")
-    def handle_connect():
+    def handle_connect() -> dict:
         user_id = session.get("user_id")
         if not user_id:
             return False  # Reject connection
@@ -295,6 +295,6 @@ def get_socketio():
     return socketio
 
 
-def get_realtime():
+def get_realtime() -> dict:
     """Get the realtime manager instance."""
     return realtime_manager

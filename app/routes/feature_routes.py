@@ -34,7 +34,7 @@ _avatar_html = None
 
 def init_feature_routes(
     app, storage, lib, auth, notif_mgr, series, challenge, progress, wishlist, diary
-):
+) -> dict:
     global _storage, _lib, _notif_mgr, _series, _challenge, _progress, _wishlist, _h, _avatar_html, _diary
     _storage = storage
     _lib = lib

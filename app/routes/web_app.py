@@ -145,7 +145,7 @@ def _rate_limit(limit_value, **kwargs):
     return limiter.limit(limit_value, **kwargs)
 
 
-def _user_key():
+def _user_key() -> dict:
     """Rate-limit key scoped to the authenticated account, not just the IP.
 
     Per-IP limits alone let a distributed attacker (many source IPs) keep
@@ -241,7 +241,7 @@ def _request_id_middleware():
 
 
 @app.after_request
-def apply_security_headers(response):
+def apply_security_headers(response) -> dict:
     """Set security headers on every response."""
     # Content Security Policy — restricts script/style sources
     response.headers["Content-Security-Policy"] = (
@@ -355,7 +355,7 @@ def h(text):
     return html.escape(str(text))
 
 
-def login_required(f):
+def login_required(f) -> dict:
     @wraps(f)
     def d(*a, **k):
         if "user_id" not in session:
@@ -367,7 +367,7 @@ def login_required(f):
 
 def admin_required(f):
     @wraps(f)
-    def d(*a, **k):
+    def d(*a, **k) -> dict:
         if "user_id" not in session:
             return redirect(url_for("login_page"))
         if session.get("role") != "admin":
@@ -386,7 +386,7 @@ def api_key_required(f):
     import secrets as _secrets
 
     @wraps(f)
-    def d(*a, **k):
+    def d(*a, **k) -> dict:
         api_key = os.environ.get("BOOKTALE_API_KEY", "")
         if not api_key:
             return f(*a, **k)
@@ -407,7 +407,7 @@ def get_current_user():
     return storage.load_users().get(session["user_id"])
 
 
-def render_page(title, content, **kw):
+def render_page(title, content, **kw) -> dict:
     user = get_current_user()
     return render_template(
         "base.html",
@@ -423,7 +423,7 @@ def _load_library_data():
     return storage.load_books(), storage.load_users(), storage.load_transactions()
 
 
-def _library_stats():
+def _library_stats() -> dict:
     books, users, txns = _load_library_data()
     all_books = [b for b in books.values() if not b.is_deleted]
     now = datetime.now()
@@ -507,7 +507,7 @@ def _initials(name):
     return parts[0][:2].upper()
 
 
-def _avatar_color(name):
+def _avatar_color(name) -> dict:
     """Generate a deterministic color from a name (stable across processes)."""
     colors = [
         "#4f46e5",
@@ -677,7 +677,7 @@ def _not_found(e):
 
 
 @app.errorhandler(500)
-def _server_error(e):
+def _server_error(e) -> dict:
     from app.core.logger import log as _err_log
 
     _err_log(f"unhandled exception: {e!r}", "error")
@@ -693,7 +693,7 @@ def logout():
 # ──
 
 
-def render_auth_page(title, content, **kw):
+def render_auth_page(title, content, **kw) -> dict:
     """Render an auth page using the split-screen auth_base.html template."""
     from flask import render_template
 
@@ -712,7 +712,7 @@ def healthz():
 
 
 @app.route("/readyz")
-def readyz():
+def readyz() -> dict:
     """Readiness probe: confirms the DB is reachable."""
     try:
         from sqlalchemy import text as _sqltext
@@ -748,7 +748,7 @@ def api_openapi_json():
 
 
 @app.route("/api/docs")
-def api_docs():
+def api_docs() -> dict:
     """Swagger UI for the BookTale API (pinned CDN, matches the CSP)."""
     return render_template_string(
         """<!DOCTYPE html>
@@ -2364,7 +2364,7 @@ def api_analytics_categories():
 
 @app.route("/api/analytics/activity")
 @api_key_required
-def api_analytics_activity():
+def api_analytics_activity() -> dict:
     """Get recent activity for 'Who to Follow' sidebar."""
     txns = storage.load_transactions()
     from collections import Counter
