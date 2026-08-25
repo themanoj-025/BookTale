@@ -134,7 +134,7 @@ except ImportError:
     limiter = None
 
 
-def _rate_limit(limit_value, **kwargs):
+def _rate_limit(limit_value, **kwargs) -> None:
     """Rate-limit decorator; no-op fallback if flask-limiter is not installed.
 
     Passes through limiter options (methods, exempt_when, deduct_when, ...)
@@ -160,7 +160,7 @@ def _user_key() -> dict:
     return f"ip:{request.remote_addr}"
 
 
-def _audit_log(admin_id, action, target="", old_value=None, new_value=None):
+def _audit_log(admin_id, action, target="", old_value=None, new_value=None) -> None:
     """Append one row to the admin audit trail (who/what/when/from-where).
 
     Non-fatal: the audit trail must never break the action it records. On any
@@ -203,7 +203,7 @@ if not Config.FLASK_DEBUG and os.getenv("SESSION_COOKIE_SECURE", "").strip() == 
 # not been run (dev/tests) so pages never 404.
 
 
-def asset(path):
+def asset(path) -> str:
     """Return the content-hashed URL for a logical static asset path."""
     _manifest = getattr(asset, "_manifest", None)
     if _manifest is None:
@@ -235,7 +235,7 @@ CORS(
 
 
 @app.before_request
-def _request_id_middleware():
+def _request_id_middleware() -> None:
     """Assign a unique request ID for log correlation (Phase 7)."""
     set_request_id()
 

@@ -85,7 +85,7 @@ def _magic_signature_ok(file) -> bool:
     return head[:4] == b"RIFF" and head[8:12] == b"WEBP"
 
 
-def render_page(title, content, **kw):
+def render_page(title, content, **kw) -> str:
     from flask import render_template
 
     user = get_current_user()
@@ -105,7 +105,7 @@ def get_current_user() -> dict:
     return storage.load_users().get(session["user_id"])
 
 
-def login_required(f):
+def login_required(f) -> None:
     @wraps(f)
     def d(*a, **k) -> dict:
         if "user_id" not in session:
@@ -115,7 +115,7 @@ def login_required(f):
     return d
 
 
-def avatar_html(name, size=32):
+def avatar_html(name, size=32) -> str:
     parts = name.strip().split()
     if not parts:
         initials = "?"
@@ -140,7 +140,7 @@ def avatar_html(name, size=32):
     )
 
 
-def time_ago(iso_str):
+def time_ago(iso_str) -> str:
     try:
         dt = datetime.fromisoformat(iso_str)
         now = datetime.now()
@@ -169,7 +169,7 @@ def time_ago(iso_str):
         return iso_str[:10]
 
 
-def cat_color(c):
+def cat_color(c) -> str:
     colors = {
         "Fiction": "#4f46e5",
         "Non-Fiction": "#059669",

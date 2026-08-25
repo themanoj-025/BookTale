@@ -30,7 +30,7 @@ except ImportError:
 FLASK_URL = f"http://localhost:{FLASK_PORT}"
 
 
-def safe_print(text):
+def safe_print(text) -> None:
     """Print text, gracefully handling UnicodeEncodeError on Windows cp1252."""
     try:
         print(text)
@@ -51,7 +51,7 @@ def print_banner() -> dict:
     )
 
 
-def launch_web():
+def launch_web() -> None:
     """Launch the Flask web server in a subprocess.
 
     NOTE: stdout/stderr are NOT piped to avoid pipe-buffer deadlocks
@@ -75,7 +75,7 @@ def launch_web():
     return process
 
 
-def launch_cli():
+def launch_cli() -> None:
     """Launch the CLI application in a subprocess."""
     safe_print("  [CLI] Starting CLI interface...")
     print()
@@ -91,7 +91,7 @@ def launch_cli():
     return process
 
 
-def show_menu():
+def show_menu() -> None:
     """Display the launcher menu."""
     print_banner()
     safe_print("  Select launch mode:\n")
@@ -108,7 +108,7 @@ def show_menu():
         safe_print("  [X] Invalid choice. Try 1-4.")
 
 
-def main():
+def main() -> None:
     """Main entry point -- show menu and launch."""
     if len(sys.argv) > 1:
         # CLI args: --web, --cli, --both
