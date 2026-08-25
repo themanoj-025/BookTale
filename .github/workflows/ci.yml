@@ -127,10 +127,13 @@ jobs:
           python-version: "3.12"
 
       - name: Install security tools
-        run: pip install bandit
+        run: pip install bandit pip-audit
 
       - name: Run bandit security scan
         run: bandit -r . -x ./venv,./__pycache__,'./Recommendation Systems',./tests,./scripts -l -s B110,B101
+
+      - name: Run pip-audit dependency scan
+        run: pip-audit -r requirements.txt --strict
 
   hadolint:
     name: Container lint
