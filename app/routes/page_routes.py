@@ -46,7 +46,7 @@ _diary_mgr = None
 logger = logging.getLogger(__name__)
 
 
-def _library_stats():
+def _library_stats() -> dict:
     """Calculate library-wide statistics (delegates to helpers.library_stats)."""
     return library_stats(_storage)
 

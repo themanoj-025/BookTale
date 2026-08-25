@@ -179,7 +179,7 @@ class RealtimeManager:
 realtime_manager: RealtimeManager | None = None
 
 
-def init_socketio(app, storage: Storage):
+def init_socketio(app, storage: Storage) -> None:
     """Initialize SocketIO with the Flask app."""
     global socketio, realtime_manager
 
@@ -290,7 +290,7 @@ def init_socketio(app, storage: Storage):
     return socketio
 
 
-def get_socketio():
+def get_socketio() -> None:
     """Get the socketio instance."""
     return socketio
 

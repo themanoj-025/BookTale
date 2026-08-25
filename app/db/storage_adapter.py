@@ -70,7 +70,7 @@ def _plain(row, drop=()) -> dict:
     return {c.name: getattr(row, c.name) for c in row.__table__.columns if c.name not in drop}
 
 
-def _row(model, data: dict):
+def _row(model, data: dict) -> None:
     """Plain dict -> ORM row, keeping only known model columns."""
     cols = _columns(model)
     return model(**{k: v for k, v in data.items() if k in cols})
@@ -328,7 +328,7 @@ class DbStorage:
 # ─────────────────────────────────────────────────────────────────────
 
 
-def create_storage():
+def create_storage() -> None:
     """Return the active persistence backend.
 
     STORAGE_BACKEND=db (default)  -> DbStorage (SQLAlchemy / SQLite|Postgres)

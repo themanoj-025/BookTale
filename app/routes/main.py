@@ -104,7 +104,7 @@ def show_notification_badge(notif_mgr: NotificationManager, user_id: str) -> Non
 # ADMIN MENUS
 
 
-def admin_menu(lib: Library, auth: AuthManager, storage: Storage):
+def admin_menu(lib: Library, auth: AuthManager, storage: Storage) -> None:
     notif_mgr = NotificationManager(storage)
     recommender = Recommender(storage)
     show_notification_badge(notif_mgr, auth.current_user.user_id)
@@ -166,7 +166,7 @@ def admin_menu(lib: Library, auth: AuthManager, storage: Storage):
             break
 
 
-def librarian_menu(lib: Library, auth: AuthManager, storage: Storage):
+def librarian_menu(lib: Library, auth: AuthManager, storage: Storage) -> None:
     notif_mgr = NotificationManager(storage)
     recommender = Recommender(storage)
     show_notification_badge(notif_mgr, auth.current_user.user_id)
@@ -203,7 +203,7 @@ def librarian_menu(lib: Library, auth: AuthManager, storage: Storage):
             break
 
 
-def user_menu(lib: Library, auth: AuthManager):
+def user_menu(lib: Library, auth: AuthManager) -> None:
     notif_mgr = NotificationManager(lib.storage)
     recommender = Recommender(lib.storage)
     show_notification_badge(notif_mgr, auth.current_user.user_id)
@@ -237,7 +237,7 @@ def user_menu(lib: Library, auth: AuthManager):
 # BOOK MANAGEMENT
 
 
-def book_management_menu(lib: Library, auth: AuthManager):
+def book_management_menu(lib: Library, auth: AuthManager) -> None:
     while True:
         choice = menu(
             "📖 BOOK MANAGEMENT",
@@ -281,7 +281,7 @@ def lookup_isbn(isbn: str) -> dict | None:
     return None
 
 
-def add_book_flow(lib: Library, auth: AuthManager):
+def add_book_flow(lib: Library, auth: AuthManager) -> None:
     header("➕ ADD NEW BOOK")
     title = input("  Title     : ").strip()
     author = input("  Author    : ").strip()
@@ -341,7 +341,7 @@ def _generate_barcode(book_id: str, isbn: str) -> None:
         pass  # QR generation is optional
 
 
-def search_books_menu(lib: Library):
+def search_books_menu(lib: Library) -> None:
     header("🔍 ADVANCED SEARCH")
     print("  Search by: 1.All  2.Title  3.Author  4.ISBN  5.Category  6.Advanced Filters")
     by_map = {"1": "all", "2": "title", "3": "author", "4": "isbn"}
@@ -392,7 +392,7 @@ def search_books_menu(lib: Library):
     pause()
 
 
-def update_book_flow(lib: Library, auth: AuthManager):
+def update_book_flow(lib: Library, auth: AuthManager) -> None:
     header("✏  UPDATE BOOK")
     book_id = input("  Book ID   : ").strip()
     book = lib.get_book(book_id)
@@ -427,7 +427,7 @@ def update_book_flow(lib: Library, auth: AuthManager):
     pause()
 
 
-def delete_book_flow(lib: Library, auth: AuthManager):
+def delete_book_flow(lib: Library, auth: AuthManager) -> None:
     header("🗑  DELETE BOOK")
     book_id = input("  Book ID   : ").strip()
     book = lib.get_book(book_id)
@@ -448,7 +448,7 @@ def delete_book_flow(lib: Library, auth: AuthManager):
 # USER MANAGEMENT
 
 
-def user_management_menu(lib: Library, auth: AuthManager, storage: Storage):
+def user_management_menu(lib: Library, auth: AuthManager, storage: Storage) -> None:
     while True:
         choice = menu(
             "👥 USER MANAGEMENT",
@@ -475,7 +475,7 @@ def user_management_menu(lib: Library, auth: AuthManager, storage: Storage):
             break
 
 
-def register_user_flow(lib: Library, auth: AuthManager):
+def register_user_flow(lib: Library, auth: AuthManager) -> None:
     header("➕ REGISTER USER")
     uid = input("  User ID   : ").strip()
     name = input("  Name      : ").strip()
@@ -510,7 +510,7 @@ def register_user_flow(lib: Library, auth: AuthManager):
     pause()
 
 
-def view_user_flow(storage: Storage):
+def view_user_flow(storage: Storage) -> None:
     header("👤 VIEW USER")
     uid = input("  User ID   : ").strip()
     user = storage.load_users().get(uid)
@@ -544,7 +544,7 @@ def block_unblock_user_flow(lib: Library, auth: AuthManager) -> dict:
     pause()
 
 
-def renew_membership_flow(lib: Library, auth: AuthManager):
+def renew_membership_flow(lib: Library, auth: AuthManager) -> None:
     header("🔄 RENEW MEMBERSHIP")
     uid = input("  User ID   : ").strip()
     days_str = input("  Days [365]: ").strip() or "365"
@@ -560,7 +560,7 @@ def renew_membership_flow(lib: Library, auth: AuthManager):
     pause()
 
 
-def list_users(storage: Storage):
+def list_users(storage: Storage) -> None:
     header("📋 ALL USERS")
     users = storage.load_users()
     for u in users.values():
@@ -576,7 +576,7 @@ def list_users(storage: Storage):
 # ISSUE / RETURN
 
 
-def issue_return_menu(lib: Library, auth: AuthManager):
+def issue_return_menu(lib: Library, auth: AuthManager) -> None:
     while True:
         choice = menu("📤 ISSUE / RETURN", ["Issue Book", "Return Book", "Back"])
         if choice == "1":
@@ -599,7 +599,7 @@ def issue_book_flow(lib: Library, auth: AuthManager) -> dict:
     pause()
 
 
-def return_book_flow(lib: Library, auth: AuthManager):
+def return_book_flow(lib: Library, auth: AuthManager) -> None:
     header("📥 RETURN BOOK")
     uid = input("  User ID   : ").strip()
     bid = input("  Book ID   : ").strip()
@@ -616,7 +616,7 @@ def return_book_flow(lib: Library, auth: AuthManager):
 # REPORTS
 
 
-def reports_menu(lib: Library):
+def reports_menu(lib: Library) -> None:
     while True:
         choice = menu(
             "📊 REPORTS & ANALYTICS",
@@ -665,7 +665,7 @@ def reports_menu(lib: Library):
 # EXPORT REPORTS
 
 
-def export_reports_menu(lib: Library):
+def export_reports_menu(lib: Library) -> None:
     """Export various reports to CSV."""
     header("📤 EXPORT REPORTS TO CSV")
     print("  1. Export Most Issued Books")
@@ -739,7 +739,7 @@ def export_reports_menu(lib: Library):
 # OVERDUE
 
 
-def overdue_menu(lib: Library):
+def overdue_menu(lib: Library) -> None:
     header("⏰ OVERDUE BOOKS")
     records = lib.get_overdue_list()
     if not records:
@@ -766,7 +766,7 @@ def overdue_menu(lib: Library):
 # FINE MANAGEMENT
 
 
-def fine_management_menu(lib: Library, auth: AuthManager):
+def fine_management_menu(lib: Library, auth: AuthManager) -> None:
     header("💳 FINE MANAGEMENT")
     uid = input("  User ID   : ").strip()
     user = lib.get_user(uid)
@@ -793,7 +793,7 @@ def fine_management_menu(lib: Library, auth: AuthManager):
 # RESERVATIONS
 
 
-def reservations_menu(lib: Library, storage: Storage):
+def reservations_menu(lib: Library, storage: Storage) -> None:
     header("📌 RESERVATION QUEUE")
     res = storage.load_reservations()
     books = storage.load_books()
@@ -1018,7 +1018,7 @@ def _show_notifications(notif_mgr: NotificationManager, user_id: str, unread_onl
 # BACKUP & RESTORE
 
 
-def backup_restore_menu(auth: AuthManager):
+def backup_restore_menu(auth: AuthManager) -> None:
     while True:
         choice = menu(
             "💾 BACKUP & RESTORE",

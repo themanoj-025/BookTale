@@ -126,7 +126,7 @@ def render_page(title, content, **kw) -> str:
     )
 
 
-def get_current_user():
+def get_current_user() -> dict | None:
     """Return the current user object from the session, or None."""
     if "user_id" not in session:
         return None
@@ -143,7 +143,7 @@ def login_required(f) -> dict:
     return d
 
 
-def admin_required(f):
+def admin_required(f) -> None:
     """Decorator: require admin role, show forbidden page if not."""
     @wraps(f)
     def d(*a, **k) -> dict:
