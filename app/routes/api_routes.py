@@ -14,36 +14,36 @@ from functools import wraps
 from flask import g, jsonify, redirect, request, session, url_for
 
 
-def init_api_routes(app, storage, lib, auth, notif_mgr, recommender, social, diary_mgr) -> None:  # type: ignore[no-untyped-def]
+def init_api_routes(app, storage, lib, auth, notif_mgr, recommender, social, diary_mgr) -> None:
     """Register API routes on the Flask app."""
 
-    def _rate_limit(limit_value, **kwargs):  # type: ignore[no-untyped-def]
+    def _rate_limit(limit_value: str, **kwargs: Any) -> Any:
         """Rate-limit decorator; no-op fallback if flask-limiter is missing."""
         _lim = app.extensions.get("booktale_limiter")
         if _lim is None:
             return lambda f: f
         return _lim.limit(limit_value, **kwargs)
 
-    def _user_key() -> dict:  # type: ignore[no-untyped-def]
+    def _user_key() -> dict[str, str]:
         uid = session.get("user_id")
         if uid:
             return f"user:{uid}"
         return f"ip:{request.remote_addr}"
 
-    def login_required(f):  # type: ignore[no-untyped-def]
+    def login_required(f: Callable[..., Any]) -> Callable[..., Any]:
         @wraps(f)
-        def d(*a, **k):  # type: ignore[no-untyped-def]
+        def d(*a: Any, **k: Any) -> Any:
             if "user_id" not in session:
                 return redirect(url_for("login_page"))
             return f(*a, **k)
         return d
 
-    def api_key_required(f):  # type: ignore[no-untyped-def]
+    def api_key_required(f: Callable[..., Any]) -> Callable[..., Any]:
         """Protect API endpoints with Bearer token auth."""
         import secrets as _secrets
 
         @wraps(f)
-        def d(*a, **k):  # type: ignore[no-untyped-def]
+        def d(*a: Any, **k: Any) -> Any:
             api_key = os.environ.get("BOOKTALE_API_KEY", "")
             if not api_key:
                 return f(*a, **k)
@@ -65,7 +65,7 @@ def init_api_routes(app, storage, lib, auth, notif_mgr, recommender, social, dia
         key_func=_user_key,
         deduct_when=lambda response: getattr(g, "_pw_change_failed", False),
     )
-    def api_save_settings():  # type: ignore[no-untyped-def]
+    def api_save_settings() -> dict[str, str]:
         """Save user settings."""
         uid = session["user_id"]
         data = request.get_json() or {}
@@ -132,7 +132,7 @@ def init_api_routes(app, storage, lib, auth, notif_mgr, recommender, social, dia
 
     @app.route("/api/books/trending")
     @login_required
-    def api_books_trending():  # type: ignore[no-untyped-def]
+    def api_books_trending() -> dict[str, Any]:
         """Get trending books based on issue count or seed data."""
         limit = min(int(request.args.get("limit", 10)), 30)
         if recommender:
@@ -164,7 +164,7 @@ def init_api_routes(app, storage, lib, auth, notif_mgr, recommender, social, dia
 
     @app.route("/api/books/random")
     @login_required
-    def api_book_random():  # type: ignore[no-untyped-def]
+    def api_book_random() -> dict[str, Any]:
         """Get a random book for the dashboard spotlight."""
         books = storage.load_books()
         all_books = [b for b in books.values() if not b.is_deleted]
@@ -187,7 +187,7 @@ def init_api_routes(app, storage, lib, auth, notif_mgr, recommender, social, dia
 
     @app.route("/api/users/suggested")
     @login_required
-    def api_users_suggested():  # type: ignore[no-untyped-def]
+    def api_users_suggested() -> dict[str, Any]:
         """Get suggested users to follow."""
         uid = session["user_id"]
         users = storage.load_users()
@@ -207,7 +207,7 @@ def init_api_routes(app, storage, lib, auth, notif_mgr, recommender, social, dia
 
     @app.route("/api/seed/stats")
     @api_key_required
-    def api_seed_stats():  # type: ignore[no-untyped-def]
+    def api_seed_stats() -> dict[str, Any]:
         """Get stats including Goodreads seed dataset counts."""
         s = _library_stats(storage)
         try:
@@ -237,7 +237,7 @@ def init_api_routes(app, storage, lib, auth, notif_mgr, recommender, social, dia
     @app.route("/api/ai/chat", methods=["POST"])
     @login_required
     @_rate_limit("30 per minute")
-    def api_ai_chat():  # type: ignore[no-untyped-def]
+    def api_ai_chat() -> dict[str, Any]:
         """AI Reading Companion - TF-IDF based book recommendations and Q&A."""
         data = request.get_json() or {}
         message = data.get("message", "").strip()
@@ -294,7 +294,7 @@ def init_api_routes(app, storage, lib, auth, notif_mgr, recommender, social, dia
 
     @app.route("/api/reading-streak")
     @login_required
-    def api_reading_streak():  # type: ignore[no-untyped-def]
+    def api_reading_streak() -> dict[str, Any]:
         """Calculate reading streak based on diary entries."""
         uid = session["user_id"]
         try:
@@ -327,7 +327,7 @@ def init_api_routes(app, storage, lib, auth, notif_mgr, recommender, social, dia
 
     @app.route("/api/analytics/monthly")
     @api_key_required
-    def api_analytics_monthly():  # type: ignore[no-untyped-def]
+    def api_analytics_monthly() -> dict[str, Any]:
         """Get monthly analytics data for charts."""
         books = storage.load_books()
         all_books = [b for b in books.values() if not b.is_deleted]
@@ -346,7 +346,7 @@ def init_api_routes(app, storage, lib, auth, notif_mgr, recommender, social, dia
 
     @app.route("/api/analytics/categories")
     @api_key_required
-    def api_analytics_categories():  # type: ignore[no-untyped-def]
+    def api_analytics_categories() -> dict[str, Any]:
         """Get category distribution for charts."""
         books = storage.load_books()
         from collections import Counter
@@ -356,7 +356,7 @@ def init_api_routes(app, storage, lib, auth, notif_mgr, recommender, social, dia
 
     @app.route("/api/analytics/activity")
     @api_key_required
-    def api_analytics_activity() -> dict:  # type: ignore[no-untyped-def]
+    def api_analytics_activity() -> dict:
         """Get recent activity for 'Who to Follow' sidebar."""
         txns = storage.load_transactions()
         from collections import Counter
@@ -368,7 +368,7 @@ def init_api_routes(app, storage, lib, auth, notif_mgr, recommender, social, dia
 
     @app.route("/api/books")
     @login_required
-    def api_books_search():  # type: ignore[no-untyped-def]
+    def api_books_search() -> dict[str, Any]:
         """Search books API - for autocomplete and search overlays."""
         q = request.args.get("q", "").strip()
         sort = request.args.get("sort", "title")
@@ -403,7 +403,7 @@ def init_api_routes(app, storage, lib, auth, notif_mgr, recommender, social, dia
         )
 
 
-def _library_stats(storage) -> dict:  # type: ignore[no-untyped-def]
+def _library_stats(storage: Any) -> dict[str, Any]:
     """Compute library statistics for analytics."""
     books, users, txns = (
         storage.load_books(),
