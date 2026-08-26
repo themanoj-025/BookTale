@@ -14,26 +14,26 @@ from flask import g, jsonify, redirect, render_template, request, session, url_f
 from app.config.settings import Config
 
 
-def init_admin_routes(app, storage, lib, auth, notif_mgr) -> None:  # type: ignore[no-untyped-def]
+def init_admin_routes(app, storage, lib, auth, notif_mgr) -> None:
     """Register admin routes on the Flask app."""
 
-    def _rate_limit(limit_value, **kwargs):  # type: ignore[no-untyped-def]
+    def _rate_limit(limit_value: str, **kwargs: Any) -> Any:
         """Rate-limit decorator; no-op fallback if flask-limiter is missing."""
         _lim = app.extensions.get("booktale_limiter")
         if _lim is None:
             return lambda f: f
         return _lim.limit(limit_value, **kwargs)
 
-    def _user_key() -> dict:  # type: ignore[no-untyped-def]
+    def _user_key() -> dict[str, str]:
         uid = session.get("user_id")
         if uid:
             return f"user:{uid}"
         return f"ip:{request.remote_addr}"
 
-    def h(text):  # type: ignore[no-untyped-def]
+    def h(text: object) -> str:
         return html.escape(str(text))
 
-    def _audit_log(admin_id, action, target="", old_value=None, new_value=None) -> None:  # type: ignore[no-untyped-def]
+    def _audit_log(admin_id: str, action: str, target: str = "", old_value: Any = None, new_value: Any = None) -> None:
         try:
             import app.db.database as _dbmod
             from app.db.repositories import AuditLogRepository
@@ -56,12 +56,12 @@ def init_admin_routes(app, storage, lib, auth, notif_mgr) -> None:  # type: igno
                 "audit",
             )
 
-    def get_current_user():  # type: ignore[no-untyped-def]
+    def get_current_user() -> Any:
         if "user_id" not in session:
             return None
         return storage.load_users().get(session["user_id"])
 
-    def render_page(title, content, **kw):  # type: ignore[no-untyped-def]
+    def render_page(title: str, content: str, **kw: Any) -> str:
         user = get_current_user()
         return render_template(
             "base.html",
@@ -71,17 +71,17 @@ def init_admin_routes(app, storage, lib, auth, notif_mgr) -> None:  # type: igno
             **kw,
         )
 
-    def login_required(f):  # type: ignore[no-untyped-def]
+    def login_required(f: Callable[..., Any]) -> Callable[..., Any]:
         @wraps(f)
-        def d(*a, **k):  # type: ignore[no-untyped-def]
+        def d(*a: Any, **k: Any) -> Any:
             if "user_id" not in session:
                 return redirect(url_for("login_page"))
             return f(*a, **k)
         return d
 
-    def admin_required(f):  # type: ignore[no-untyped-def]
+    def admin_required(f: Callable[..., Any]) -> Callable[..., Any]:
         @wraps(f)
-        def d(*a, **k):  # type: ignore[no-untyped-def]
+        def d(*a: Any, **k: Any) -> Any:
             if "user_id" not in session:
                 return redirect(url_for("login_page"))
             if session.get("role") != "admin":
@@ -93,7 +93,7 @@ def init_admin_routes(app, storage, lib, auth, notif_mgr) -> None:  # type: igno
 
     @app.route("/admin/settings")
     @admin_required
-    def admin_settings_page():  # type: ignore[no-untyped-def]
+    def admin_settings_page() -> str:
         """Admin settings page for managing system-wide configuration."""
         from app.config.settings import Config as C
 
@@ -300,7 +300,7 @@ function saveAdminSettings() {
         key_func=_user_key,
         deduct_when=lambda response: getattr(g, "_admin_pw_failed", False),
     )
-    def api_save_admin_settings():  # type: ignore[no-untyped-def]
+    def api_save_admin_settings() -> dict[str, str]:
         """Save admin settings to settings_override.json."""
         data = request.get_json() or {}
 
@@ -390,7 +390,7 @@ function saveAdminSettings() {
     @app.route("/admin/fines")
     @login_required
     @admin_required
-    def admin_fines_page():  # type: ignore[no-untyped-def]
+    def admin_fines_page() -> str:
         """Admin fines management page."""
         fines = storage.load_fines()
         users = storage.load_users()

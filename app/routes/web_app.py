@@ -98,21 +98,21 @@ except ImportError:
     limiter = None
 
 
-def _rate_limit(limit_value, **kwargs):  # type: ignore[no-untyped-def]
+def _rate_limit(limit_value: str, **kwargs: Any) -> Any:
     """Rate-limit decorator; no-op fallback if flask-limiter is not installed."""
     if limiter is None:
         return lambda f: f
     return limiter.limit(limit_value, **kwargs)
 
 
-def _user_key() -> dict:  # type: ignore[no-untyped-def]
+def _user_key() -> dict[str, str]:
     uid = session.get("user_id")
     if uid:
         return f"user:{uid}"
     return f"ip:{request.remote_addr}"
 
 
-def _audit_log(admin_id, action, target="", old_value=None, new_value=None) -> None:  # type: ignore[no-untyped-def]
+def _audit_log(admin_id: str, action: str, target: str = "", old_value: Any = None, new_value: Any = None) -> None:
     """Append one row to the admin audit trail."""
     try:
         import app.db.database as _dbmod
@@ -273,22 +273,22 @@ init_site_pages(app, storage, lib, recommender, social, review_mgr, notif_mgr)
 
 # ── Utility helpers ─────────────────────────────────────────────────────────
 
-def h(text):  # type: ignore[no-untyped-def]
+def h(text: object) -> str:
     return html.escape(str(text))
 
 
-def login_required(f):  # type: ignore[no-untyped-def]
+def login_required(f: Callable[..., Any]) -> Callable[..., Any]:
     @wraps(f)
-    def d(*a, **k):  # type: ignore[no-untyped-def]
+    def d(*a: Any, **k: Any) -> Any:
         if "user_id" not in session:
             return redirect(url_for("login_page"))
         return f(*a, **k)
     return d
 
 
-def admin_required(f):  # type: ignore[no-untyped-def]
+def admin_required(f: Callable[..., Any]) -> Callable[..., Any]:
     @wraps(f)
-    def d(*a, **k):  # type: ignore[no-untyped-def]
+    def d(*a: Any, **k: Any) -> Any:
         if "user_id" not in session:
             return redirect(url_for("login_page"))
         if session.get("role") != "admin":
@@ -297,11 +297,11 @@ def admin_required(f):  # type: ignore[no-untyped-def]
     return d
 
 
-def api_key_required(f):  # type: ignore[no-untyped-def]
+def api_key_required(f: Callable[..., Any]) -> Callable[..., Any]:
     import secrets as _secrets
 
     @wraps(f)
-    def d(*a, **k):  # type: ignore[no-untyped-def]
+    def d(*a: Any, **k: Any) -> Any:
         api_key = os.environ.get("BOOKTALE_API_KEY", "")
         if not api_key:
             return f(*a, **k)
@@ -315,13 +315,13 @@ def api_key_required(f):  # type: ignore[no-untyped-def]
     return d
 
 
-def get_current_user():  # type: ignore[no-untyped-def]
+def get_current_user() -> Any:
     if "user_id" not in session:
         return None
     return storage.load_users().get(session["user_id"])
 
 
-def render_page(title, content, **kw):  # type: ignore[no-untyped-def]
+def render_page(title: str, content: str, **kw: Any) -> str:
     user = get_current_user()
     return render_template(
         "base.html",
@@ -332,12 +332,12 @@ def render_page(title, content, **kw):  # type: ignore[no-untyped-def]
     )
 
 
-def render_auth_page(title, content, **kw):  # type: ignore[no-untyped-def]
+def render_auth_page(title: str, content: str, **kw: Any) -> str:
     """Render an auth page using the split-screen auth_base.html template."""
     return render_template("auth_base.html", title=title, auth_content=content, session={}, **kw)
 
 
-def _initials(name):  # type: ignore[no-untyped-def]
+def _initials(name: str) -> str:
     parts = name.strip().split()
     if not parts:
         return "?"
@@ -346,7 +346,7 @@ def _initials(name):  # type: ignore[no-untyped-def]
     return parts[0][:2].upper()
 
 
-def _avatar_color(name) -> dict:  # type: ignore[no-untyped-def]
+def _avatar_color(name) -> dict:
     colors = [
         "#4f46e5", "#059669", "#d97706", "#dc2626",
         "#0891b2", "#7c3aed", "#db2777", "#ca8a04",
@@ -354,7 +354,7 @@ def _avatar_color(name) -> dict:  # type: ignore[no-untyped-def]
     return colors[zlib.crc32(str(name).encode("utf-8")) % len(colors)]
 
 
-def _avatar_html(name, size=32):  # type: ignore[no-untyped-def]
+def _avatar_html(name: str, size: int = 32) -> str:
     i = _initials(name)
     c = _avatar_color(name)
     return (
@@ -375,7 +375,7 @@ CAT_COLORS = {
 }
 
 
-def cat_color(c):  # type: ignore[no-untyped-def]
+def cat_color(c: str) -> str:
     return CAT_COLORS.get(c, CAT_COLORS["Other"])
 
 
@@ -446,12 +446,12 @@ def _server_error(e) -> dict:
 
 
 @app.route("/healthz")
-def healthz():  # type: ignore[no-untyped-def]
+def healthz() -> dict[str, str]:
     return jsonify({"status": "ok"}), 200
 
 
 @app.route("/readyz")
-def readyz() -> dict:  # type: ignore[no-untyped-def]
+def readyz() -> dict:
     try:
         from sqlalchemy import text as _sqltext
         import app.db.database as _dbmod
@@ -471,13 +471,13 @@ def readyz() -> dict:  # type: ignore[no-untyped-def]
 
 
 @app.route("/api/openapi.json")
-def api_openapi_json():  # type: ignore[no-untyped-def]
+def api_openapi_json() -> str:
     from app.api.api_spec import build_openapi_spec
     return jsonify(build_openapi_spec())
 
 
 @app.route("/api/docs")
-def api_docs() -> dict:  # type: ignore[no-untyped-def]
+def api_docs() -> dict:
     return render_template_string(
         """<!DOCTYPE html>
 <html lang="en">
@@ -513,7 +513,7 @@ def api_docs() -> dict:  # type: ignore[no-untyped-def]
 
 
 @app.route("/security")
-def security_page():  # type: ignore[no-untyped-def]
+def security_page() -> str:
     items = [
         ("🔑", "Password hashing", "Passwords are stored as bcrypt hashes; the policy requires 12+ characters, enforced server-side on every password surface (registration, reset, settings)."),
         ("🛡️", "Role-safe registration", 'Self-service registration can only ever create "user" accounts — client-supplied admin/librarian roles are silently downgraded.'),
@@ -553,7 +553,7 @@ def security_page():  # type: ignore[no-untyped-def]
 
 @app.route("/help")
 @login_required
-def help_page():  # type: ignore[no-untyped-def]
+def help_page() -> str:
     CONTENT = '<div class="animate-in">'
     CONTENT += '<div class="glass-card p-0 mb-4" style="overflow:hidden;">'
     CONTENT += '<div class="p-4" style="background:linear-gradient(135deg,var(--primary),#7c3aed);color:white;">'
@@ -604,7 +604,7 @@ def help_page():  # type: ignore[no-untyped-def]
 
 @app.route("/settings")
 @login_required
-def settings_page():  # type: ignore[no-untyped-def]
+def settings_page() -> str:
     """User settings page with Profile, Notifications, Privacy, Appearance, and Reading tabs."""
     uid = session["user_id"]
     users = storage.load_users()

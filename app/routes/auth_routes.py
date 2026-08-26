@@ -14,26 +14,26 @@ from flask import g, redirect, render_template, request, session, url_for
 def init_auth_routes(app, storage, lib, auth, notif_mgr) -> None:
     """Register authentication routes on the Flask app."""
 
-    def _rate_limit(limit_value, **kwargs):  # type: ignore[no-untyped-def]
+    def _rate_limit(limit_value: str, **kwargs: Any) -> Any:
         """Rate-limit decorator; no-op fallback if flask-limiter is missing."""
         _lim = app.extensions.get("booktale_limiter")
         if _lim is None:
             return lambda f: f
         return _lim.limit(limit_value, **kwargs)
 
-    def h(text):  # type: ignore[no-untyped-def]
+    def h(text: object) -> str:
         return html.escape(str(text))
 
-    def render_auth_page(title, content, **kw):  # type: ignore[no-untyped-def]
+    def render_auth_page(title: str, content: str, **kw: Any) -> str:
         """Render an auth page using the split-screen auth_base.html template."""
         return render_template("auth_base.html", title=title, auth_content=content, session={}, **kw)
 
-    def get_current_user():  # type: ignore[no-untyped-def]
+    def get_current_user() -> Any:
         if "user_id" not in session:
             return None
         return storage.load_users().get(session["user_id"])
 
-    def render_page(title, content, **kw):  # type: ignore[no-untyped-def]
+    def render_page(title: str, content: str, **kw: Any) -> str:
         user = get_current_user()
         return render_template(
             "base.html",
@@ -43,9 +43,9 @@ def init_auth_routes(app, storage, lib, auth, notif_mgr) -> None:
             **kw,
         )
 
-    def login_required(f):  # type: ignore[no-untyped-def]
+    def login_required(f: Callable[..., Any]) -> Callable[..., Any]:
         @wraps(f)
-        def d(*a, **k):  # type: ignore[no-untyped-def]
+        def d(*a: Any, **k: Any) -> Any:
             if "user_id" not in session:
                 return redirect(url_for("login_page"))
             return f(*a, **k)
@@ -54,7 +54,7 @@ def init_auth_routes(app, storage, lib, auth, notif_mgr) -> None:
     # ── Logout ──────────────────────────────────────────────────────────────
 
     @app.route("/logout")
-    def logout():  # type: ignore[no-untyped-def]
+    def logout() -> Any:
         session.clear()
         return redirect(url_for("login_page"))
 
@@ -67,7 +67,7 @@ def init_auth_routes(app, storage, lib, auth, notif_mgr) -> None:
         exempt_when=lambda: request.method == "GET",
         deduct_when=lambda response: getattr(g, "_login_failed", False),
     )
-    def login_page():  # type: ignore[no-untyped-def]
+    def login_page() -> str:
         if request.method == "GET":
             return render_template("auth/login.html", title="Login", form_aria_label="Login form")
 
@@ -91,7 +91,7 @@ def init_auth_routes(app, storage, lib, auth, notif_mgr) -> None:
 
     @app.route("/register", methods=["GET", "POST"])
     @_rate_limit("5 per minute", methods=["POST"], exempt_when=lambda: request.method == "GET")
-    def register_page():  # type: ignore[no-untyped-def]
+    def register_page() -> str:
         if request.method == "GET":
             return render_template(
                 "auth/register.html", title="Register", form_aria_label="Registration form"
@@ -169,7 +169,7 @@ def init_auth_routes(app, storage, lib, auth, notif_mgr) -> None:
 
     @app.route("/forgot-password", methods=["GET", "POST"])
     @_rate_limit("5 per minute", methods=["POST"], exempt_when=lambda: request.method == "GET")
-    def forgot_password_page():  # type: ignore[no-untyped-def]
+    def forgot_password_page() -> str:
         if request.method == "GET":
             return render_template(
                 "auth/forgot_password.html",
@@ -221,7 +221,7 @@ def init_auth_routes(app, storage, lib, auth, notif_mgr) -> None:
     # ── Verify Email ────────────────────────────────────────────────────────
 
     @app.route("/verify-email")
-    def verify_email_page():  # type: ignore[no-untyped-def]
+    def verify_email_page() -> str:
         token = request.args.get("token", "")
         if not token:
             CONTENT = (
@@ -268,7 +268,7 @@ def init_auth_routes(app, storage, lib, auth, notif_mgr) -> None:
 
     @app.route("/reset-password", methods=["GET", "POST"])
     @_rate_limit("5 per minute", methods=["POST"], exempt_when=lambda: request.method == "GET")
-    def reset_password_page():  # type: ignore[no-untyped-def]
+    def reset_password_page() -> str:
         if request.method == "GET":
             token = request.args.get("token", "")
             if not token:

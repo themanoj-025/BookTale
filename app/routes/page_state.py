@@ -76,26 +76,26 @@ def init(
 # ── Shared helpers ─────────────────────────────────────────────────────
 
 
-def h(text):  # type: ignore[no-untyped-def]
+def h(text: object) -> str:
     """HTML-escape text."""
     return _html.escape(str(text))
 
 
-def get_current_user():  # type: ignore[no-untyped-def]
+def get_current_user() -> Any:
     """Return current user from session, or None."""
     if "user_id" not in session:
         return None
     return storage.load_users().get(session["user_id"])
 
 
-def library_stats():  # type: ignore[no-untyped-def]
+def library_stats() -> dict[str, Any]:
     """Calculate library-wide statistics (delegates to helpers.library_stats)."""
     from app.routes.helpers import library_stats as _ls
 
     return _ls(storage)
 
 
-def render_page(title, content, **kw):  # type: ignore[no-untyped-def]
+def render_page(title: str, content: str, **kw: Any) -> str:
     """Render a page using base.html with notification count."""
     user = get_current_user()
     return render_template(
@@ -107,11 +107,11 @@ def render_page(title, content, **kw):  # type: ignore[no-untyped-def]
     )
 
 
-def login_required(f):  # type: ignore[no-untyped-def]
+def login_required(f: Callable[..., Any]) -> Callable[..., Any]:
     """Decorator: redirect to login if not authenticated."""
 
     @wraps(f)
-    def d(*a, **k):  # type: ignore[no-untyped-def]
+    def d(*a: Any, **k: Any) -> Any:
         if "user_id" not in session:
             return redirect(url_for("login_page"))
         return f(*a, **k)
@@ -119,11 +119,11 @@ def login_required(f):  # type: ignore[no-untyped-def]
     return d
 
 
-def admin_required(f):  # type: ignore[no-untyped-def]
+def admin_required(f: Callable[..., Any]) -> Callable[..., Any]:
     """Decorator: 403 if not admin."""
 
     @wraps(f)
-    def d(*a, **k):  # type: ignore[no-untyped-def]
+    def d(*a: Any, **k: Any) -> Any:
         if "user_id" not in session:
             return redirect(url_for("login_page"))
         if session.get("role") != "admin":
@@ -133,10 +133,10 @@ def admin_required(f):  # type: ignore[no-untyped-def]
     return d
 
 
-def make_rate_limit(app):  # type: ignore[no-untyped-def]
+def make_rate_limit(app: Flask) -> Callable[..., Any]:
     """Return a rate-limit decorator using the app's booktale_limiter."""
 
-    def _rate_limit(limit_value, **kwargs):  # type: ignore[no-untyped-def]
+    def _rate_limit(limit_value: str, **kwargs: Any) -> Any:
         _lim = app.extensions.get("booktale_limiter")
         if _lim is None:
             return lambda f: f
