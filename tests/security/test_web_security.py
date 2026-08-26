@@ -1338,7 +1338,7 @@ class TestRedisLimiterStorage:
 
             _r = _redis_client.Redis.from_url(Config.REDIS_URL, socket_connect_timeout=1.0)
             return bool(_r.ping())
-        except Exception:
+        except (OSError, ConnectionError, TimeoutError):
             return False
 
     def test_limiter_storage_uri_uses_redis_by_default(self):
@@ -1411,7 +1411,7 @@ class TestRedisLimiterStorage:
             _r = _redis_client.Redis.from_url(Config.REDIS_URL)
             for key in _r.scan_iter(f"limiter/{prefix}/*"):
                 _r.delete(key)
-        except Exception:
+        except (OSError, ConnectionError, TimeoutError):
             pass
 
     def test_redis_budget_survives_limiter_recreation(self):
@@ -1464,7 +1464,7 @@ class TestRedisLimiterStorage:
             _r = _redis_client.Redis.from_url(Config.REDIS_URL)
             for key in _r.scan_iter(f"limiter/{prefix}/*"):
                 _r.delete(key)
-        except Exception:
+        except (OSError, ConnectionError, TimeoutError):
             pass
 
 
