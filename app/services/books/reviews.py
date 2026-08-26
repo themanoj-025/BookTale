@@ -38,7 +38,7 @@ def _load_custom_shelves(storage: Storage) -> list:
     try:
         with open(path, encoding="utf-8") as f:
             return json.load(f)
-    except:
+    except (OSError, ValueError):
         return []
 
 
@@ -150,7 +150,7 @@ class ReviewManager:
         try:
             with open(comments_path, encoding="utf-8") as f:
                 comments = json.load(f)
-        except:
+        except (OSError, ValueError):
             comments = []
 
         comment = {
@@ -172,7 +172,7 @@ class ReviewManager:
         try:
             with open(comments_path, encoding="utf-8") as f:
                 all_comments = json.load(f)
-        except:
+        except (OSError, ValueError):
             return []
         review_comments = [c for c in all_comments if c["review_id"] == review_id]
         review_comments.sort(key=lambda c: c["created_at"])

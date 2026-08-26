@@ -588,7 +588,7 @@ def generate_membership_expiry(reg_date_str: str) -> str:
             return (reg_date + timedelta(days=365)).isoformat()
         else:  # Blocked
             return (datetime.now() + timedelta(days=random.randint(-30, 30))).isoformat()
-    except:
+    except (ValueError, TypeError):
         return (datetime.now() + timedelta(days=365)).isoformat()
 
 
@@ -601,7 +601,7 @@ def generate_membership_status(reg_date_str: str, expiry_str: str) -> str:
         expiry = datetime.fromisoformat(expiry_str)
         if datetime.now() > expiry:
             return "Expired"
-    except:
+    except (ValueError, TypeError):
         pass
     return "Active"
 

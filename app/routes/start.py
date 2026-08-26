@@ -148,7 +148,7 @@ def main() -> None:
                 sock.close()
                 port_ready = True
                 break
-            except:
+            except (OSError, ConnectionRefusedError, TimeoutError):
                 sock.close()
             # Check if process crashed
             if web_proc.poll() is not None:
