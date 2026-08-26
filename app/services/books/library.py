@@ -189,7 +189,7 @@ class Library:
                         date_added_after
                     ):
                         continue
-                except:
+                except (ValueError, TypeError):
                     pass
             if date_added_before:
                 try:
@@ -197,7 +197,7 @@ class Library:
                         date_added_before
                     ):
                         continue
-                except:
+                except (ValueError, TypeError):
                     pass
 
             # Author exact filter

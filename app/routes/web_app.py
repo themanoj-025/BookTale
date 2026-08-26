@@ -2217,7 +2217,7 @@ def api_seed_stats():
                 "total_ratings": seed.get("total_ratings", 0),
             }
         )
-    except:
+    except (OSError, ValueError, KeyError):
         return jsonify(
             {
                 "total_books": s.get("total_books", 0),
@@ -2267,7 +2267,7 @@ def api_ai_chat():
                     )
                 else:
                     response = "I'd recommend checking out our Explore page for trending books!"
-        except:
+        except (OSError, ValueError, KeyError, TypeError):
             response = "I'm having trouble finding recommendations right now. Try browsing the Explore page!"
     elif "similar" in msg_lower or "like" in msg_lower:
         response = (
@@ -2316,7 +2316,7 @@ def api_reading_streak():
             except (ValueError, TypeError):
                 pass
         return jsonify({"streak": streak, "total_days": len(dates)})
-    except:
+    except (OSError, ValueError, KeyError, TypeError):
         return jsonify({"streak": 0, "total_days": 0})
 
 

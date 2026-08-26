@@ -225,7 +225,7 @@ class Gamification:
                     ud["streak_days"] += 1
                 elif diff > 1:
                     ud["streak_days"] = 1  # Reset streak
-            except:
+            except (ValueError, TypeError):
                 ud["streak_days"] = 1
         else:
             ud["streak_days"] = 1

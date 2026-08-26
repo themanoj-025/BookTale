@@ -165,7 +165,7 @@ def time_ago(iso_str) -> str:
             return "%dmo ago" % months
         years = days // 365
         return "%dy ago" % years
-    except:
+    except (ValueError, TypeError, OverflowError):
         return iso_str[:10]
 
 
@@ -1596,7 +1596,7 @@ document.addEventListener("DOMContentLoaded", function(){
                         hmd[dr] += 1
             hml = [{"date": d, "count": hmd[d]} for d in sorted(hmd.keys())]
             HS = _render_heatmap_svg(hml, sum(hmd.values()))
-        except:
+        except (OSError, ValueError, KeyError, TypeError):
             HS = '<div class="text-center text-muted small py-3">Heatmap unavailable</div>'
 
         FB = ""
