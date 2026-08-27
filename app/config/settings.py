@@ -146,7 +146,7 @@ def _load_settings_overrides() -> None:
                     setattr(Config, _key, _val)
             else:
                 setattr(Config, _key, _val)
-    except Exception as _e:
+    except (ValueError, OSError) as _e:
         import sys as _sys
 
         print("[Config] Warning: Could not load settings override:", _e, file=_sys.stderr)

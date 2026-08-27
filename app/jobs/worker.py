@@ -105,7 +105,7 @@ def _scheduler_loop(stop_event: threading.Event) -> None:
         try:
             for prefix, cron_expr, job_func, timeout in cron_jobs:
                 _register_cron(conn, prefix, cron_expr, job_func, timeout)
-        except Exception as e:
+        except (OSError, RuntimeError) as e:
             # Keep polling: a transient Redis blip must not kill the worker;
             # the next iteration re-registers anything missed.
             log(f"Scheduler tick failed: {e}", "worker")
@@ -136,7 +136,7 @@ def _ensure_schema() -> None:
 
         create_all()
         log("Worker: relational schema verified (create_all)", "worker")
-    except Exception as e:
+    except (OSError, RuntimeError) as e:
         log(
             f"Worker: schema ensure failed (DB jobs will fail until the " f"schema exists): {e}",
             "worker",
@@ -161,7 +161,7 @@ def main() -> None:
     conn = _redis_client.Redis.from_url(Config.REDIS_URL, socket_connect_timeout=2.0)
     try:
         conn.ping()
-    except Exception as e:
+    except (OSError, RuntimeError) as e:
         log(
             f"Cannot start worker — Redis unreachable at {Config.REDIS_URL}: {e}",
             "worker",

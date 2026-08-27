@@ -87,7 +87,7 @@ def _safe_add_all(db, rows: list, name: str) -> dict:
                 db.add(row)
                 db.flush()
             loaded += 1
-        except Exception as e:
+        except (json.JSONDecodeError, OSError, ValueError) as e:
             skipped += 1
             print(f"  ! SKIP {name} row: {e}")
     return {"source": len(rows), "loaded": loaded, "skipped": skipped}

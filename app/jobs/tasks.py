@@ -64,7 +64,7 @@ def job_fetch_book_cover(book_id: str, title: str, author: str, isbn: str, stora
             "ok": True,
             "source": result.get("cover_source", ""),
         }
-    except Exception as e:
+    except (OSError, RuntimeError) as e:
         # Cover enhancement must never crash a batch: log with full context.
         log(f"Cover fetch failed for '{title}' ({book_id}): {e}", "worker", book_id)
         return {"book_id": book_id, "ok": False, "reason": "error"}

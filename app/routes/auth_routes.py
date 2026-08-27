@@ -158,7 +158,7 @@ def init_auth_routes(app, storage, lib, auth, notif_mgr) -> None:
                         "<p>Happy reading!</p>"
                     ),
                 )
-            except Exception as e:
+            except (ValueError, KeyError) as e:
                 print("Welcome email error:", e)
 
         return render_template(
@@ -208,7 +208,7 @@ def init_auth_routes(app, storage, lib, auth, notif_mgr) -> None:
                             "<p>If you did not request this, you can safely ignore this email.</p>"
                         ),
                     )
-            except Exception as e:
+            except (ValueError, KeyError) as e:
                 print("Reset email error:", e)
 
         return render_template(

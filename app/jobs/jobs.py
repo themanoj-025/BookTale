@@ -110,7 +110,7 @@ def _enqueue_or_fallback(job_name: str, fn, args: tuple, pool_args: tuple | None
     except ImportError:
         # rq not installed: same bounded fallback.
         _log_fallback(job_name, "rq not installed")
-    except Exception as e:
+    except (OSError, RuntimeError) as e:
         _log_fallback(job_name, f"enqueue failed: {e}")
     _get_pool().submit(fn, *pool_args)
     return "pool"
