@@ -459,7 +459,7 @@ def readyz() -> dict:
         with _dbmod.get_session_factory()() as db_session:
             db_session.execute(_sqltext("SELECT 1"))
         return jsonify({"status": "ok", "database": "connected"}), 200
-    except Exception as e:
+    except (ValueError, KeyError, OSError) as e:
         from app.core.logger import log as _log
         _log(f"readyz probe failed: {e}", "health")
         return jsonify({"status": "not_ready", "error": "database unreachable"}), 503

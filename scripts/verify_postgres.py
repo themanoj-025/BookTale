@@ -87,7 +87,7 @@ def main() -> int:
     try:
         command.upgrade(cfg, "head")
         check("alembic upgrade head", True)
-    except Exception as e:
+    except (psycopg2.OperationalError, OSError) as e:
         check("alembic upgrade head", False, str(e))
         _print_result()
         return 1
@@ -196,7 +196,7 @@ def main() -> int:
             len(actual2) == 0,
             f"remaining: {actual2}",
         )
-    except Exception as e:
+    except (psycopg2.OperationalError, OSError) as e:
         check("downgrade base", False, str(e))
 
     _print_result()

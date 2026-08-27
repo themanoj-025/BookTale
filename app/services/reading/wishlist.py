@@ -179,7 +179,7 @@ class Wishlist:
                     "suggestion_approved",
                     f'Your suggestion "{suggestion["title"]}" was approved and added to the library! (ID: {msg})',
                 )
-        except Exception as e:
+        except (ValueError, KeyError) as e:
             log(f"Auto-add book failed for suggestion: {e}", admin_id)
 
     def get_suggestions(

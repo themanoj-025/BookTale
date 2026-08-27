@@ -82,7 +82,7 @@ def _upsert_tolerant(db, model, data: dict, name: str) -> None:
         with db.begin_nested():
             db.merge(_row(model, data))
             db.flush()
-    except Exception as e:
+    except (OSError, ValueError) as e:
         log.warning(
             "DbStorage skip %s row (id=%s): %s",
             name,
@@ -105,7 +105,7 @@ def _insert_tolerant(db, model, data: dict, name: str) -> None:
         with db.begin_nested():
             db.add(_row(model, data))
             db.flush()
-    except Exception as e:
+    except (OSError, ValueError) as e:
         log.warning("DbStorage skip %s insert: %s", name, e)
 
 
