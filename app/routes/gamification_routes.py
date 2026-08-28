@@ -7,4 +7,9 @@ This file re-exports the registration function so existing
 continues to work unchanged.
 """
 
-from app.routes.gamification_pkg import register_gamification_routes  # noqa: F401
+from app.routes.gamification_pkg import register_gamification_routes
+
+__all__ = [
+    "register_gamification_routes",
+]
+
