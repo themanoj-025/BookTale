@@ -24,8 +24,9 @@ from app.routes.social_shared import (
 )
 
 # Re-export module-level refs that init_social_routes may mutate at startup.
-from app.routes.social_shared import lib  # noqa: F401
-from app.routes.social_shared import book_lists  # noqa: F401
+from app.routes.social_shared import lib, book_lists
+
+lib; book_lists  # referenced by init_social_routes at startup
 
 
 def register_social_api_routes(app, _rate_limit) -> None:
