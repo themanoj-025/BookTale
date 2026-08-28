@@ -466,6 +466,76 @@ def readyz() -> dict:
 
 
 # ════════════════════════════════════════════════════════════════════════════
+# Prometheus metrics
+# ════════════════════════════════════════════════════════════════════════════
+
+try:
+    from prometheus_client import Counter, Histogram, Gauge, generate_latest, CONTENT_TYPE_LATEST
+
+    BOOKTALE_REQUEST_COUNT = Counter(
+        "booktale_requests_total",
+        "Total HTTP requests",
+        ["method", "endpoint", "status"],
+    )
+    BOOKTALE_REQUEST_LATENCY = Histogram(
+        "booktale_request_duration_seconds",
+        "HTTP request latency in seconds",
+        ["method", "endpoint"],
+        buckets=(0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1.0, 2.5, 5.0, 10.0),
+    )
+    BOOKTALE_ACTIVE_SESSIONS = Gauge(
+        "booktale_active_sessions",
+        "Number of active user sessions",
+    )
+    BOOKTALE_BOOKS_TOTAL = Gauge(
+        "booktale_books_total", "Total books in the library"
+    )
+    _PROMETHEUS_AVAILABLE = True
+except ImportError:
+    _PROMETHEUS_AVAILABLE = False
+
+
+@app.before_request
+def _prometheus_before_request() -> None:
+    if not _PROMETHEUS_AVAILABLE:
+        return
+    from time import time as _time
+    g._prom_start = _time()
+
+
+@app.after_request
+def _prometheus_after_request(response):
+    if not _PROMETHEUS_AVAILABLE:
+        return response
+    # Skip the /metrics endpoint itself to avoid recursive counting
+    if request.path == "/metrics":
+        return response
+    from time import time as _time
+
+    endpoint = request.path
+    # Normalise dynamic path segments to avoid high-cardinality labels
+    if endpoint.startswith("/api/"):
+        parts = endpoint.split("/")
+        if len(parts) > 3 and parts[3].isdigit():
+            endpoint = "/".join(parts[:3]) + "/{id}"
+    method = request.method
+    status = response.status_code
+
+    BOOKTALE_REQUEST_COUNT.labels(method=method, endpoint=endpoint, status=str(status)).inc()
+    latency = _time() - getattr(g, "_prom_start", _time())
+    BOOKTALE_REQUEST_LATENCY.labels(method=method, endpoint=endpoint).observe(latency)
+    return response
+
+
+@app.route("/metrics")
+def prometheus_metrics():
+    """Prometheus scrape endpoint."""
+    if not _PROMETHEUS_AVAILABLE:
+        return jsonify({"status": "prometheus_client not installed"}), 501
+    return generate_latest(), 200, {"Content-Type": CONTENT_TYPE_LATEST}
+
+
+# ════════════════════════════════════════════════════════════════════════════
 # OpenAPI / Swagger UI
 # ════════════════════════════════════════════════════════════════════════════
 
