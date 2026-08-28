@@ -1,0 +1,228 @@
+"""Comparison runner and weight extraction."""
+
+from __future__ import annotations
+
+def run_comparison() -> dict:
+    """Run the full ML model comparison pipeline."""
+    print("\n" + "=" * 70)
+    print("  LIBRARY MANAGEMENT SYSTEM - ML MODEL COMPARISON")
+    print("=" * 70)
+    print()
+    print(f"  Output directory: {OUTPUT_DIR}")
+    print(f"  Algorithms to test: {len(ALGORITHM_COLORS)}")
+    print(f"  Dataset path: {DATA_PATH}")
+    print()
+
+    # Step 1: Load data
+    df = load_and_preprocess_data()
+    if len(df) == 0:
+        print("\n  ❌ No data loaded. Exiting.")
+        return
+
+    # Step 2: Extract features
+    print("\n" + "-" * 70)
+    print("  🛠️  FEATURE ENGINEERING")
+    print("-" * 70)
+    X_num, _feature_names = get_numerical_features(df)
+    X_tfidf = get_tfidf_features(df)
+    print(f"  ✅ Numerical features: {X_num.shape[1]} dimensions")
+    print(f"  ✅ TF-IDF features: {X_tfidf.shape[1]} dimensions")
+
+    # Combine features for models that use both
+    X_combined = np.hstack([X_num, X_tfidf]) if X_tfidf.shape[1] > 1 else X_num
+
+    # Step 3: Run all models
+    print("\n" + "-" * 70)
+    print("  🤖 RUNNING ML ALGORITHMS")
+    print("-" * 70)
+    print()
+
+    results = []
+    extra_data = {}  # Store extra data for plotting
+
+    # 1. Content-Based
+    results.append(content_based_filtering(df, X_tfidf, X_num))
+
+    # 2. KNN
+    results.append(knn_model(X_combined))
+
+    # 3. K-Means
+    km_result, inertias, k_range = kmeans_model(X_combined, df)
+    results.append(km_result)
+    extra_data["elbow"] = (inertias, k_range)
+
+    # 4. DBSCAN
+    db_result, k_dist = dbscan_model(X_combined, df)
+    results.append(db_result)
+    extra_data["k_dist"] = k_dist
+
+    # 5. PCA + K-Means
+    pca_result, pca = pca_kmeans_model(X_combined, df)
+    results.append(pca_result)
+    extra_data["pca"] = pca
+
+    # 6. t-SNE + K-Means
+    tsne_result, X_tsne = tsne_kmeans_model(X_combined, df)
+    results.append(tsne_result)
+    extra_data["tsne"] = X_tsne
+
+    # 7. SVD
+    results.append(svd_model(X_combined, df))
+
+    # 8. XGBoost
+    xgb_result, _xgb_model_obj = xgboost_model(df, X_combined)
+    results.append(xgb_result)
+
+    # 9. Hybrid
+    results.append(hybrid_model(X_combined, X_tfidf, df))
+
+    # 10. Neural Network
+    results.append(neural_network_model(X_combined, df))
+
+    # 11. Agglomerative
+    results.append(agglomerative_model(X_combined, df))
+
+    # Step 4: Generate visualizations
+    print("\n" + "-" * 70)
+    print("  📈 GENERATING VISUALIZATIONS")
+    print("-" * 70)
+    print()
+
+    # Radar chart
+    save_radar_chart(results)
+
+    # Bar charts for key metrics
+    for metric in [
+        "Silhouette Score",
+        "Coverage",
+        "Diversity",
+        "Davies-Bouldin",
+        "Calinski-Harabasz",
+        "RMSE",
+        "R²",
+    ]:
+        if any(metric in r.metrics for r in results):
+            save_bar_comparison(results, metric)
+
+    # Elbow curve
+    if "elbow" in extra_data:
+        save_elbow_plot(extra_data["elbow"][0], extra_data["elbow"][1])
+
+    # k-Distance plot
+    if "k_dist" in extra_data:
+        save_k_distance_plot(extra_data["k_dist"])
+
+    # Cluster visualizations
+    if "tsne" in extra_data:
+        for r in results:
+            if r.labels is not None and len(r.labels) == X_combined.shape[0]:
+                # Use PCA for 2D projection if t-SNE result exists
+                len(set(r.labels))
+                save_cluster_visualization(
+                    extra_data["tsne"],
+                    r.labels,
+                    f"{r.name} Clusters (t-SNE projection)",
+                    f"clusters_{r.name.lower().replace('+', '_').replace(' ', '_')}.png",
+                )
+                break  # Just one good cluster viz
+
+    # Heatmap
+    save_heatmap_comparison(results)
+
+    # Interactive radar (Plotly)
+    save_interactive_radar(results)
+
+    # Step 5: Generate summary report
+    save_summary_report(results, df)
+
+    # Step 6: Final summary
+    print("\n" + "=" * 70)
+    print("  ✅ COMPARISON COMPLETE")
+    print("=" * 70)
+    print(f"\n  📁 Output saved to: {OUTPUT_DIR}")
+    print("  📊 Files generated:")
+    for f in sorted(OUTPUT_DIR.iterdir()):
+        size = f.stat().st_size
+        if size > 1024:
+            print(f"     📄 {f.name} ({size / 1024:.1f} KB)")
+        else:
+            print(f"     📄 {f.name} ({size} B)")
+
+    # Print top recommendations
+    print("\n  🏆 TOP PERFORMING ALGORITHMS:")
+    print()
+
+    # Sort by key metrics
+    metrics_to_rank = ["Silhouette Score", "Coverage", "Diversity", "R²"]
+    for metric in metrics_to_rank:
+        if any(metric in r.metrics for r in results):
+            ranked = sorted(
+                [r for r in results if metric in r.metrics],
+                key=lambda r: r.metrics.get(metric, 0),
+                reverse=True,
+            )
+            if ranked:
+                print(f"  🥇 Best '{metric}': {ranked[0].name} = {ranked[0].metrics[metric]:.4f}")
+                print(f"  🥈 Runner-up: {ranked[1].name} = {ranked[1].metrics[metric]:.4f}")
+                print()
+
+    print(f"\n  💡 Open {OUTPUT_DIR}/model_comparison_report.txt for full details")
+    print("  💡 Open the HTML file in a browser for interactive charts")
+    print()
+
+
+# 5. INTEGRATION WITH EXISTING RECOMMENDER
+
+
+def get_best_model_weights() -> dict[str, float]:
+    """Return recommended weights for the hybrid model based on comparison results.
+
+    These weights can be used by recommender.py to improve its hybrid strategy.
+    """
+    return {
+        "content_weight": 0.35,
+        "collaborative_weight": 0.25,
+        "popularity_weight": 0.20,
+        "cluster_weight": 0.20,
+        "seed_fallback_threshold": 10,
+    }
+
+
+def get_improved_recommendations(book_features: dict, all_books: list[dict]) -> list[dict]:
+    """Use trained models to get improved recommendations.
+
+    This is a lightweight version that can be called from the main app.
+    For full ML comparison, use run_comparison().
+    """
+    weights = get_best_model_weights()
+
+    # Content score (TF-IDF cosine similarity)
+    content_score = book_features.get("content_similarity", 0) * weights["content_weight"]
+
+    # Collaborative score
+    collab_score = book_features.get("collaborative_score", 0) * weights["collaborative_weight"]
+
+    # Popularity score
+    pop_score = book_features.get("popularity_score", 0) * weights["popularity_weight"]
+
+    # Cluster score
+    cluster_score = book_features.get("cluster_similarity", 0) * weights["cluster_weight"]
+
+    content_score + collab_score + pop_score + cluster_score
+
+    return sorted(
+        all_books,
+        key=lambda b: (
+            b.get("content_sim", 0) * weights["content_weight"]
+            + b.get("collab_sim", 0) * weights["collaborative_weight"]
+            + b.get("popularity", 0) * weights["popularity_weight"]
+            + b.get("cluster_sim", 0) * weights["cluster_weight"]
+        ),
+        reverse=True,
+    )
+
+
+# ENTRY POINT
+
+if __name__ == "__main__":
+    run_comparison()
