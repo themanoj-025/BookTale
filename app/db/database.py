@@ -112,11 +112,11 @@ class session_scope:
     def __init__(self) -> None:
         self._session = None
 
-    def __enter__(self):
+    def __enter__(self) -> Self:
         self._session = get_session_factory()()
         return self._session
 
-    def __exit__(self, exc_type, exc, tb):
+    def __exit__(self, exc_type, exc, tb) -> None:
         try:
             if exc_type is None:
                 self._session.commit()

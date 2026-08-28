@@ -38,7 +38,7 @@ def init_explore_routes(app) -> None:
 
     @app.route("/explore")
     @login_required
-    def explore_page():
+    def explore_page() -> str:
         from app.routes.page_state import challenge as _challenge
 
         uid = session["user_id"]
@@ -282,7 +282,7 @@ def init_explore_routes(app) -> None:
 
     @app.route("/recommendations")
     @login_required
-    def recommendations_page():
+    def recommendations_page() -> str:
         import contextlib
 
         uid = session["user_id"]
@@ -415,14 +415,14 @@ def init_explore_routes(app) -> None:
 
     @app.route("/api/notifications/<notif_id>/read", methods=["POST"])
     @login_required
-    def api_notification_read(notif_id):
+    def api_notification_read(notif_id) -> Response:
         if notif_mgr:
             notif_mgr.mark_as_read(notif_id)
         return jsonify({"success": True})
 
     @app.route("/api/notifications/read-all", methods=["POST"])
     @login_required
-    def api_notifications_read_all():
+    def api_notifications_read_all() -> Response:
         uid = session["user_id"]
         if notif_mgr:
             notif_mgr.mark_all_read(uid)

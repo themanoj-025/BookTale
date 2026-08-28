@@ -136,7 +136,7 @@ def get_current_user() -> dict | None:
 def login_required(f) -> dict:
     """Decorator: redirect to login if user is not authenticated."""
     @wraps(f)
-    def d(*a, **k):
+    def d(*a, **k) -> Any:
         if "user_id" not in session:
             return redirect(url_for("login_page"))
         return f(*a, **k)

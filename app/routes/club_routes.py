@@ -28,7 +28,7 @@ def init_club_routes(app) -> None:
 
     @app.route("/clubs")
     @login_required
-    def clubs_page():
+    def clubs_page() -> str:
         uid = session["user_id"]
         clubs_data, total = communities.get_clubs(page=1) if communities else ([], 0)
 
@@ -142,7 +142,7 @@ function submitCreateClub(){
 
     @app.route("/clubs/<club_id>")
     @login_required
-    def club_detail_page(club_id):
+    def club_detail_page(club_id) -> str:
         uid = session["user_id"]
         club = communities.get_club(club_id) if communities else None
 
@@ -315,7 +315,7 @@ function leaveClub(cid) {
     @app.route("/api/clubs/create", methods=["POST"])
     @login_required
     @_rate_limit("10 per minute")
-    def api_create_club():
+    def api_create_club() -> Response:
         uid = session["user_id"]
         data = request.get_json() or {}
         ok, msg, club = (
@@ -337,7 +337,7 @@ function leaveClub(cid) {
     @app.route("/api/clubs/<club_id>/join", methods=["POST"])
     @login_required
     @_rate_limit("60 per minute")
-    def api_club_join(club_id):
+    def api_club_join(club_id) -> Response:
         uid = session["user_id"]
         ok, msg = (
             communities.join_club(club_id, uid) if communities else (False, "Clubs unavailable")
@@ -346,7 +346,7 @@ function leaveClub(cid) {
 
     @app.route("/api/clubs/<club_id>/leave", methods=["POST"])
     @login_required
-    def api_club_leave(club_id):
+    def api_club_leave(club_id) -> Response:
         uid = session["user_id"]
         ok, msg = (
             communities.leave_club(club_id, uid) if communities else (False, "Clubs unavailable")

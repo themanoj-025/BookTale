@@ -18,7 +18,7 @@ from app.routes.social_shared import (
 )
 
 
-def register_review_routes(app, _rate_limit):
+def register_review_routes(app, _rate_limit) -> None:
     """Register review, shelf, and profile API endpoints on *app*.
 
     Parameters
@@ -34,7 +34,7 @@ def register_review_routes(app, _rate_limit):
     @app.route("/api/reviews/<book_id>", methods=["POST"])
     @login_required
     @_rate_limit("30 per minute")
-    def api_add_review(book_id):
+    def api_add_review(book_id) -> Response:
         uid = session["user_id"]
         data = request.get_json() or {}
         ok, msg, review = review_mgr.add_review(
@@ -49,7 +49,7 @@ def register_review_routes(app, _rate_limit):
     @app.route("/api/reviews/<review_id>/helpful", methods=["POST"])
     @login_required
     @_rate_limit("60 per minute")
-    def api_helpful_review(review_id):
+    def api_helpful_review(review_id) -> Response:
         uid = session["user_id"]
         ok, _msg, is_helpful = review_mgr.mark_helpful(review_id, uid)
         return jsonify({"success": ok, "is_helpful": is_helpful})
@@ -57,7 +57,7 @@ def register_review_routes(app, _rate_limit):
     @app.route("/api/reviews/<review_id>/comments", methods=["GET", "POST"])
     @login_required
     @_rate_limit("30 per minute", methods=["POST"])
-    def api_review_comments(review_id):
+    def api_review_comments(review_id) -> Response:
         uid = session["user_id"]
         if request.method == "GET":
             return jsonify({"comments": review_mgr.get_review_comments(review_id)})
@@ -71,7 +71,7 @@ def register_review_routes(app, _rate_limit):
 
     @app.route("/api/reviews/<book_id>/list")
     @login_required
-    def api_reviews_list(book_id):
+    def api_reviews_list(book_id) -> Response:
         uid = session["user_id"]
         page = max(1, int(request.args.get("page", 1)))
         sort_by = request.args.get("sort", "recent")
@@ -80,7 +80,7 @@ def register_review_routes(app, _rate_limit):
 
     @app.route("/api/books/<book_id>/reviews")
     @login_required
-    def api_book_reviews(book_id):
+    def api_book_reviews(book_id) -> Response:
         uid = session["user_id"]
         page = max(1, int(request.args.get("page", 1)))
         reviews, stats = review_mgr.get_book_reviews(book_id, uid, page=page)
@@ -89,7 +89,7 @@ def register_review_routes(app, _rate_limit):
     @app.route("/api/books/<book_id>/review", methods=["POST"])
     @login_required
     @_rate_limit("30 per minute")
-    def api_submit_review(book_id):
+    def api_submit_review(book_id) -> Response:
         uid = session["user_id"]
         data = request.get_json() or {}
         ok, msg, review = review_mgr.add_review(
@@ -105,7 +105,7 @@ def register_review_routes(app, _rate_limit):
 
     @app.route("/api/bookshelves/<book_id>", methods=["POST"])
     @login_required
-    def api_add_to_shelf(book_id):
+    def api_add_to_shelf(book_id) -> Response:
         uid = session["user_id"]
         data = request.get_json() or {}
         ok, msg = review_mgr.add_to_shelf(uid, book_id, data.get("shelf", "want_to_read"))
@@ -113,14 +113,14 @@ def register_review_routes(app, _rate_limit):
 
     @app.route("/api/bookshelves/status/<book_id>")
     @login_required
-    def api_shelf_status(book_id):
+    def api_shelf_status(book_id) -> Response:
         uid = session["user_id"]
         shelf = review_mgr.is_on_shelf(uid, book_id)
         return jsonify({"shelf": shelf})
 
     @app.route("/api/bookshelves/<book_id>/remove", methods=["POST"])
     @login_required
-    def api_remove_from_shelf(book_id):
+    def api_remove_from_shelf(book_id) -> Response:
         uid = session["user_id"]
         ok, msg = review_mgr.remove_from_shelf(uid, book_id)
         return jsonify({"success": ok, "message": msg})
@@ -130,7 +130,7 @@ def register_review_routes(app, _rate_limit):
     @app.route("/api/shelves/create", methods=["POST"])
     @login_required
     @_rate_limit("30 per minute")
-    def api_create_shelf():
+    def api_create_shelf() -> Response:
         uid = session["user_id"]
         data = request.get_json() or {}
         ok, msg = review_mgr.create_custom_shelf(
@@ -143,13 +143,13 @@ def register_review_routes(app, _rate_limit):
 
     @app.route("/api/shelves")
     @login_required
-    def api_get_shelves():
+    def api_get_shelves() -> Response:
         uid = session["user_id"]
         return jsonify({"shelves": review_mgr.get_user_custom_shelves(uid)})
 
     @app.route("/api/shelves/<shelf_name>", methods=["DELETE"])
     @login_required
-    def api_delete_shelf(shelf_name):
+    def api_delete_shelf(shelf_name) -> Response:
         from urllib.parse import unquote
 
         shelf_name = unquote(shelf_name)
@@ -158,7 +158,7 @@ def register_review_routes(app, _rate_limit):
 
     @app.route("/api/shelves/<shelf_name>/rename", methods=["POST"])
     @login_required
-    def api_rename_shelf(shelf_name):
+    def api_rename_shelf(shelf_name) -> Response:
         from urllib.parse import unquote
 
         shelf_name = unquote(shelf_name)
@@ -172,7 +172,7 @@ def register_review_routes(app, _rate_limit):
 
     @app.route("/api/reviews/stats")
     @login_required
-    def api_reviews_stats_overall():
+    def api_reviews_stats_overall() -> Response:
         """Get overall rating distribution stats for the profile chart."""
         all_reviews = storage.load_reviews()
         dist = {}
@@ -185,7 +185,7 @@ def register_review_routes(app, _rate_limit):
 
     @app.route("/api/profile/favorites/remove", methods=["POST"])
     @login_required
-    def api_profile_favorites_remove():
+    def api_profile_favorites_remove() -> Response:
         """Remove a book from the current user's favorite_books list."""
         uid = session["user_id"]
         data = request.get_json() or {}
@@ -204,7 +204,7 @@ def register_review_routes(app, _rate_limit):
 
     @app.route("/api/profile/favorites/reorder", methods=["POST"])
     @login_required
-    def api_profile_favorites_reorder():
+    def api_profile_favorites_reorder() -> Response:
         """Reorder the current user's favorite_books list."""
         uid = session["user_id"]
         data = request.get_json() or {}
@@ -223,7 +223,7 @@ def register_review_routes(app, _rate_limit):
 
     @app.route("/api/profile/favorites/add", methods=["POST"])
     @login_required
-    def api_profile_favorites_add():
+    def api_profile_favorites_add() -> Response:
         """Add a book to the current user's favorite_books list (max 4)."""
         uid = session["user_id"]
         data = request.get_json() or {}
@@ -262,7 +262,7 @@ def register_review_routes(app, _rate_limit):
         "10 per minute",
         deduct_when=lambda response: getattr(g, "_profile_email_changed", False),
     )
-    def api_profile_update():
+    def api_profile_update() -> Response:
         """Update the current user's profile fields."""
         uid = session["user_id"]
         data = request.get_json() or {}

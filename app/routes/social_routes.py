@@ -46,7 +46,7 @@ def init_social_routes(
     )
 
     # Build a rate-limit decorator (no-op fallback when flask-limiter is absent).
-    def _rate_limit(limit_value, **kwargs):
+    def _rate_limit(limit_value, **kwargs) -> Callable:
         _lim = app.extensions.get("booktale_limiter")
         if _lim is None:
             return lambda f: f

@@ -11,12 +11,12 @@ from flask import jsonify, request, session
 from app.routes.feature_shared import _challenge, h, cat_color, _avatar_html as avatar_html
 
 
-def register_challenge_routes(app, login_required, render_page, _rate_limit):
+def register_challenge_routes(app, login_required, render_page, _rate_limit) -> None:
     """Register reading challenge routes on *app*."""
 
     @app.route("/reading-challenge")
     @login_required
-    def reading_challenge_page():
+    def reading_challenge_page() -> str:
         uid = session["user_id"]
         year = int(request.args.get("year", datetime.now().year))
         goal = _challenge.get_goal(uid, year)
@@ -171,7 +171,7 @@ def register_challenge_routes(app, login_required, render_page, _rate_limit):
 
     @app.route("/api/reading-challenge/goal", methods=["POST"])
     @login_required
-    def api_set_reading_goal():
+    def api_set_reading_goal() -> Response:
         uid = session["user_id"]
         data = request.get_json() or {}
         goal = int(data.get("goal", 12))
@@ -181,7 +181,7 @@ def register_challenge_routes(app, login_required, render_page, _rate_limit):
 
     @app.route("/api/reading-challenge/progress")
     @login_required
-    def api_reading_progress_data():
+    def api_reading_progress_data() -> Response:
         uid = session["user_id"]
         year = int(request.args.get("year", datetime.now().year))
         goal = _challenge.get_goal(uid, year)
@@ -190,14 +190,14 @@ def register_challenge_routes(app, login_required, render_page, _rate_limit):
 
     @app.route("/api/reading-challenge/leaderboard")
     @login_required
-    def api_reading_leaderboard():
+    def api_reading_leaderboard() -> Response:
         year = int(request.args.get("year", datetime.now().year))
         top_n = min(int(request.args.get("top_n", 10)), 50)
         return jsonify({"leaderboard": _challenge.get_leaderboard(year, top_n)})
 
     @app.route("/api/reading-challenge/stats")
     @login_required
-    def api_reading_challenge_stats():
+    def api_reading_challenge_stats() -> Response:
         uid = session["user_id"]
         year = int(request.args.get("year", datetime.now().year))
         goal = _challenge.get_goal(uid, year)
