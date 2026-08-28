@@ -204,14 +204,14 @@ def init_socketio(app, storage: Storage) -> None:
         emit("user_online", {"user_id": user_id}, broadcast=True, include_self=False)
 
     @socketio.on("disconnect", namespace="/social")
-    def handle_disconnect():
+    def handle_disconnect() -> None:
         user_id = session.get("user_id")
         if user_id:
             realtime_manager.user_disconnected(user_id)
             emit("user_offline", {"user_id": user_id}, broadcast=True, include_self=False)
 
     @socketio.on("join_post", namespace="/social")
-    def handle_join_post(data):
+    def handle_join_post(data) -> None:
         """Join a post's room to receive live updates."""
         post_id = data.get("post_id")
         if post_id:
@@ -220,7 +220,7 @@ def init_socketio(app, storage: Storage) -> None:
             log(f"Joined post room: {post_id}", user_id)
 
     @socketio.on("leave_post", namespace="/social")
-    def handle_leave_post(data):
+    def handle_leave_post(data) -> None:
         """Leave a post's room."""
         post_id = data.get("post_id")
         if post_id:
@@ -236,7 +236,7 @@ def init_socketio(app, storage: Storage) -> None:
             )
 
     @socketio.on("typing", namespace="/social")
-    def handle_typing(data):
+    def handle_typing(data) -> None:
         """Broadcast typing indicator to post room."""
         post_id = data.get("post_id")
         user_id = session.get("user_id", "?")
@@ -266,7 +266,7 @@ def init_socketio(app, storage: Storage) -> None:
         )
 
     @socketio.on("view_comments", namespace="/social")
-    def handle_view_comments(data):
+    def handle_view_comments(data) -> None:
         """Track that a user is viewing comments (for read receipts)."""
         post_id = data.get("post_id")
         user_id = session.get("user_id")

@@ -46,13 +46,13 @@ def init_shared_state(
     _wishlist = wishlist
     _diary = diary
 
-    def h(text):
+    def h(text) -> str:
         return html.escape(str(text))
 
-    def _js_str(value):
+    def _js_str(value) -> str:
         return str(value).replace("\\", "\\\\").replace("'", "\\'").replace('"', "&quot;")
 
-    def _initials(name):
+    def _initials(name) -> str:
         parts = name.strip().split()
         if not parts:
             return "?"
@@ -60,14 +60,14 @@ def init_shared_state(
             return (parts[0][0] + parts[-1][0]).upper()
         return parts[0][:2].upper()
 
-    def _avatar_color(name):
+    def _avatar_color(name) -> str:
         colors = [
             "#4f46e5", "#059669", "#d97706", "#dc2626",
             "#0891b2", "#7c3aed", "#db2777", "#ca8a04",
         ]
         return colors[zlib.crc32(str(name).encode("utf-8")) % len(colors)]
 
-    def avatar_html(name, size=32):
+    def avatar_html(name, size=32) -> str:
         i = _initials(name)
         c = _avatar_color(name)
         return f'<div class="avatar" style="width:{size}px;height:{size}px;background:{c}20;color:{c};font-size:{size // 2}px;font-weight:700;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;" title="{h(name)}">{h(i)}</div>'
@@ -79,19 +79,19 @@ def init_shared_state(
 # ── Helpers ──
 
 
-def h(text):
+def h(text) -> str:
     """HTML-escape helper."""
     return html.escape(str(text))
 
 
-def _js_str(value):
+def _js_str(value) -> str:
     """Escape a value for a single-quoted JS string inside a double-quoted
     HTML attribute (onclick="...").
     """
     return str(value).replace("\\", "\\\\").replace("'", "\\'").replace('"', "&quot;")
 
 
-def cat_color(c):
+def cat_color(c) -> str:
     """Category color lookup."""
     colors = {
         "Fiction": "#4f46e5", "Non-Fiction": "#059669", "Science": "#0891b2",
@@ -108,7 +108,7 @@ def cat_color(c):
 # ── Dashboard widget HTML ──
 
 
-def get_dashboard_widgets_html(user_id):
+def get_dashboard_widgets_html(user_id) -> str:
     """Get HTML snippets for dashboard widgets."""
     out = ""
 

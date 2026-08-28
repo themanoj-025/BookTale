@@ -17,12 +17,12 @@ from app.routes.feature_shared import (
 )
 
 
-def register_progress_routes(app, login_required, render_page, _rate_limit):
+def register_progress_routes(app, login_required, render_page, _rate_limit) -> None:
     """Register reading progress and bookmark routes on *app*."""
 
     @app.route("/reading-progress")
     @login_required
-    def reading_progress_page():
+    def reading_progress_page() -> str:
         uid = session["user_id"]
         rl = _progress.get_user_reading_list(uid)
         stats = _progress.get_reading_stats(uid)
@@ -151,7 +151,7 @@ def register_progress_routes(app, login_required, render_page, _rate_limit):
 
     @app.route("/reading-progress/<book_id>")
     @login_required
-    def reading_progress_book(book_id):
+    def reading_progress_book(book_id) -> Any:
         uid = session["user_id"]
         book = _storage.load_books().get(book_id)
         if not book:
@@ -289,7 +289,7 @@ def register_progress_routes(app, login_required, render_page, _rate_limit):
 
     @app.route("/reading-progress/history")
     @login_required
-    def reading_progress_history():
+    def reading_progress_history() -> Any:
         uid = session["user_id"]
         rl = _progress.get_user_reading_list(uid)
         all_books = rl.get("currently_reading", []) + rl.get("finished", []) + rl.get("on_hold", [])
@@ -341,7 +341,7 @@ def register_progress_routes(app, login_required, render_page, _rate_limit):
 
     @app.route("/api/reading-progress/<book_id>/update", methods=["POST"])
     @login_required
-    def api_update_reading_progress(book_id):
+    def api_update_reading_progress(book_id) -> Response:
         uid = session["user_id"]
         data = request.get_json() or {}
         ok, msg, progress = _progress.update_progress(
@@ -356,7 +356,7 @@ def register_progress_routes(app, login_required, render_page, _rate_limit):
 
     @app.route("/api/reading-progress/<book_id>/finish", methods=["POST"])
     @login_required
-    def api_finish_reading(book_id):
+    def api_finish_reading(book_id) -> Response:
         uid = session["user_id"]
         ok, msg, progress = _progress.mark_as_finished(uid, book_id)
         with contextlib.suppress(Exception):
@@ -369,13 +369,13 @@ def register_progress_routes(app, login_required, render_page, _rate_limit):
 
     @app.route("/api/reading-progress/<book_id>")
     @login_required
-    def api_get_progress(book_id):
+    def api_get_progress(book_id) -> Response:
         uid = session["user_id"]
         return jsonify(_progress.get_progress(uid, book_id))
 
     @app.route("/api/reading-progress/stats")
     @login_required
-    def api_reading_progress_stats():
+    def api_reading_progress_stats() -> Response:
         uid = session["user_id"]
         rl = _progress.get_user_reading_list(uid)
         stats = _progress.get_reading_stats(uid)
@@ -394,13 +394,13 @@ def register_progress_routes(app, login_required, render_page, _rate_limit):
 
     @app.route("/api/bookmarks")
     @login_required
-    def api_get_bookmarks():
+    def api_get_bookmarks() -> Response:
         uid = session["user_id"]
         return jsonify({"bookmarks": _progress.get_user_bookmarks(uid)})
 
     @app.route("/api/bookmarks/add", methods=["POST"])
     @login_required
-    def api_add_bookmark():
+    def api_add_bookmark() -> Response:
         uid = session["user_id"]
         data = request.get_json() or {}
         ok, msg, bm = _progress.add_bookmark(
@@ -410,7 +410,7 @@ def register_progress_routes(app, login_required, render_page, _rate_limit):
 
     @app.route("/api/bookmarks/<bookmark_id>/remove", methods=["POST"])
     @login_required
-    def api_remove_bookmark(bookmark_id):
+    def api_remove_bookmark(bookmark_id) -> Response:
         uid = session["user_id"]
         ok, msg = _progress.remove_bookmark(bookmark_id, uid)
         return jsonify({"success": ok, "message": msg})

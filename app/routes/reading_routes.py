@@ -32,7 +32,7 @@ def init_reading_routes(app) -> None:
 
     @app.route("/shelves")
     @login_required
-    def shelves_page():
+    def shelves_page() -> str:
         uid = session["user_id"]
         tab = request.args.get("tab", "want_to_read")
         shelves_data = review_mgr.get_user_shelf(uid) if review_mgr else []
@@ -217,7 +217,7 @@ function createCustomShelf() {
 
     @app.route("/reading-calendar")
     @login_required
-    def reading_calendar_page():
+    def reading_calendar_page() -> str:
         uid = session["user_id"]
         year = int(request.args.get("year", datetime.now().year))
 
@@ -379,7 +379,7 @@ function showDayEntries(ds) {
 
     @app.route("/analytics")
     @login_required
-    def analytics_page():
+    def analytics_page() -> str:
         uid = session["user_id"]
 
         # Gather data

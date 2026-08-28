@@ -378,7 +378,7 @@ def _hsl_to_rgb(h: int, s: int, l: int) -> tuple:
     s = s / 100.0
     l = l / 100.0
 
-    def hue_to_rgb(p, q, t):
+    def hue_to_rgb(p, q, t) -> tuple[int, int, int]:
         if t < 0:
             t += 1
         if t > 1:

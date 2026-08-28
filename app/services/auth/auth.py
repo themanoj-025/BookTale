@@ -142,7 +142,7 @@ def _store_token(token: str, user_id: str, purpose: str, ttl: timedelta) -> None
         db.execute(_sa_delete(AuthToken).where(AuthToken.expires_at < _now_iso()))
 
 
-def _find_token(token: str, purpose: str):
+def _find_token(token: str, purpose: str) -> dict | None:
     """Look up a live token row, or None (does NOT consume).
 
     Expired / malformed rows are deleted here (same session, committed on

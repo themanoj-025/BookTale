@@ -8,12 +8,12 @@ from flask import jsonify, request, session
 from app.routes.feature_shared import _wishlist, _storage, h, _js_str, cat_color
 
 
-def register_wishlist_routes(app, login_required, admin_required, render_page, _rate_limit):
+def register_wishlist_routes(app, login_required, admin_required, render_page, _rate_limit) -> None:
     """Register wishlist and suggestion routes on *app*."""
 
     @app.route("/wishlist")
     @login_required
-    def wishlist_page():
+    def wishlist_page() -> str:
         uid = session["user_id"]
         status = request.args.get("status", "")
         sort_by = request.args.get("sort", "score")
@@ -231,7 +231,7 @@ def register_wishlist_routes(app, login_required, admin_required, render_page, _
     @app.route("/api/wishlist/suggest", methods=["POST"])
     @login_required
     @_rate_limit("10 per minute")
-    def api_suggest_book():
+    def api_suggest_book() -> Response:
         uid = session["user_id"]
         data = request.get_json() or {}
         ok, msg, suggestion = _wishlist.add_suggestion(
@@ -255,7 +255,7 @@ def register_wishlist_routes(app, login_required, admin_required, render_page, _
     @app.route("/api/wishlist/<suggestion_id>/vote", methods=["POST"])
     @login_required
     @_rate_limit("60 per minute")
-    def api_vote_suggestion(suggestion_id):
+    def api_vote_suggestion(suggestion_id) -> Response:
         uid = session["user_id"]
         data = request.get_json() or {}
         ok, msg, result = _wishlist.vote_suggestion(suggestion_id, uid, data.get("vote", "up"))
@@ -265,7 +265,7 @@ def register_wishlist_routes(app, login_required, admin_required, render_page, _
     @login_required
     @admin_required
     @_rate_limit("20 per minute")
-    def api_moderate_suggestion(suggestion_id):
+    def api_moderate_suggestion(suggestion_id) -> Response:
         uid = session["user_id"]
         data = request.get_json() or {}
         ok, msg = _wishlist.moderate_suggestion(
@@ -276,7 +276,7 @@ def register_wishlist_routes(app, login_required, admin_required, render_page, _
     @app.route("/api/wishlist/<suggestion_id>/comment", methods=["POST"])
     @login_required
     @_rate_limit("30 per minute")
-    def api_suggestion_comment(suggestion_id):
+    def api_suggestion_comment(suggestion_id) -> Response:
         uid = session["user_id"]
         data = request.get_json() or {}
         ok, msg = _wishlist.add_suggestion_comment(suggestion_id, uid, data.get("content", ""))
@@ -284,5 +284,5 @@ def register_wishlist_routes(app, login_required, admin_required, render_page, _
 
     @app.route("/api/wishlist/stats")
     @login_required
-    def api_wishlist_stats():
+    def api_wishlist_stats() -> Response:
         return jsonify(_wishlist.get_suggestion_stats())

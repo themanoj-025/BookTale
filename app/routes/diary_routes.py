@@ -19,12 +19,12 @@ from app.services.reading.diary import (
 )
 
 
-def register_diary_routes(app, login_required, render_page, _rate_limit):
+def register_diary_routes(app, login_required, render_page, _rate_limit) -> None:
     """Register reading diary routes on *app*."""
 
     @app.route("/diary")
     @login_required
-    def diary_page():
+    def diary_page() -> str:
         uid = session["user_id"]
         page = max(1, int(request.args.get("page", 1)))
         entries, _total = _diary.get_user_diary(uid, page=page)
@@ -246,7 +246,7 @@ def register_diary_routes(app, login_required, render_page, _rate_limit):
 
     @app.route("/diary/<entry_id>")
     @login_required
-    def diary_entry_page(entry_id):
+    def diary_entry_page(entry_id) -> str:
         uid = session["user_id"]
         entry = _diary.get_entry(entry_id)
         if not entry:
@@ -357,7 +357,7 @@ def register_diary_routes(app, login_required, render_page, _rate_limit):
 
     @app.route("/api/diary/log", methods=["POST"])
     @login_required
-    def api_diary_log():
+    def api_diary_log() -> Response:
         uid = session["user_id"]
         data = request.get_json() or {}
         ok, msg, entry = _diary.log_read(
@@ -375,7 +375,7 @@ def register_diary_routes(app, login_required, render_page, _rate_limit):
 
     @app.route("/api/diary/<entry_id>", methods=["PUT", "DELETE"])
     @login_required
-    def api_diary_entry(entry_id):
+    def api_diary_entry(entry_id) -> Response:
         uid = session["user_id"]
         if request.method == "DELETE":
             ok, msg = _diary.delete_entry(entry_id, uid)
@@ -387,12 +387,12 @@ def register_diary_routes(app, login_required, render_page, _rate_limit):
 
     @app.route("/api/diary/stats")
     @login_required
-    def api_diary_stats():
+    def api_diary_stats() -> Response:
         uid = session["user_id"]
         return jsonify(_diary.get_stats(uid))
 
     @app.route("/api/diary/book/<book_id>")
     @login_required
-    def api_diary_book_logs(book_id):
+    def api_diary_book_logs(book_id) -> Response:
         include_spoilers = request.args.get("spoilers", "0") == "1"
         return jsonify({"logs": _diary.get_book_logs(book_id, include_spoilers=include_spoilers)})

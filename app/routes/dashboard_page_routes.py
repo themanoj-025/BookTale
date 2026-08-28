@@ -41,7 +41,7 @@ def init_dashboard_page_routes(app) -> None:
 
     @app.route("/profile")
     @login_required
-    def profile_self_redirect():
+    def profile_self_redirect() -> Response:
         uid = session["user_id"]
         return redirect(url_for("profile_page", user_id=uid))
 
@@ -51,7 +51,7 @@ def init_dashboard_page_routes(app) -> None:
 
     @app.route("/dashboard")
     @login_required
-    def dashboard_page():
+    def dashboard_page() -> str:
         uid = session["user_id"]
         user = get_current_user()
         s = library_stats()
@@ -362,7 +362,7 @@ def init_dashboard_page_routes(app) -> None:
 
     @app.route("/books")
     @login_required
-    def books_page():
+    def books_page() -> str:
         books_data = storage.load_books()
         all_books = [b for b in books_data.values() if not b.is_deleted]
         q = request.args.get("q", "").strip()
@@ -403,7 +403,7 @@ def init_dashboard_page_routes(app) -> None:
 
     @app.route("/books/<book_id>")
     @login_required
-    def book_detail_page(book_id):
+    def book_detail_page(book_id) -> str:
         books_data = storage.load_books()
         book = books_data.get(book_id)
         if not book or book.is_deleted:
@@ -485,7 +485,7 @@ def init_dashboard_page_routes(app) -> None:
     @app.route("/api/books/<book_id>/issue", methods=["POST"])
     @login_required
     @_rate_limit("10 per minute", methods=["POST"])
-    def api_book_issue(book_id):
+    def api_book_issue(book_id) -> Response:
         data = request.get_json(silent=True) or {}
         target = str(data.get("user_id") or session.get("user_id") or "").strip()
         role = session.get("role", "")
@@ -507,7 +507,7 @@ def init_dashboard_page_routes(app) -> None:
     @app.route("/api/books/<book_id>/return", methods=["POST"])
     @login_required
     @_rate_limit("10 per minute", methods=["POST"])
-    def api_book_return(book_id):
+    def api_book_return(book_id) -> Response:
         data = request.get_json(silent=True) or {}
         target = str(data.get("user_id") or session.get("user_id") or "").strip()
         role = session.get("role", "")
@@ -532,7 +532,7 @@ def init_dashboard_page_routes(app) -> None:
 
     @app.route("/gamification")
     @login_required
-    def gamification_page():
+    def gamification_page() -> str:
         uid = session["user_id"]
         gd = gamification.get_user_gamification(uid) if gamification else {}
         leaderboard = gamification.get_leaderboard(top_n=20) if gamification else []
@@ -659,7 +659,7 @@ def init_dashboard_page_routes(app) -> None:
 
     @app.route("/profile/<user_id>")
     @login_required
-    def profile_page(user_id):
+    def profile_page(user_id) -> str:
         users_data = storage.load_users()
         user = users_data.get(user_id)
         if not user:
@@ -704,7 +704,7 @@ def init_dashboard_page_routes(app) -> None:
 
     @app.route("/profile/<uid>/export/pdf")
     @login_required
-    def profile_export_pdf(uid):
+    def profile_export_pdf(uid) -> Any:
         users_data = storage.load_users()
         user = users_data.get(uid)
         if not user:

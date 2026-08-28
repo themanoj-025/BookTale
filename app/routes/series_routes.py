@@ -8,12 +8,12 @@ from flask import jsonify, redirect, render_template, request, session, url_for
 from app.routes.feature_shared import _series, _storage, h, cat_color
 
 
-def register_series_routes(app, login_required, admin_required, render_page, _rate_limit):
+def register_series_routes(app, login_required, admin_required, render_page, _rate_limit) -> None:
     """Register series routes on *app*."""
 
     @app.route("/series")
     @login_required
-    def series_list_page():
+    def series_list_page() -> str:
         page = max(1, int(request.args.get("page", 1)))
         q = request.args.get("q", "")
         series_list, total = _series.get_all_series(page=page)
@@ -57,7 +57,7 @@ def register_series_routes(app, login_required, admin_required, render_page, _ra
     @app.route("/series/create", methods=["GET", "POST"])
     @login_required
     @admin_required
-    def series_create():
+    def series_create() -> Any:
         if request.method == "GET":
             from app.models.book import CATEGORIES as BOOK_CATEGORIES
 
@@ -104,7 +104,7 @@ def register_series_routes(app, login_required, admin_required, render_page, _ra
 
     @app.route("/series/<series_id>")
     @login_required
-    def series_detail(series_id):
+    def series_detail(series_id) -> Any:
         s = _series.get_series(series_id)
         if not s:
             return render_page(
@@ -175,13 +175,13 @@ def register_series_routes(app, login_required, admin_required, render_page, _ra
 
     @app.route("/api/series/search")
     @login_required
-    def api_series_search():
+    def api_series_search() -> Response:
         q = request.args.get("q", "")
         return jsonify({"series": _series.search_series(q) if q else []})
 
     @app.route("/api/series/suggestions")
     @login_required
-    def api_series_suggestions():
+    def api_series_suggestions() -> Response:
         q = request.args.get("q", "")
         return jsonify({"suggestions": _series.get_series_suggestions(q) if q else []})
 
@@ -189,6 +189,6 @@ def register_series_routes(app, login_required, admin_required, render_page, _ra
     @login_required
     @admin_required
     @_rate_limit("20 per minute")
-    def api_series_delete(series_id):
+    def api_series_delete(series_id) -> Response:
         ok, msg = _series.delete_series(series_id)
         return jsonify({"success": ok, "message": msg})

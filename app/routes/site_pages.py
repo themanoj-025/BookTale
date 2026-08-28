@@ -16,7 +16,7 @@ from app.models.book import CATEGORIES as BOOK_CATEGORIES
 from app.routes.helpers import cat_color
 
 
-def init_site_pages(app, storage, lib, recommender, social, review_mgr, notif_mgr):
+def init_site_pages(app, storage, lib, recommender, social, review_mgr, notif_mgr) -> Any:
     """Register site pages on the Flask app."""
 
     def get_current_user() -> dict:
@@ -24,7 +24,7 @@ def init_site_pages(app, storage, lib, recommender, social, review_mgr, notif_mg
             return None
         return storage.load_users().get(session["user_id"])
 
-    def _library_stats():
+    def _library_stats() -> dict:
         books = storage.load_books()
         users = storage.load_users()
         txns = storage.load_transactions()
@@ -83,7 +83,7 @@ def init_site_pages(app, storage, lib, recommender, social, review_mgr, notif_mg
 
     @app.route("/landing")
     @app.route("/")
-    def landing_page():
+    def landing_page() -> str:
         """Spectacular landing page — works for both guests and logged-in users."""
         uid = session.get("user_id")
         user = get_current_user() if uid else None
@@ -121,7 +121,7 @@ def init_site_pages(app, storage, lib, recommender, social, review_mgr, notif_mg
     # ═══════════════════════════════════════════════════════════
 
     @app.route("/features")
-    def features_page():
+    def features_page() -> str:
         """Showcase all platform features."""
         books = storage.load_books()
         all_books = [b for b in books.values() if not b.is_deleted]
@@ -142,7 +142,7 @@ def init_site_pages(app, storage, lib, recommender, social, review_mgr, notif_mg
     # ═══════════════════════════════════════════════════════════
 
     @app.route("/welcome")
-    def welcome_page():
+    def welcome_page() -> str:
         """BookSocial welcome/onboarding page."""
         uid = session.get("user_id")
         user = get_current_user() if uid else None
