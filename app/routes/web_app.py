@@ -420,7 +420,7 @@ def _error_response(status: int, message: str) -> tuple:
 
 for _code in sorted(set(_ERROR_PAGES) - {404, 500}):
 
-    def _make_handler(code: int):
+    def _make_handler(code: int) -> Any:
         def _handler(e):
             return _error_response(code, _ERROR_PAGES[code][3])
         return _handler
@@ -429,7 +429,7 @@ for _code in sorted(set(_ERROR_PAGES) - {404, 500}):
 
 
 @app.errorhandler(404)
-def _not_found(e):
+def _not_found(e) -> Response:
     return _error_response(404, _ERROR_PAGES[404][3])
 
 
@@ -504,7 +504,7 @@ def _prometheus_before_request() -> None:
 
 
 @app.after_request
-def _prometheus_after_request(response):
+def _prometheus_after_request(response) -> None:
     if not _PROMETHEUS_AVAILABLE:
         return response
     # Skip the /metrics endpoint itself to avoid recursive counting
@@ -528,7 +528,7 @@ def _prometheus_after_request(response):
 
 
 @app.route("/metrics")
-def prometheus_metrics():
+def prometheus_metrics() -> Response:
     """Prometheus scrape endpoint."""
     if not _PROMETHEUS_AVAILABLE:
         return jsonify({"status": "prometheus_client not installed"}), 501

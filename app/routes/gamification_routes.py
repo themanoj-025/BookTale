@@ -33,7 +33,7 @@ from app.routes.social_shared import (
 from app.routes.helpers import h
 
 
-def register_gamification_routes(app, _rate_limit):
+def register_gamification_routes(app, _rate_limit) -> None:
     """Register page routes on *app*.
 
     Parameters
@@ -48,7 +48,7 @@ def register_gamification_routes(app, _rate_limit):
 
     @app.route("/feed")
     @login_required
-    def feed_page():
+    def feed_page() -> str:
         FEED_CONTENT = """<!-- Compose Box -->
 <div class="compose-box animate-in">
   <form class="w-100" onsubmit="return submitPost()">
@@ -173,7 +173,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
     @app.route("/search")
     @login_required
-    def search_page():
+    def search_page() -> str:
         return render_page(
             "Search",
             '<div class="empty-state empty-state-variant py-5"><div class="empty-icon"><i class="bi bi-search" style="font-size:3rem;"></i></div><div class="empty-title">Search Books &amp; People</div><div class="empty-desc">Use the search overlay (Ctrl+K) to find books, users, and more.</div><button class="empty-cta" onclick="openSearchOverlay()"><i class="bi bi-search me-2"></i>Open Search</button></div>',
@@ -183,7 +183,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
     @app.route("/profile/edit")
     @login_required
-    def profile_edit_page():
+    def profile_edit_page() -> str:
         """Profile edit page."""
         uid = session["user_id"]
         users_data = storage.load_users()
@@ -382,7 +382,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
     @app.route("/author/<author_name>")
     @login_required
-    def author_page(author_name):
+    def author_page(author_name) -> str:
         from urllib.parse import unquote
         from collections import Counter
 
@@ -441,7 +441,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
     @app.route("/profile/<user_id>")
     @login_required
-    def profile_page(user_id):
+    def profile_page(user_id) -> str:
         uid = session["user_id"]
         users_data = storage.load_users()
         pu = users_data.get(user_id)

@@ -193,7 +193,7 @@ def main() -> None:
     print("  --------------------------------------------")
 
     # Wait for keypress to shut down
-    def shutdown_all():
+    def shutdown_all() -> None:
         """Terminate all running processes cleanly."""
         print()
         safe_print("  [STOP] Shutting down...")

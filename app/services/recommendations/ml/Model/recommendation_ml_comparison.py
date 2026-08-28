@@ -237,7 +237,7 @@ def get_tfidf_features(df: pd.DataFrame) -> np.ndarray:
 class ModelResult:
     """Stores evaluation results for a single model."""
 
-    def __init__(self, name: str, color: str):
+    def __init__(self, name: str, color: str) -> None:
         self.name = name
         self.color = color
         self.metrics = {}
@@ -245,7 +245,7 @@ class ModelResult:
         self.labels = None
         self.time_taken = 0.0
 
-    def add_metric(self, name: str, value: float):
+    def add_metric(self, name: str, value: float) -> None:
         self.metrics[name] = value
 
     def get_formatted_metrics(self) -> str:
@@ -256,7 +256,7 @@ class ModelResult:
         return "\n".join(lines)
 
 
-def evaluate_clustering(X: np.ndarray, labels: np.ndarray, result: ModelResult):
+def evaluate_clustering(X: np.ndarray, labels: np.ndarray, result: ModelResult) -> None:
     """Evaluate clustering quality with multiple metrics."""
     unique_labels = len(set(labels))
     n_noise = list(labels).count(-1) if -1 in labels else 0
@@ -759,7 +759,7 @@ def agglomerative_model(X: np.ndarray, df: pd.DataFrame) -> ModelResult:
 # 3. VISUALIZATION FUNCTIONS
 
 
-def save_radar_chart(results: list[ModelResult], filename: str = "radar_comparison.png"):
+def save_radar_chart(results: list[ModelResult], filename: str = "radar_comparison.png") -> None:
     """Create a radar chart comparing algorithms across key metrics."""
     print("\n  📊 Generating Radar Chart...")
 
@@ -833,7 +833,7 @@ def save_radar_chart(results: list[ModelResult], filename: str = "radar_comparis
     print(f"  ✅ Radar chart saved: {path}")
 
 
-def save_bar_comparison(results: list[ModelResult], metric: str, filename: str | None = None):
+def save_bar_comparison(results: list[ModelResult], metric: str, filename: str | None = None) -> None:
     """Create a bar chart comparing a specific metric across algorithms."""
     names = [r.name for r in results]
     values = [r.metrics.get(metric, 0) for r in results]
@@ -871,7 +871,7 @@ def save_bar_comparison(results: list[ModelResult], metric: str, filename: str |
     print(f"  ✅ Bar chart saved: {path}")
 
 
-def save_elbow_plot(inertias, k_range, filename: str = "elbow_curve.png"):
+def save_elbow_plot(inertias, k_range, filename: str = "elbow_curve.png") -> None:
     """Save elbow curve for K selection."""
     _fig, ax = plt.subplots(figsize=(10, 6))
     ax.plot(list(k_range), inertias, "bo-", linewidth=2, markersize=8, color="#2196F3")
@@ -904,7 +904,7 @@ def save_elbow_plot(inertias, k_range, filename: str = "elbow_curve.png"):
     print(f"  ✅ Elbow curve saved: {path}")
 
 
-def save_k_distance_plot(k_dist: np.ndarray, filename: str = "k_distance_plot.png"):
+def save_k_distance_plot(k_dist: np.ndarray, filename: str = "k_distance_plot.png") -> None:
     """Save k-distance plot for DBSCAN eps tuning."""
     _fig, ax = plt.subplots(figsize=(10, 6))
     ax.plot(range(len(k_dist)), k_dist, "b-", linewidth=1.5, alpha=0.7)
@@ -933,7 +933,7 @@ def save_k_distance_plot(k_dist: np.ndarray, filename: str = "k_distance_plot.pn
     print(f"  ✅ k-Distance plot saved: {path}")
 
 
-def save_cluster_visualization(X_2d: np.ndarray, labels: np.ndarray, title: str, filename: str):
+def save_cluster_visualization(X_2d: np.ndarray, labels: np.ndarray, title: str, filename: str) -> None:
     """Save 2D cluster visualization."""
     n_clusters = len(set(labels)) - (1 if -1 in labels else 0)
     _fig, ax = plt.subplots(figsize=(12, 8))
@@ -962,7 +962,7 @@ def save_cluster_visualization(X_2d: np.ndarray, labels: np.ndarray, title: str,
     print(f"  ✅ Cluster viz saved: {path}")
 
 
-def save_heatmap_comparison(results: list[ModelResult], filename: str = "performance_heatmap.png"):
+def save_heatmap_comparison(results: list[ModelResult], filename: str = "performance_heatmap.png") -> None:
     """Create a heatmap of all metrics across all algorithms."""
     metrics_pool = set()
     for r in results:
@@ -1035,7 +1035,7 @@ def save_heatmap_comparison(results: list[ModelResult], filename: str = "perform
     print(f"  ✅ Heatmap saved: {path}")
 
 
-def save_interactive_radar(results: list[ModelResult], filename: str = "interactive_radar.html"):
+def save_interactive_radar(results: list[ModelResult], filename: str = "interactive_radar.html") -> None:
     """Create interactive radar chart using Plotly."""
     if not PLOTLY_AVAILABLE:
         return
@@ -1081,7 +1081,7 @@ def save_interactive_radar(results: list[ModelResult], filename: str = "interact
     print(f"  ✅ Interactive radar saved: {path}")
 
 
-def save_summary_report(results: list[ModelResult], df: pd.DataFrame):
+def save_summary_report(results: list[ModelResult], df: pd.DataFrame) -> None:
     """Save a comprehensive text summary report."""
     path = OUTPUT_DIR / "model_comparison_report.txt"
 
@@ -1147,7 +1147,7 @@ def save_summary_report(results: list[ModelResult], df: pd.DataFrame):
 # 4. MAIN PIPELINE
 
 
-def run_comparison():
+def run_comparison() -> dict:
     """Run the full ML model comparison pipeline."""
     print("\n" + "=" * 70)
     print("  LIBRARY MANAGEMENT SYSTEM - ML MODEL COMPARISON")

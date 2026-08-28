@@ -45,18 +45,18 @@ def init_feature_routes(
 
     from flask import jsonify, redirect, render_template, session, url_for
 
-    def h(text):
+    def h(text) -> str:
         return html.escape(str(text))
 
-    def _js_str(value):
+    def _js_str(value) -> str:
         return str(value).replace("\\", "\\\\").replace("'", "\\'").replace('"', "&quot;")
 
-    def get_current_user():
+    def get_current_user() -> User | None:
         if "user_id" not in session:
             return None
         return storage.load_users().get(session["user_id"])
 
-    def render_page(title, content, **kw):
+    def render_page(title, content, **kw) -> str:
         user = get_current_user()
         return render_template(
             "base.html",
@@ -67,7 +67,7 @@ def init_feature_routes(
             **kw,
         )
 
-    def login_required(f):
+    def login_required(f) -> Callable[[Callable], Callable]:
         @wraps(f)
         def d(*a, **k):
             if "user_id" not in session:
@@ -75,7 +75,7 @@ def init_feature_routes(
             return f(*a, **k)
         return d
 
-    def admin_required(f):
+    def admin_required(f) -> Callable[[Callable], Callable]:
         @wraps(f)
         def d(*a, **k):
             if "user_id" not in session:
@@ -85,7 +85,7 @@ def init_feature_routes(
             return f(*a, **k)
         return d
 
-    def _rate_limit(limit_value, **kwargs):
+    def _rate_limit(limit_value, **kwargs) -> Callable:
         _lim = app.extensions.get("booktale_limiter")
         if _lim is None:
             return lambda f: f

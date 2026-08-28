@@ -96,7 +96,7 @@ def _get_logger_locked() -> logging.Logger:
     # Force flush after each emit so get_logs() reads current data immediately.
     _orig_emit = text_handler.emit
 
-    def _flushing_emit(record):
+    def _flushing_emit(record) -> None:
         _orig_emit(record)
         text_handler.flush()
 

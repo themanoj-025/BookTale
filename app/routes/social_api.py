@@ -28,7 +28,7 @@ from app.routes.social_shared import lib  # noqa: F401
 from app.routes.social_shared import book_lists  # noqa: F401
 
 
-def register_social_api_routes(app, _rate_limit):
+def register_social_api_routes(app, _rate_limit) -> None:
     """Register all JSON API endpoints on *app*.
 
     Parameters
@@ -44,7 +44,7 @@ def register_social_api_routes(app, _rate_limit):
 
     @app.route("/api/feed")
     @login_required
-    def api_feed():
+    def api_feed() -> Response:
         uid = session["user_id"]
         page = max(1, int(request.args.get("page", 1)))
         tab = request.args.get("tab", "following")
@@ -59,7 +59,7 @@ def register_social_api_routes(app, _rate_limit):
     @app.route("/api/posts", methods=["POST"])
     @login_required
     @_rate_limit("30 per minute")
-    def api_create_post():
+    def api_create_post() -> Response:
         uid = session["user_id"]
         data = request.get_json() or {}
         content = data.get("content", "").strip()
@@ -94,7 +94,7 @@ def register_social_api_routes(app, _rate_limit):
     @app.route("/api/upload", methods=["POST"])
     @login_required
     @_rate_limit("10 per minute")
-    def api_upload():
+    def api_upload() -> Response:
         uid = session["user_id"]
         if "file" not in request.files:
             return jsonify({"success": False, "error": "No file provided"})
@@ -135,7 +135,7 @@ def register_social_api_routes(app, _rate_limit):
         return jsonify({"success": True, "url": url_path, "filename": safe_name})
 
     @app.route("/uploads/<path:filename>")
-    def serve_upload(filename):
+    def serve_upload(filename) -> Response:
         from flask import send_from_directory
 
         full_path = os.path.join(Config.UPLOADS_DIR, filename)
@@ -146,14 +146,14 @@ def register_social_api_routes(app, _rate_limit):
     @app.route("/api/posts/<post_id>/repost", methods=["POST"])
     @login_required
     @_rate_limit("30 per minute")
-    def api_repost(post_id):
+    def api_repost(post_id) -> Response:
         ok, msg, repost = social.repost_post(post_id, session["user_id"])
         return jsonify({"success": ok, "message": msg, "repost": repost})
 
     @app.route("/api/posts/<post_id>/like", methods=["POST"])
     @login_required
     @_rate_limit("60 per minute")
-    def api_like_post(post_id):
+    def api_like_post(post_id) -> Response:
         uid = session["user_id"]
         ok, msg, is_liked = social.like_post(post_id, uid)
         post = social.get_post(post_id)
@@ -166,7 +166,7 @@ def register_social_api_routes(app, _rate_limit):
     @app.route("/api/posts/<post_id>/vote", methods=["POST"])
     @login_required
     @_rate_limit("60 per minute")
-    def api_vote_post(post_id):
+    def api_vote_post(post_id) -> Response:
         data = request.get_json() or {}
         ok, msg, ns = social.vote_post(post_id, session["user_id"], data.get("vote", "up"))
         return jsonify(
@@ -180,7 +180,7 @@ def register_social_api_routes(app, _rate_limit):
 
     @app.route("/api/posts/<post_id>/delete", methods=["POST"])
     @login_required
-    def api_delete_post(post_id):
+    def api_delete_post(post_id) -> Response:
         uid = session["user_id"]
         ok, msg = social.delete_post(post_id, uid)
         if ok:
@@ -192,7 +192,7 @@ def register_social_api_routes(app, _rate_limit):
     @app.route("/api/posts/<post_id>/comments", methods=["GET", "POST"])
     @login_required
     @_rate_limit("30 per minute", methods=["POST"])
-    def api_comments(post_id):
+    def api_comments(post_id) -> Response:
         uid = session["user_id"]
         if request.method == "GET":
             comments = social.get_comments(post_id)
@@ -241,7 +241,7 @@ def register_social_api_routes(app, _rate_limit):
     @app.route("/api/follow/<user_id>", methods=["POST"])
     @login_required
     @_rate_limit("60 per minute")
-    def api_follow_user(user_id):
+    def api_follow_user(user_id) -> Response:
         uid = session["user_id"]
         is_following = social.is_following(uid, user_id)
         if is_following:
@@ -255,13 +255,13 @@ def register_social_api_routes(app, _rate_limit):
 
     @app.route("/api/hashtags/trending")
     @login_required
-    def api_trending_hashtags():
+    def api_trending_hashtags() -> Response:
         limit = min(int(request.args.get("limit", 10)), 30)
         return jsonify({"hashtags": social.get_trending_hashtags(limit)})
 
     @app.route("/api/hashtags/<tag>/posts")
     @login_required
-    def api_hashtag_posts(tag):
+    def api_hashtag_posts(tag) -> Response:
         uid = session["user_id"]
         page = max(1, int(request.args.get("page", 1)))
         posts, total = social.search_by_hashtag(tag, uid, page=page)
@@ -271,7 +271,7 @@ def register_social_api_routes(app, _rate_limit):
 
     @app.route("/api/search/suggestions")
     @login_required
-    def api_search_suggestions():
+    def api_search_suggestions() -> Response:
         from app.routes.social_shared import lib as _lib
 
         q = request.args.get("q", "").strip()
@@ -335,7 +335,7 @@ def register_social_api_routes(app, _rate_limit):
 
     @app.route("/api/search")
     @login_required
-    def api_advanced_search():
+    def api_advanced_search() -> Response:
         from app.routes.social_shared import lib as _lib
 
         uid = session["user_id"]
@@ -374,7 +374,7 @@ def register_social_api_routes(app, _rate_limit):
 
     @app.route("/api/posts/search")
     @login_required
-    def api_search_posts():
+    def api_search_posts() -> Response:
         uid = session["user_id"]
         q = request.args.get("q", "")
         page = max(1, int(request.args.get("page", 1)))
@@ -386,7 +386,7 @@ def register_social_api_routes(app, _rate_limit):
     @app.route("/api/comments/<comment_id>/reply", methods=["POST"])
     @login_required
     @_rate_limit("30 per minute")
-    def api_reply_comment(comment_id):
+    def api_reply_comment(comment_id) -> Response:
         uid = session["user_id"]
         data = request.get_json() or {}
         content = data.get("content", "").strip()
@@ -408,7 +408,7 @@ def register_social_api_routes(app, _rate_limit):
     @app.route("/api/lists", methods=["POST"])
     @login_required
     @_rate_limit("30 per minute")
-    def api_create_list():
+    def api_create_list() -> Response:
         from app.routes.social_shared import book_lists as _bl
 
         uid = session["user_id"]
@@ -426,7 +426,7 @@ def register_social_api_routes(app, _rate_limit):
 
     @app.route("/api/lists/<list_id>", methods=["GET", "PUT", "DELETE"])
     @login_required
-    def api_list_ops(list_id):
+    def api_list_ops(list_id) -> Response:
         from app.routes.social_shared import book_lists as _bl
 
         uid = session["user_id"]
@@ -466,7 +466,7 @@ def register_social_api_routes(app, _rate_limit):
 
     @app.route("/api/lists/<list_id>/books", methods=["POST", "DELETE"])
     @login_required
-    def api_list_books(list_id):
+    def api_list_books(list_id) -> Response:
         from app.routes.social_shared import book_lists as _bl
 
         uid = session["user_id"]
@@ -484,7 +484,7 @@ def register_social_api_routes(app, _rate_limit):
     @app.route("/api/lists/<list_id>/follow", methods=["POST"])
     @login_required
     @_rate_limit("60 per minute")
-    def api_list_follow(list_id):
+    def api_list_follow(list_id) -> Response:
         from app.routes.social_shared import book_lists as _bl
 
         uid = session["user_id"]
@@ -500,7 +500,7 @@ def register_social_api_routes(app, _rate_limit):
     @app.route("/api/lists/<list_id>/upvote", methods=["POST"])
     @login_required
     @_rate_limit("60 per minute")
-    def api_list_upvote(list_id):
+    def api_list_upvote(list_id) -> Response:
         from app.routes.social_shared import book_lists as _bl
 
         uid = session["user_id"]
@@ -511,7 +511,7 @@ def register_social_api_routes(app, _rate_limit):
 
     @app.route("/api/lists/my")
     @login_required
-    def api_my_lists():
+    def api_my_lists() -> Response:
         from app.routes.social_shared import book_lists as _bl
 
         uid = session["user_id"]
@@ -521,7 +521,7 @@ def register_social_api_routes(app, _rate_limit):
 
     @app.route("/api/lists/trending")
     @login_required
-    def api_lists_trending():
+    def api_lists_trending() -> Response:
         from app.routes.social_shared import book_lists as _bl
 
         if not _bl:
@@ -530,7 +530,7 @@ def register_social_api_routes(app, _rate_limit):
 
     @app.route("/api/lists/weekly-books")
     @login_required
-    def api_weekly_books():
+    def api_weekly_books() -> Response:
         from app.routes.social_shared import book_lists as _bl
 
         if not _bl:
@@ -539,7 +539,7 @@ def register_social_api_routes(app, _rate_limit):
 
     @app.route("/api/lists/public")
     @login_required
-    def api_public_lists():
+    def api_public_lists() -> Response:
         from app.routes.social_shared import book_lists as _bl
 
         if not _bl:

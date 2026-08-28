@@ -33,7 +33,7 @@ def init_admin_page_routes(app) -> None:
     @app.route("/admin/users")
     @login_required
     @admin_required
-    def admin_users_page():
+    def admin_users_page() -> str:
         users_data = storage.load_users()
         q = request.args.get("q", "").strip().lower()
         role_filter = request.args.get("role", "").strip().lower()
@@ -219,7 +219,7 @@ def init_admin_page_routes(app) -> None:
     @app.route("/admin/audit")
     @login_required
     @admin_required
-    def admin_audit_page():
+    def admin_audit_page() -> str:
         import app.db.database as _dbmod
         from app.db.repositories import AuditLogRepository
         from urllib.parse import urlencode
@@ -363,7 +363,7 @@ def init_admin_page_routes(app) -> None:
     @app.route("/admin/overdue")
     @login_required
     @admin_required
-    def admin_overdue_page():
+    def admin_overdue_page() -> str:
         txns = storage.load_transactions()
         books_data = storage.load_books()
         users_data = storage.load_users()
@@ -464,7 +464,7 @@ def init_admin_page_routes(app) -> None:
     @app.route("/reports")
     @login_required
     @admin_required
-    def reports_page():
+    def reports_page() -> str:
         s = library_stats()
 
         return render_template(
