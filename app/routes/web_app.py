@@ -613,9 +613,11 @@ def settings_page() -> str:
     return _settings_page(render_page, storage, notif_mgr)
 
 if __name__ == "__main__":
-    print("  📚 Library Management System — Web Interface")
-    print(f"  🌐 http://{Config.FLASK_HOST}:{Config.FLASK_PORT}")
-    print("  ⌨️  Press Ctrl+K to search books from anywhere")
+    import logging as _logging
+    _logging.getLogger(__name__).info(
+        "Library Management System starting — http://%s:%s",
+        Config.FLASK_HOST, Config.FLASK_PORT,
+    )
     socketio.run(
         app,
         host=Config.FLASK_HOST,
