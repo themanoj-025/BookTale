@@ -159,7 +159,8 @@ def init_auth_routes(app, storage, lib, auth, notif_mgr) -> None:
                     ),
                 )
             except (ValueError, KeyError) as e:
-                print("Welcome email error:", e)
+                from app.core.logger import log
+                log("Welcome email error", extra=str(e))
 
         return render_template(
             "auth/registered.html", title="Registered", name=name, email=email or None
@@ -209,7 +210,8 @@ def init_auth_routes(app, storage, lib, auth, notif_mgr) -> None:
                         ),
                     )
             except (ValueError, KeyError) as e:
-                print("Reset email error:", e)
+                from app.core.logger import log
+                log("Reset email error", extra=str(e))
 
         return render_template(
             "auth/forgot_password.html",

@@ -4,10 +4,13 @@ Sends email alerts for overdue books, reservation availability, and fine notices
 Gracefully degrades if SMTP is not configured.
 """
 
+import logging
 import os
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+
+logger = logging.getLogger(__name__)
 
 try:
     from app.config.settings import Config
@@ -34,7 +37,7 @@ def send_email(to_email: str, subject: str, html_body: str, text_body: str | Non
     Gracefully fails if SMTP is not configured.
     """
     if not is_smtp_configured():
-        print(f"  [EMAIL SKIPPED] SMTP not configured. Would send to {to_email}: {subject}")
+        logger.warning("SMTP not configured — email skipped: to=%s subject=%s", to_email, subject)
         return False
 
     try:
@@ -58,7 +61,7 @@ def send_email(to_email: str, subject: str, html_body: str, text_body: str | Non
 
         return True
     except (smtplib.SMTPException, ConnectionRefusedError, TimeoutError, OSError) as e:
-        print(f"  [EMAIL FAILED] to {to_email}: {e}")
+        logger.error("Email send failed to %s: %s", to_email, e)
         return False
 
 
