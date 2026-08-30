@@ -7,8 +7,9 @@ Routes: /clubs, /clubs/<club_id>, /api/clubs/create, /api/clubs/<id>/join, /api/
 from flask import jsonify, request, session
 
 from app.routes.helpers import avatar_html, cat_color
-from app.routes.page_state import (
 from flask import Response
+
+from app.routes.page_state import (
     communities,
     h,
     login_required,
