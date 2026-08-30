@@ -1,6 +1,7 @@
 """ML model implementations."""
 
 from __future__ import annotations
+from app.services.recommendations.ml.Model.ml_pkg.data_loading import N_CLUSTERS, N_NEIGHBORS, RANDOM_STATE, TEST_SIZE, XGB_AVAILABLE
 from app.services.recommendations.ml.Model.ml_pkg.models import ALGORITHM_COLORS
 from sklearn.cluster import AgglomerativeClustering
 from sklearn.cluster import DBSCAN
