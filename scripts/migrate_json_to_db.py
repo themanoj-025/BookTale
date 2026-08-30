@@ -50,7 +50,7 @@ from app.db.models import (
 )
 
 
-def _load(path: str):
+def _load(path: str) -> list[object]:
     """Load a JSON file; return [] if missing. Never raises on corrupt data
     (the file is logged and skipped, mirroring storage's per-file isolation)."""
     if not os.path.exists(path):
@@ -67,7 +67,7 @@ def _json_path(name: str) -> str:
     return os.path.join(Config.DATA_DIR, name)
 
 
-def _as_dict(data):
+def _as_dict(data) -> None:
     """Coerce a loaded JSON value to a dict (books/users/reservations are
     object-shaped; a missing file yields [] from _load)."""
     return data if isinstance(data, dict) else {}

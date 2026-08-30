@@ -33,7 +33,7 @@ def init_page_routes(
     reading_progress,
     wishlist,
     diary_mgr,
-):
+) -> None:
     """Initialize shared state and register all page route modules."""
 
     # Populate shared state used by all route modules

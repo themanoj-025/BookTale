@@ -422,7 +422,7 @@ def _error_response(status: int, message: str) -> tuple:
 for _code in sorted(set(_ERROR_PAGES) - {404, 500}):
 
     def _make_handler(code: int) -> Any:
-        def _handler(e):
+        def _handler(e) -> None:
             return _error_response(code, _ERROR_PAGES[code][3])
         return _handler
 

@@ -73,7 +73,7 @@ def check(num: int, name: str, ok: bool, note: str = "") -> None:
     print(f"  {mark} #{num:<2} {name}" + (f"  [{note}]" if note else ""))
 
 
-def admin_session():
+def admin_session() -> None:
     """Log in as the bootstrap admin for admin-gated journeys."""
     with client.session_transaction() as s:
         s["user_id"] = Config.DEFAULT_ADMIN_ID
@@ -351,7 +351,7 @@ race_results = []
 lock = threading.Lock()
 
 
-def _race(i: int):
+def _race(i: int) -> None:
     ok, _msg = lib.issue_book(f"MEM-RACE{i}", rare_id, actor="Librarian")
     with lock:
         race_results.append(ok)
