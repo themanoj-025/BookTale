@@ -18,6 +18,8 @@ import os
 import sys
 import tempfile
 
+
+pytestmark = pytest.mark.slow
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 sys.path.insert(0, PROJECT_ROOT)
 
@@ -1720,6 +1722,7 @@ class TestUploadValidation:
         """A genuine 1x1 PNG uploads (re-encoded) and is served back."""
         _login(client)
         import base64
+
 
         png = base64.b64decode(
             "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJ"

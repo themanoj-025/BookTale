@@ -9,6 +9,8 @@ the bounded pool when Redis is unreachable, and the cron next-run helper.
 import os
 import sys
 
+
+pytestmark = pytest.mark.slow
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 sys.path.insert(0, PROJECT_ROOT)
 
@@ -383,6 +385,7 @@ class TestWorkerSchemaEnsure:
         monkeypatch.setattr("app.db.database.create_all", lambda: called.append(True))
         monkeypatch.setenv("STORAGE_BACKEND", "json")
         from app.jobs import worker
+
 
         worker._ensure_schema()
         assert not called
