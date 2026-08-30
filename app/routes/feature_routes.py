@@ -14,6 +14,8 @@ registration to the focused sub-modules:
 
 from flask import Flask
 
+from app.db.models import User
+
 from app.routes.feature_shared import init_shared_state
 from app.routes.series_routes import register_series_routes
 from app.routes.challenge_routes import register_challenge_routes

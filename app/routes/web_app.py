@@ -9,6 +9,7 @@ import html
 import os
 import sys
 import zlib
+from typing import Any
 from functools import wraps
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
@@ -259,7 +260,6 @@ init_api_routes(app, storage, lib, auth, notif_mgr, recommender, social, diary_m
 # Page routes
 from app.routes.helpers import init_helpers
 from app.routes.page_routes import init_page_routes
-from typing import Any
 from collections.abc import Callable
 from flask import Response
 
