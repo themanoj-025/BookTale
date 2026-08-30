@@ -10,8 +10,6 @@ import requests
 from app.config.settings import Config
 from app.core.utils import (
     confirm,
-    console,
-    format_date,
     header,
     menu,
     pause,

@@ -15,7 +15,6 @@ from app.core.utils import (
     print_success,
     print_warning,
 )
-from app.services.auth.auth import AuthManager
 from app.services.books.library import Library
 from app.services.notifications.notifications import NotificationManager
 

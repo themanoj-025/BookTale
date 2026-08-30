@@ -405,7 +405,7 @@ def init_api_routes(app, storage, lib, auth, notif_mgr, recommender, social, dia
 
 def _library_stats(storage: Any) -> dict[str, Any]:
     """Compute library statistics for analytics."""
-    books, users, txns = (
+    books, users, _txns = (
         storage.load_books(),
         storage.load_users(),
         storage.load_transactions(),

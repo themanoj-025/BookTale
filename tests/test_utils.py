@@ -3,7 +3,6 @@
 Tests validation helpers, formatting, and ANSI color output.
 """
 
-import pytest
 
 from app.core.utils import (
     colored,

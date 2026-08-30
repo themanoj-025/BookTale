@@ -28,13 +28,13 @@ def render_author_page(author_name: str) -> str:
             else '<span class="badge-red px-2 py-1 small">Out</span>'
         )
         BOOKS_GRID += (
-            '<a href="/books/{}" class="text-decoration-none col-6 col-md-4 col-lg-3 mb-2">'
+            f'<a href="/books/{b.book_id}" class="text-decoration-none col-6 col-md-4 col-lg-3 mb-2">'
             '<div class="glass-card p-2 text-center" style="cursor:pointer;">'
-            '<div style="font-size:1.2rem;color:{};"><i class="bi bi-book-fill"></i></div>'
-            '<div class="fw-bold small">{}</div>'
-            '<small class="text-muted">{}</small>'
-            '<div class="mt-1">{}</div>'
-            '</div></a>'.format(b.book_id, cc, h(b.title)[:40], h(b.category), avail)
+            f'<div style="font-size:1.2rem;color:{cc};"><i class="bi bi-book-fill"></i></div>'
+            f'<div class="fw-bold small">{h(b.title)[:40]}</div>'
+            f'<small class="text-muted">{h(b.category)}</small>'
+            f'<div class="mt-1">{avail}</div>'
+            '</div></a>'
         )
     if not BOOKS_GRID:
         BOOKS_GRID = '<div class="col-12"><div class="empty-state empty-state-variant"><div class="empty-icon"><i class="bi bi-book"></i></div><div class="empty-title">No books found</div><div class="empty-desc">This author has no books in the library yet.</div></div></div>'

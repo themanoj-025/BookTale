@@ -5,15 +5,9 @@ Extracted from social_routes.py for focused maintenance.
 
 from flask import g, jsonify, request, session
 
-from app.core.logger import log
-from app.realtime.realtime import get_realtime
 from app.routes.social_shared import (
-    avatar_html,
-    gamification,
     login_required,
-    notif_mgr,
     review_mgr,
-    social,
     storage,
 )
 

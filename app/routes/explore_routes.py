@@ -4,7 +4,6 @@ explore_routes.py - Explore and Recommendations page routes.
 Routes: /explore, /recommendations, /api/notifications/<id>/read, /api/notifications/read-all
 """
 
-from collections import Counter
 from datetime import datetime
 
 from flask import jsonify, session
@@ -13,14 +12,11 @@ from app.models.book import CATEGORIES as BOOK_CATEGORIES
 from app.routes.helpers import avatar_html, cat_color
 from app.routes.page_state import (
     communities,
-    diary_mgr,
-    gamification,
     h,
     login_required,
     notif_mgr,
     recommender,
     render_page,
-    review_mgr,
     social,
     storage,
     make_rate_limit,
