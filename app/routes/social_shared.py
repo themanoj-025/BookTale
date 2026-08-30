@@ -5,16 +5,12 @@ Extracted from social_routes.py to support the split into focused modules.
 
 import html
 import io
-import os
-import uuid
 import zlib
 from datetime import datetime, timedelta
 from functools import wraps
 
-from flask import g, jsonify, redirect, request, session, url_for
+from flask import redirect, session, url_for
 
-from app.config.settings import Config
-from app.core.logger import log
 
 # ── Module-level shared state (populated by init_social_routes) ──
 
@@ -335,7 +331,6 @@ def _render_heatmap_svg(heatmap_data: list, total: int) -> str:
 
 def _render_fav_grid(fav_books: list, is_own: bool) -> str:
     """Render favorite 4 books grid."""
-    from app.routes.helpers import h
 
     _esc = html.escape
     books_data = storage.load_books()

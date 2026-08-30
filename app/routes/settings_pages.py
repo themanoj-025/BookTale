@@ -6,9 +6,8 @@ static HTML with Jinja-style template replacements.
 
 import html as _html
 
-from flask import render_template, session
+from flask import session
 
-from app.config.settings import Config
 
 
 def _h(text: object) -> str:

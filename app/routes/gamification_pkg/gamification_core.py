@@ -4,19 +4,11 @@ gamification_core.py — Registration function, feed page, and search page.
 Extracted from gamification_routes.py for focused maintenance.
 """
 
-from flask import jsonify, request, session
 
 from app.routes.social_shared import (
-    gamification,
-    get_current_user,
     login_required,
-    notif_mgr,
     render_page,
-    review_mgr,
-    social,
-    storage,
 )
-from app.routes.helpers import h
 
 
 def register_gamification_routes(app, _rate_limit) -> None:

@@ -16,8 +16,6 @@ from app.routes.social_shared import (
     avatar_html,
     gamification,
     login_required,
-    notif_mgr,
-    review_mgr,
     social,
     storage,
     time_ago,
@@ -273,7 +271,6 @@ def register_social_api_routes(app, _rate_limit) -> None:
     @app.route("/api/search/suggestions")
     @login_required
     def api_search_suggestions() -> Response:
-        from app.routes.social_shared import lib as _lib
 
         q = request.args.get("q", "").strip()
         if len(q) < 2:

@@ -8,7 +8,6 @@ from app.core.utils import (
     menu,
     pause,
     print_error,
-    print_info,
     print_success,
     print_warning,
     confirm,

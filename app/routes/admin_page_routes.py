@@ -9,16 +9,14 @@ from datetime import datetime, timedelta
 
 from flask import request, session
 
-from app.routes.helpers import avatar_html, cat_color
+from app.routes.helpers import avatar_html
 from app.routes.page_state import (
     admin_required,
     h,
     login_required,
     notif_mgr,
     render_page,
-    review_mgr,
     storage,
-    make_rate_limit,
     library_stats,
 )
 

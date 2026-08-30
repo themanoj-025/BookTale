@@ -8,7 +8,6 @@ from datetime import datetime
 
 from app.config.settings import Config
 from app.core.utils import (
-    console,
     header,
     menu,
     pause,
