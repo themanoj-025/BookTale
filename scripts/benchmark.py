@@ -292,7 +292,7 @@ def _measure(fn, n: int, warmup: int = 20) -> list:
 def _percentiles(samples: list) -> dict:
     s = sorted(samples)
 
-    def pct(p):
+    def pct(p) -> None:
         idx = min(len(s) - 1, round((p / 100.0) * (len(s) - 1)))
         return s[idx]
 
@@ -335,7 +335,7 @@ def main() -> int:
         return 1
     checkout_i = 0
 
-    def checkout():
+    def checkout() -> None:
         nonlocal checkout_i
         # Distinct (user, book) pairs only: warmup (20) + samples (200) must
         # stay under the pool size (5k users / 10k books), so no modulo wrap
@@ -351,15 +351,15 @@ def main() -> int:
             raise RuntimeError(f"checkout failed for {user_ids[i]}/{book_ids[i]}")
 
     # ── Search: broad substring LIKE across title/author/isbn/category ─
-    def search():
+    def search() -> None:
         svc.search_books(query="the", page=1, per_page=20)
 
     # ── Overdue list: indexed open-issue scan + tolerant date filter ───
-    def overdue():
+    def overdue() -> None:
         svc.get_overdue_list()
 
     # ── Stats: one-shot aggregate (reports dashboard) ──────────────────
-    def stats():
+    def stats() -> None:
         svc.library_stats()
 
     results = {}

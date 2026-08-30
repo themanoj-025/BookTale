@@ -126,11 +126,11 @@ if not _ready:
 print(f"✅ live server ready at {BASE} (CSRF ON, RATELIMIT ON)\n")
 
 
-def _get(session, path, **kw):
+def _get(session, path, **kw) -> None:
     return session.get(BASE + path, timeout=5, **kw)
 
 
-def _post(session, path, data=None, headers=None):
+def _post(session, path, data=None, headers=None) -> None:
     return session.post(BASE + path, data=data, headers=headers, timeout=5)
 
 

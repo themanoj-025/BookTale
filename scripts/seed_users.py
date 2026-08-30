@@ -709,7 +709,7 @@ def generate_users(count: int = 5000) -> dict[str, User]:
     return users
 
 
-def main():
+def main() -> None:
     """Main entry point."""
     print("=" * 60)
     print("  📚 LibraryMS - User Data Seeder")

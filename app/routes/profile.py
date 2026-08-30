@@ -74,7 +74,7 @@ def register_profile_routes(app) -> None:
 
     @app.route("/profile/<uid>/export/pdf")
     @login_required
-    def profile_export_pdf(uid):
+    def profile_export_pdf(uid) -> None:
         users_data = storage.load_users()
         user = users_data.get(uid)
         if not user:
