@@ -3,7 +3,6 @@ operations_cli.py - Issue/Return, Overdue, Fine Management, Reservations CLI.
 """
 
 from app.core.utils import (
-    console,
     create_table,
     header,
     menu,

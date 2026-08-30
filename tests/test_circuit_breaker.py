@@ -72,26 +72,23 @@ class TestCircuitBreaker:
 
     def test_context_manager_failure(self) -> None:
         cb = CircuitBreaker(failure_threshold=2, recovery_timeout=1.0)
-        with pytest.raises(ValueError, match="boom"):
-            with cb:
-                raise ValueError("boom")
+        with pytest.raises(ValueError, match="boom"), cb:
+            raise ValueError("boom")
         assert cb._failure_count == 1
 
     def test_context_manager_opens_circuit(self) -> None:
         cb = CircuitBreaker(failure_threshold=2, recovery_timeout=1.0)
         for _ in range(2):
-            with pytest.raises(ValueError):
-                with cb:
-                    raise ValueError("boom")
+            with pytest.raises(ValueError), cb:
+                raise ValueError("boom")
         assert cb.state == CircuitState.OPEN
 
     def test_open_circuit_rejects_context(self) -> None:
         cb = CircuitBreaker(failure_threshold=1, recovery_timeout=10.0)
         cb.record_failure()
         assert cb.is_open()
-        with pytest.raises(CircuitBreakerOpenError):
-            with cb:
-                pass
+        with pytest.raises(CircuitBreakerOpenError), cb:
+            pass
 
     def test_name(self) -> None:
         cb = CircuitBreaker(name="test-api")
@@ -116,6 +113,5 @@ class TestCircuitBreaker:
     def test_open_error_message(self) -> None:
         cb = CircuitBreaker(failure_threshold=1, recovery_timeout=10.0, name="myapi")
         cb.record_failure()
-        with pytest.raises(CircuitBreakerOpenError, match="myapi"):
-            with cb:
-                pass
+        with pytest.raises(CircuitBreakerOpenError, match="myapi"), cb:
+            pass

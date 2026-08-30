@@ -3,7 +3,6 @@ recommendations_cli.py - Recommendations and Goodreads Seed Data CLI.
 """
 
 from app.core.utils import (
-    console,
     create_table,
     header,
     menu,

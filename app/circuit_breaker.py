@@ -52,7 +52,7 @@ class CircuitBreaker:
 
     @property
     def state(self) -> CircuitState:
-        if self._state == CircuitState.OPEN:
+        if self._state == CircuitState.OPEN:  # noqa: SIM102 — nested ifs for clarity
             if time.monotonic() - self._last_failure_time >= self.recovery_timeout:
                 self._state = CircuitState.HALF_OPEN
                 logger.info("Circuit breaker %s: OPEN -> HALF_OPEN", self.name)
