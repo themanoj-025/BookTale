@@ -57,7 +57,7 @@ def get_engine() -> Engine:
     if url.startswith("sqlite"):
 
         @event.listens_for(_engine, "connect")
-        def _set_sqlite_pragma(dbapi_connection, connection_record):
+        def _set_sqlite_pragma(dbapi_connection, connection_record) -> None:
             cursor = dbapi_connection.cursor()
             cursor.execute("PRAGMA journal_mode=WAL")
             cursor.execute("PRAGMA foreign_keys=ON")
@@ -67,7 +67,7 @@ def get_engine() -> Engine:
             dbapi_connection.isolation_level = None
 
         @event.listens_for(_engine, "begin")
-        def _sqlite_begin_immediate(conn):
+        def _sqlite_begin_immediate(conn) -> None:
             # Serialize writers: every transaction takes the write lock up
             # front (BEGIN IMMEDIATE), so two concurrent checkouts cannot both
             # read available_copies=1. This is the documented SQLAlchemy

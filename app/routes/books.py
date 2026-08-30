@@ -27,7 +27,7 @@ def register_book_routes(app) -> None:
 
     @app.route("/profile")
     @login_required
-    def profile_self_redirect():
+    def profile_self_redirect() -> None:
         uid = session["user_id"]
         return redirect(url_for("profile_page", user_id=uid))
 
@@ -159,7 +159,7 @@ def register_book_routes(app) -> None:
 
     @app.route("/api/books/<book_id>/issue", methods=["POST"])
     @login_required
-    def api_book_issue(book_id):
+    def api_book_issue(book_id) -> None:
         target = request.json.get("user_id") if request.is_json else None
         if not target:
             target = session.get("user_id")
@@ -168,7 +168,7 @@ def register_book_routes(app) -> None:
 
     @app.route("/api/books/<book_id>/return", methods=["POST"])
     @login_required
-    def api_book_return(book_id):
+    def api_book_return(book_id) -> None:
         target = request.json.get("user_id") if request.is_json else None
         if not target:
             target = session.get("user_id")

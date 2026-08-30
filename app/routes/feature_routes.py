@@ -70,7 +70,7 @@ def init_feature_routes(
 
     def login_required(f) -> Callable[[Callable], Callable]:
         @wraps(f)
-        def d(*a, **k):
+        def d(*a, **k) -> None:
             if "user_id" not in session:
                 return redirect(url_for("login_page"))
             return f(*a, **k)
@@ -78,7 +78,7 @@ def init_feature_routes(
 
     def admin_required(f) -> Callable[[Callable], Callable]:
         @wraps(f)
-        def d(*a, **k):
+        def d(*a, **k) -> None:
             if "user_id" not in session:
                 return redirect(url_for("login_page"))
             if session.get("role") != "admin":
