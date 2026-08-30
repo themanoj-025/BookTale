@@ -1,6 +1,28 @@
 """ML model implementations."""
 
 from __future__ import annotations
+from app.services.recommendations.ml.Model.ml_pkg.models import ALGORITHM_COLORS
+from sklearn.cluster import AgglomerativeClustering
+from sklearn.cluster import DBSCAN
+from sklearn.cluster import KMeans
+from sklearn.neural_network import MLPRegressor
+from app.services.recommendations.ml.Model.ml_pkg.models import ModelResult
+from sklearn.neighbors import NearestNeighbors
+from sklearn.decomposition import PCA
+from sklearn.manifold import TSNE
+from sklearn.decomposition import TruncatedSVD
+from sklearn.metrics.pairwise import cosine_similarity
+from app.services.recommendations.ml.Model.ml_pkg.models import evaluate_clustering
+from app.services.recommendations.ml.Model.ml_pkg.models import evaluate_recommendation
+import math
+from sklearn.metrics import mean_absolute_error
+from sklearn.metrics import mean_squared_error
+import numpy as np
+import pandas as pd
+from sklearn.metrics import r2_score
+import time
+from sklearn.model_selection import train_test_split
+import xgboost as xgb
 
 def knn_model(X: np.ndarray) -> ModelResult:
     """KNN-based recommendation using nearest neighbors."""

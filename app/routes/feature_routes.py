@@ -20,6 +20,7 @@ from app.routes.challenge_routes import register_challenge_routes
 from app.routes.progress_routes import register_progress_routes
 from app.routes.wishlist_routes import register_wishlist_routes
 from app.routes.diary_routes import register_diary_routes
+from collections.abc import Callable
 
 
 def init_feature_routes(

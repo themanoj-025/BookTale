@@ -11,6 +11,8 @@ from functools import wraps
 from flask import g, jsonify, redirect, render_template, request, session, url_for
 
 from app.config.settings import Config
+from typing import Any
+from collections.abc import Callable
 
 
 def init_admin_routes(app, storage, lib, auth, notif_mgr) -> None:

@@ -6,6 +6,8 @@ Extracted from feature_routes.py for focused maintenance.
 from flask import jsonify, redirect, request, session, url_for
 
 from app.routes.feature_shared import _series, h, cat_color
+from typing import Any
+from flask import Response
 
 
 def register_series_routes(app, login_required, admin_required, render_page, _rate_limit) -> None:

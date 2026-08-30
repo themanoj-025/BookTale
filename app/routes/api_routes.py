@@ -12,6 +12,8 @@ from datetime import datetime
 from functools import wraps
 
 from flask import g, jsonify, redirect, request, session, url_for
+from typing import Any
+from collections.abc import Callable
 
 
 def init_api_routes(app, storage, lib, auth, notif_mgr, recommender, social, diary_mgr) -> None:
