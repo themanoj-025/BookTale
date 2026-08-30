@@ -259,6 +259,9 @@ init_api_routes(app, storage, lib, auth, notif_mgr, recommender, social, diary_m
 # Page routes
 from app.routes.helpers import init_helpers
 from app.routes.page_routes import init_page_routes
+from typing import Any
+from collections.abc import Callable
+from flask import Response
 
 init_helpers(storage, notif_mgr)
 init_page_routes(

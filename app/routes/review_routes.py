@@ -6,6 +6,7 @@ Extracted from social_routes.py for focused maintenance.
 from flask import g, jsonify, request, session
 
 from app.routes.social_shared import (
+from flask import Response
     login_required,
     review_mgr,
     storage,

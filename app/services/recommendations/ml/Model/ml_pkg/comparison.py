@@ -1,6 +1,32 @@
 """Comparison runner and weight extraction."""
 
 from __future__ import annotations
+from app.services.recommendations.ml.Model.ml_pkg.models import ALGORITHM_COLORS
+from app.services.recommendations.ml.Model.ml_pkg.models import DATA_PATH
+from app.services.recommendations.ml.Model.ml_pkg.models import OUTPUT_DIR
+from app.services.recommendations.ml.Model.ml_pkg.models import agglomerative_model
+from app.services.recommendations.ml.Model.ml_pkg.models import content_based_filtering
+from app.services.recommendations.ml.Model.ml_pkg.models import dbscan_model
+from app.services.recommendations.ml.Model.ml_pkg.models import get_numerical_features
+from app.services.recommendations.ml.Model.ml_pkg.models import get_tfidf_features
+from app.services.recommendations.ml.Model.ml_pkg.models import hybrid_model
+from app.services.recommendations.ml.Model.ml_pkg.models import kmeans_model
+from app.services.recommendations.ml.Model.ml_pkg.models import knn_model
+from app.services.recommendations.ml.Model.ml_pkg.models import load_and_preprocess_data
+from app.services.recommendations.ml.Model.ml_pkg.models import neural_network_model
+import numpy as np
+from app.services.recommendations.ml.Model.ml_pkg.models import pca_kmeans_model
+from app.services.recommendations.ml.Model.ml_pkg.visualization import save_bar_comparison
+from app.services.recommendations.ml.Model.ml_pkg.visualization import save_cluster_visualization
+from app.services.recommendations.ml.Model.ml_pkg.visualization import save_elbow_plot
+from app.services.recommendations.ml.Model.ml_pkg.visualization import save_heatmap_comparison
+from app.services.recommendations.ml.Model.ml_pkg.visualization import save_interactive_radar
+from app.services.recommendations.ml.Model.ml_pkg.visualization import save_k_distance_plot
+from app.services.recommendations.ml.Model.ml_pkg.visualization import save_radar_chart
+from app.services.recommendations.ml.Model.ml_pkg.visualization import save_summary_report
+from app.services.recommendations.ml.Model.ml_pkg.models import svd_model
+from app.services.recommendations.ml.Model.ml_pkg.models import tsne_kmeans_model
+from app.services.recommendations.ml.Model.ml_pkg.models import xgboost_model
 
 def run_comparison() -> dict:
     """Run the full ML model comparison pipeline."""

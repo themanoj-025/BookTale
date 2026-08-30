@@ -14,6 +14,7 @@ from flask import redirect, render_template, session, url_for
 from app.config.settings import Config
 from app.models.book import CATEGORIES as BOOK_CATEGORIES
 from app.routes.helpers import cat_color
+from typing import Any
 
 
 def init_site_pages(app, storage, lib, recommender, social, review_mgr, notif_mgr) -> Any:

@@ -11,6 +11,9 @@ import logging
 from functools import wraps
 
 from flask import redirect, render_template, session, url_for
+from typing import Any
+from collections.abc import Callable
+from flask import Flask
 
 logger = logging.getLogger(__name__)
 

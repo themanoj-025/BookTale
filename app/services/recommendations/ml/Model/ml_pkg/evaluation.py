@@ -1,6 +1,15 @@
 """Model result, evaluation, content-based filtering."""
 
 from __future__ import annotations
+from app.services.recommendations.ml.Model.ml_pkg.models import ALGORITHM_COLORS
+from sklearn.cluster import KMeans
+from sklearn.metrics import calinski_harabasz_score
+from sklearn.metrics.pairwise import cosine_similarity
+from sklearn.metrics import davies_bouldin_score
+import numpy as np
+import pandas as pd
+from sklearn.metrics import silhouette_score
+import time
 
 class ModelResult:
     """Stores evaluation results for a single model."""

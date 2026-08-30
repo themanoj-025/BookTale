@@ -11,6 +11,9 @@ from flask import request, session
 
 from app.routes.helpers import avatar_html
 from app.routes.page_state import (
+import logging
+logger = logging.getLogger(__name__)
+from flask import render_template
     admin_required,
     h,
     login_required,

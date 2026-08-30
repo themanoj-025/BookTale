@@ -8,6 +8,7 @@ from flask import jsonify, request, session
 
 from app.routes.helpers import avatar_html, cat_color
 from app.routes.page_state import (
+from flask import Response
     communities,
     h,
     login_required,
