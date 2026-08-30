@@ -51,6 +51,10 @@ from sqlalchemy import insert
 from app.db.database import create_all, get_engine
 from app.db.models import Book, Transaction, User
 from app.db.service import LibraryService
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 # ══════════════════════════════════════════════════════════════════════
 # SEED DATA GENERATORS
@@ -269,7 +273,7 @@ def _seed(books_n: int, users_n: int, txns_n: int) -> tuple:
     _bulk_insert(Transaction, txn_rows)
 
     dt = time.perf_counter() - t0
-    print(f"  seeded {books_n} books / {users_n} users / {txns_n} txns in {dt:.1f}s")
+    logger.info(f"  seeded {books_n} books / {users_n} users / {txns_n} txns in {dt:.1f}s")
     return user_ids, book_ids
 
 
@@ -315,13 +319,13 @@ def main() -> int:
     )
     args = parser.parse_args()
 
-    print("== Book-Tale Phase 2 DoD benchmark ==")
-    print(f"  DB: {Config.DATA_DIR}/booktale.db (SQLite WAL + BEGIN IMMEDIATE)")
+    logger.info("== Book-Tale Phase 2 DoD benchmark ==")
+    logger.info(f"  DB: {Config.DATA_DIR}/booktale.db (SQLite WAL + BEGIN IMMEDIATE)")
 
     user_ids, book_ids = _seed(args.books, args.users, args.txns)
     svc = LibraryService()
 
-    print("\n  warming up each operation (20 iterations, discarded)...\n")
+    logger.info("\n  warming up each operation (20 iterations, discarded)...\n")
 
     # ── Checkout: one fresh (user, book) pair per iteration ───────────
     # Warmup (20) + samples must fit in the user/book pool for any custom
@@ -329,9 +333,7 @@ def main() -> int:
     # the warmup from the cap.
     n_checkout = max(0, min(200, len(user_ids) - 20, len(book_ids) - 20))
     if n_checkout == 0:
-        print(
-            "  pool too small for the checkout benchmark " "(need at least 21 users and 21 books)"
-        )
+        logger.info("  pool too small for the checkout benchmark " "(need at least 21 users and 21 books)")
         return 1
     checkout_i = 0
 
@@ -372,23 +374,19 @@ def main() -> int:
         samples = _measure(fn, n)
         results[name] = _percentiles(samples)
 
-    print(f"{'operation':<26} {'n':>5} {'mean':>9} {'p50':>9} {'p95':>9} {'p99':>9}")
-    print("-" * 67)
+    logger.info(f"{'operation':<26} {'n':>5} {'mean':>9} {'p50':>9} {'p95':>9} {'p99':>9}")
+    logger.info("-" * 67)
     for name, r in results.items():
-        print(
-            f"{name:<26} {r['n']:>5} {r['mean']:>8.2f}ms {r['p50']:>8.2f}ms "
-            f"{r['p95']:>8.2f}ms {r['p99']:>8.2f}ms"
-        )
+        logger.info(f"{name:<26} {r['n']:>5} {r['mean']:>8.2f}ms {r['p50']:>8.2f}ms "
+            f"{r['p95']:>8.2f}ms {r['p99']:>8.2f}ms")
 
     # DoD gate: checkout p95 < 50ms
     checkout_p95 = results["checkout (issue_book)"]["p95"]
     gate = checkout_p95 < 50.0
     # ASCII markers only: the Windows cp1252 console cannot encode the
     # check/cross emoji and would raise UnicodeEncodeError on the gate line.
-    print(
-        f"\n  Phase 2 DoD gate: checkout p95 < 50ms -> "
-        f"{checkout_p95:.2f}ms {'PASS' if gate else 'FAIL'}"
-    )
+    logger.error(f"\n  Phase 2 DoD gate: checkout p95 < 50ms -> "
+        f"{checkout_p95:.2f}ms {'PASS' if gate else 'FAIL'}")
 
     if args.write_doc:
         _append_doc(args, results)
@@ -417,7 +415,7 @@ def _append_doc(args, results: dict) -> None:
     doc = os.path.join("docs", "perf-report.md")
     with open(doc, "a", encoding="utf-8") as fh:
         fh.write("\n".join(lines))
-    print(f"\n  appended results to {doc}")
+    logger.info(f"\n  appended results to {doc}")
 
 
 if __name__ == "__main__":

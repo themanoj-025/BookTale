@@ -27,40 +27,44 @@ from app.services.recommendations.ml.Model.ml_pkg.visualization import save_summ
 from app.services.recommendations.ml.Model.ml_pkg.models import svd_model
 from app.services.recommendations.ml.Model.ml_pkg.models import tsne_kmeans_model
 from app.services.recommendations.ml.Model.ml_pkg.models import xgboost_model
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 def run_comparison() -> dict:
     """Run the full ML model comparison pipeline."""
-    print("\n" + "=" * 70)
-    print("  LIBRARY MANAGEMENT SYSTEM - ML MODEL COMPARISON")
-    print("=" * 70)
+    logger.info("\n" + "=" * 70)
+    logger.info("  LIBRARY MANAGEMENT SYSTEM - ML MODEL COMPARISON")
+    logger.info("=" * 70)
     print()
-    print(f"  Output directory: {OUTPUT_DIR}")
-    print(f"  Algorithms to test: {len(ALGORITHM_COLORS)}")
-    print(f"  Dataset path: {DATA_PATH}")
+    logger.info(f"  Output directory: {OUTPUT_DIR}")
+    logger.info(f"  Algorithms to test: {len(ALGORITHM_COLORS)}")
+    logger.info(f"  Dataset path: {DATA_PATH}")
     print()
 
     # Step 1: Load data
     df = load_and_preprocess_data()
     if len(df) == 0:
-        print("\n  ❌ No data loaded. Exiting.")
+        logger.info("\n  ❌ No data loaded. Exiting.")
         return
 
     # Step 2: Extract features
-    print("\n" + "-" * 70)
-    print("  🛠️  FEATURE ENGINEERING")
-    print("-" * 70)
+    logger.info("\n" + "-" * 70)
+    logger.info("  🛠️  FEATURE ENGINEERING")
+    logger.info("-" * 70)
     X_num, _feature_names = get_numerical_features(df)
     X_tfidf = get_tfidf_features(df)
-    print(f"  ✅ Numerical features: {X_num.shape[1]} dimensions")
-    print(f"  ✅ TF-IDF features: {X_tfidf.shape[1]} dimensions")
+    logger.info(f"  ✅ Numerical features: {X_num.shape[1]} dimensions")
+    logger.info(f"  ✅ TF-IDF features: {X_tfidf.shape[1]} dimensions")
 
     # Combine features for models that use both
     X_combined = np.hstack([X_num, X_tfidf]) if X_tfidf.shape[1] > 1 else X_num
 
     # Step 3: Run all models
-    print("\n" + "-" * 70)
-    print("  🤖 RUNNING ML ALGORITHMS")
-    print("-" * 70)
+    logger.info("\n" + "-" * 70)
+    logger.info("  🤖 RUNNING ML ALGORITHMS")
+    logger.info("-" * 70)
     print()
 
     results = []
@@ -109,9 +113,9 @@ def run_comparison() -> dict:
     results.append(agglomerative_model(X_combined, df))
 
     # Step 4: Generate visualizations
-    print("\n" + "-" * 70)
-    print("  📈 GENERATING VISUALIZATIONS")
-    print("-" * 70)
+    logger.info("\n" + "-" * 70)
+    logger.info("  📈 GENERATING VISUALIZATIONS")
+    logger.info("-" * 70)
     print()
 
     # Radar chart
@@ -162,20 +166,20 @@ def run_comparison() -> dict:
     save_summary_report(results, df)
 
     # Step 6: Final summary
-    print("\n" + "=" * 70)
-    print("  ✅ COMPARISON COMPLETE")
-    print("=" * 70)
-    print(f"\n  📁 Output saved to: {OUTPUT_DIR}")
-    print("  📊 Files generated:")
+    logger.info("\n" + "=" * 70)
+    logger.info("  ✅ COMPARISON COMPLETE")
+    logger.info("=" * 70)
+    logger.info(f"\n  📁 Output saved to: {OUTPUT_DIR}")
+    logger.info("  📊 Files generated:")
     for f in sorted(OUTPUT_DIR.iterdir()):
         size = f.stat().st_size
         if size > 1024:
-            print(f"     📄 {f.name} ({size / 1024:.1f} KB)")
+            logger.info(f"     📄 {f.name} ({size / 1024:.1f} KB)")
         else:
-            print(f"     📄 {f.name} ({size} B)")
+            logger.info(f"     📄 {f.name} ({size} B)")
 
     # Print top recommendations
-    print("\n  🏆 TOP PERFORMING ALGORITHMS:")
+    logger.info("\n  🏆 TOP PERFORMING ALGORITHMS:")
     print()
 
     # Sort by key metrics
@@ -188,12 +192,12 @@ def run_comparison() -> dict:
                 reverse=True,
             )
             if ranked:
-                print(f"  🥇 Best '{metric}': {ranked[0].name} = {ranked[0].metrics[metric]:.4f}")
-                print(f"  🥈 Runner-up: {ranked[1].name} = {ranked[1].metrics[metric]:.4f}")
+                logger.info(f"  🥇 Best '{metric}': {ranked[0].name} = {ranked[0].metrics[metric]:.4f}")
+                logger.info(f"  🥈 Runner-up: {ranked[1].name} = {ranked[1].metrics[metric]:.4f}")
                 print()
 
-    print(f"\n  💡 Open {OUTPUT_DIR}/model_comparison_report.txt for full details")
-    print("  💡 Open the HTML file in a browser for interactive charts")
+    logger.info(f"\n  💡 Open {OUTPUT_DIR}/model_comparison_report.txt for full details")
+    logger.info("  💡 Open the HTML file in a browser for interactive charts")
     print()
 
 

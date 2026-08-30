@@ -80,7 +80,7 @@ RESULTS = []
 def check(num: int, name: str, ok: bool, note: str = "") -> None:
     RESULTS.append((num, name, ok))
     mark = "✅" if ok else "❌"
-    print(f"  {mark} #{num:<2} {name}" + (f"  [{note}]" if note else ""))
+    logger.info(f"  {mark} #{num:<2} {name}" + (f"  [{note}]" if note else ""))
 
 
 def _free_port() -> int:
@@ -107,6 +107,10 @@ def _csrf_meta(html: str) -> str:
 PORT = _free_port()
 BASE = f"http://127.0.0.1:{PORT}"
 from werkzeug.serving import make_server
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 _server = make_server("127.0.0.1", PORT, app, threaded=True)
 _thread = threading.Thread(target=_server.serve_forever, daemon=True)
@@ -121,9 +125,9 @@ for _ in range(50):
     except requests.RequestException:
         time.sleep(0.2)
 if not _ready:
-    print("❌ live server failed to become ready")
+    logger.error("❌ live server failed to become ready")
     sys.exit(1)
-print(f"✅ live server ready at {BASE} (CSRF ON, RATELIMIT ON)\n")
+logger.info(f"✅ live server ready at {BASE} (CSRF ON, RATELIMIT ON)\n")
 
 
 def _get(session, path, **kw) -> None:
@@ -135,7 +139,7 @@ def _post(session, path, data=None, headers=None) -> None:
 
 
 # ═══════════════════════════════════════════════════════════════════
-print("== A. Auth over real HTTP (rate limits + CSRF active) ==")
+logger.info("== A. Auth over real HTTP (rate limits + CSRF active) ==")
 
 r = _get(requests.Session(), "/")
 check(1, "Landing page loads (no auth)", r.status_code == 200)
@@ -218,7 +222,7 @@ check(
 )
 
 # ═══════════════════════════════════════════════════════════════════
-print("== E. Phase gates over real HTTP (CSRF + per-user limits) ==")
+logger.info("== E. Phase gates over real HTTP (CSRF + per-user limits) ==")
 
 # Settings journeys key on the ACCOUNT (per-user budget), independent of the
 # per-IP login budget — but they still need a logged-in session.
@@ -291,7 +295,7 @@ check(13, "GET /healthz -> 200", _get(requests.Session(), "/healthz").status_cod
 check(14, "GET /readyz -> 200", _get(requests.Session(), "/readyz").status_code == 200)
 
 # ═══════════════════════════════════════════════════════════════════
-print("== A (cont). Failure throttles fire only on abuse ==")
+logger.error("== A (cont). Failure throttles fire only on abuse ==")
 
 # Login failures: 10 allowed, 11th -> 429 (deduct_when counts only failures).
 s = requests.Session()
@@ -373,12 +377,12 @@ check(
 
 _server.shutdown()
 
-print("\n" + "=" * 60)
+logger.info("\n" + "=" * 60)
 passed = sum(1 for _, _, ok in RESULTS if ok)
 failed = [r for r in RESULTS if not r[2]]
-print(f"LIVE SMOKE CHECKLIST: {passed}/{len(RESULTS)} passed")
+logger.info(f"LIVE SMOKE CHECKLIST: {passed}/{len(RESULTS)} passed")
 if failed:
-    print("FAILED:", ", ".join(f"#{n} {name}" for n, name, _ in failed))
+    logger.error("FAILED:", ", ".join(f"#{n} {name}" for n, name, _ in failed))
     sys.exit(1)
-print("ALL LIVE JOURNEYS PASS with CSRF + rate limiting ENABLED ✅")
+logger.info("ALL LIVE JOURNEYS PASS with CSRF + rate limiting ENABLED ✅")
 sys.exit(0)

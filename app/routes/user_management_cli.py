@@ -16,6 +16,10 @@ from app.models.user import ROLES
 from app.services.auth.auth import AuthManager, hash_password
 from app.services.books.library import Library
 from app.storage.storage import Storage
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 
 def user_management_menu(lib: Library, auth: AuthManager, storage: Storage) -> None:
@@ -53,7 +57,7 @@ def register_user_flow(lib: Library, auth: AuthManager) -> None:
     if not validate_email(email):
         print_warning("Invalid email.")
     phone = input("  Phone     : ").strip()
-    print("  Roles:", ", ".join(ROLES))
+    logger.info("  Roles:", ", ".join(ROLES))
     role = input("  Role [user]: ").strip() or "user"
     if role not in ROLES:
         print_error("Invalid role.")
@@ -85,7 +89,7 @@ def view_user_flow(storage: Storage) -> None:
     uid = input("  User ID   : ").strip()
     user = storage.load_users().get(uid)
     if user:
-        print("\n" + user.display())
+        logger.info("\n" + user.display())
     else:
         print_error("User not found.")
     pause()
@@ -99,7 +103,7 @@ def block_unblock_user_flow(lib: Library, auth: AuthManager) -> dict:
         print_error("User not found.")
         pause()
         return
-    print(f"\n  {user.name} — Status: {user.membership_status}")
+    logger.info(f"\n  {user.name} — Status: {user.membership_status}")
     action = input("  [b]lock / [u]nblock: ").strip().lower()
     if action == "b":
         ok, msg = lib.block_user(uid, auth.current_user.user_id)
@@ -135,9 +139,7 @@ def list_users(storage: Storage) -> None:
     users = storage.load_users()
     for u in users.values():
         status_color = "green" if u.membership_status == "Active" else "red"
-        print(
-            f"  [{u.user_id}] {u.name} | {u.role.upper()} | "
+        logger.info(f"  [{u.user_id}] {u.name} | {u.role.upper()} | "
             f"{colored(u.membership_status, status_color)} | "
-            f"Books: {len(u.books_issued)} | Fine: ₹{u.unpaid_fine:.2f}"
-        )
+            f"Books: {len(u.books_issued)} | Fine: ₹{u.unpaid_fine:.2f}")
     pause()

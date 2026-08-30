@@ -14,6 +14,10 @@ from app.core.utils import (
 )
 from app.services.auth.auth import AuthManager
 from app.services.books.backup import create_backup, list_backups, restore_backup
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 
 def backup_restore_menu(auth: AuthManager) -> None:
@@ -31,11 +35,11 @@ def backup_restore_menu(auth: AuthManager) -> None:
             backups = list_backups()
             header("📂 AVAILABLE BACKUPS")
             if not backups:
-                print("  No backups found.")
+                logger.info("  No backups found.")
             for i, b in enumerate(backups, 1):
                 ts = b.get("timestamp", b["name"])
                 by = b.get("triggered_by", "?")
-                print(f"  {i}. {ts}  (by: {by})")
+                logger.info(f"  {i}. {ts}  (by: {by})")
             pause()
         elif choice == "3":
             backups = list_backups()
@@ -44,7 +48,7 @@ def backup_restore_menu(auth: AuthManager) -> None:
                 pause()
                 continue
             for i, b in enumerate(backups, 1):
-                print(f"  {i}. {b.get('timestamp', b['name'])}")
+                logger.info(f"  {i}. {b.get('timestamp', b['name'])}")
             try:
                 idx = int(input("  Restore backup #: ").strip()) - 1
                 bk = backups[idx]
@@ -68,7 +72,7 @@ def logs_menu() -> None:
     header("📜 ACTIVITY LOGS (Last 50 entries)")
     lines = get_logs(50)
     if not lines:
-        print("  No logs yet.")
+        logger.info("  No logs yet.")
     for line in lines:
-        print(f"  {line}")
+        logger.info(f"  {line}")
     pause()

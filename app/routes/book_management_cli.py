@@ -22,6 +22,10 @@ from app.core.utils import (
 from app.models.book import CATEGORIES
 from app.services.auth.auth import AuthManager
 from app.services.books.library import Library
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 
 def book_management_menu(lib: Library, auth: AuthManager) -> None:
@@ -93,7 +97,7 @@ def add_book_flow(lib: Library, auth: AuthManager) -> None:
         if not confirm("Continue anyway?"):
             return
 
-    print("  Categories:", ", ".join(CATEGORIES))
+    logger.info("  Categories:", ", ".join(CATEGORIES))
     category = input("  Category  : ").strip() or "Other"
     if category not in CATEGORIES:
         print_warning(f"'{category}' not in standard list. Using as-is.")
@@ -130,7 +134,7 @@ def _generate_barcode(book_id: str, isbn: str) -> None:
 
 def search_books_menu(lib: Library) -> None:
     header("🔍 ADVANCED SEARCH")
-    print("  Search by: 1.All  2.Title  3.Author  4.ISBN  5.Category  6.Advanced Filters")
+    logger.info("  Search by: 1.All  2.Title  3.Author  4.ISBN  5.Category  6.Advanced Filters")
     by_map = {"1": "all", "2": "title", "3": "author", "4": "isbn"}
     by_choice = input("  Choice [1]: ").strip() or "1"
 
@@ -141,14 +145,14 @@ def search_books_menu(lib: Library) -> None:
     search_by = "all"
 
     if by_choice == "5":
-        print("  Categories:", ", ".join(CATEGORIES))
+        logger.info("  Categories:", ", ".join(CATEGORIES))
         category = input("  Category  : ").strip()
     elif by_choice == "6":
         query = input("  Query     : ").strip()
-        print("  Filter by: 1.All  2.Title  3.Author  4.ISBN")
+        logger.info("  Filter by: 1.All  2.Title  3.Author  4.ISBN")
         fb = input("  [1]: ").strip() or "1"
         search_by = {"1": "all", "2": "title", "3": "author", "4": "isbn"}.get(fb, "all")
-        print("  Categories:", ", ".join(CATEGORIES))
+        logger.info("  Categories:", ", ".join(CATEGORIES))
         cat_str = input("  Category (optional): ").strip()
         if cat_str in CATEGORIES:
             category = cat_str
@@ -172,9 +176,9 @@ def search_books_menu(lib: Library) -> None:
         query = input("  Query     : ").strip()
         results = lib.search_books(query=query, search_by=search_by)
 
-    print(f"\n  Found {len(results)} book(s):\n")
+    logger.info(f"\n  Found {len(results)} book(s):\n")
     for b in results:
-        print(b.display())
+        logger.info("%s", b.display())
         print()
     pause()
 
@@ -187,8 +191,8 @@ def update_book_flow(lib: Library, auth: AuthManager) -> None:
         print_error("Book not found.")
         pause()
         return
-    print("\n" + book.display())
-    print("\n  Leave blank to keep current value.")
+    logger.info("\n" + book.display())
+    logger.info("\n  Leave blank to keep current value.")
     updates = {}
     for field_name, label in [
         ("title", "Title"),
@@ -210,7 +214,7 @@ def update_book_flow(lib: Library, auth: AuthManager) -> None:
         else:
             print_error(msg)
     else:
-        print("  No changes made.")
+        logger.info("  No changes made.")
     pause()
 
 
@@ -222,7 +226,7 @@ def delete_book_flow(lib: Library, auth: AuthManager) -> None:
         print_error("Book not found.")
         pause()
         return
-    print("\n" + book.display())
+    logger.info("\n" + book.display())
     if confirm("\n  Soft-delete this book?"):
         ok, msg = lib.delete_book(book_id, actor=auth.current_user.user_id)
         if ok:

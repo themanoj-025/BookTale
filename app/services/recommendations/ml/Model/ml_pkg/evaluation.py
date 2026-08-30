@@ -11,6 +11,10 @@ import numpy as np
 import pandas as pd
 from sklearn.metrics import silhouette_score
 import time
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 class ModelResult:
     """Stores evaluation results for a single model."""
@@ -103,7 +107,7 @@ def content_based_filtering(
     df: pd.DataFrame, X_tfidf: np.ndarray, X_num: np.ndarray
 ) -> ModelResult:
     """Content-based recommendations using TF-IDF + numerical features."""
-    print("  🔄 Content-Based Filtering...", end=" ", flush=True)
+    logger.info("  🔄 Content-Based Filtering...")
     start = time.time()
     result = ModelResult("Content-Based", ALGORITHM_COLORS["Content-Based"])
 
@@ -134,7 +138,7 @@ def content_based_filtering(
     evaluate_clustering(X_combined, labels, result)
     evaluate_recommendation(df, sim_matrix, result)
     result.time_taken = time.time() - start
-    print(f"✅ ({result.time_taken:.2f}s)")
+    logger.info(f"✅ ({result.time_taken:.2f}s)")
     return result
 
 

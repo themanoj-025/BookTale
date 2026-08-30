@@ -43,6 +43,10 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 
 # Scikit-learn
 from sklearn.preprocessing import LabelEncoder, StandardScaler
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 try:
     import xgboost as xgb
@@ -114,17 +118,17 @@ plt.rcParams.update(
 
 def load_and_preprocess_data(path: str = str(DATA_PATH)) -> pd.DataFrame:
     """Load books dataset with robust error handling."""
-    print("=" * 70)
-    print("  📥 LOADING & PREPROCESSING DATA")
-    print("=" * 70)
+    logger.info("=" * 70)
+    logger.info("  📥 LOADING & PREPROCESSING DATA")
+    logger.info("=" * 70)
 
     if not os.path.exists(path):
-        print(f"  ❌ Dataset not found at: {path}")
-        print(f"  💡 Expected at: {DATA_PATH}")
+        logger.warning(f"  ❌ Dataset not found at: {path}")
+        logger.info(f"  💡 Expected at: {DATA_PATH}")
         return pd.DataFrame()
 
     df = pd.read_csv(path, encoding="utf-8", on_bad_lines="skip")
-    print(f"  ✅ Loaded {len(df):,} rows, {len(df.columns)} columns")
+    logger.info(f"  ✅ Loaded {len(df):,} rows, {len(df.columns)} columns")
 
     # Clean column names
     df.columns = df.columns.str.strip()
@@ -181,8 +185,8 @@ def load_and_preprocess_data(path: str = str(DATA_PATH)) -> pd.DataFrame:
         df["authors"].fillna("") + " " + df["publisher"].fillna("") + " " + df["title"].fillna("")
     )
 
-    print(f"  ✅ After cleaning: {len(df):,} rows")
-    print(f"  📊 Features: {', '.join(df.select_dtypes(include=[np.number]).columns)}")
+    logger.info(f"  ✅ After cleaning: {len(df):,} rows")
+    logger.info(f"  📊 Features: {', '.join(df.select_dtypes(include=[np.number]).columns)}")
     return df
 
 

@@ -10,10 +10,14 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 def save_radar_chart(results: list[ModelResult], filename: str = "radar_comparison.png") -> None:
     """Create a radar chart comparing algorithms across key metrics."""
-    print("\n  📊 Generating Radar Chart...")
+    logger.info("\n  📊 Generating Radar Chart...")
 
     # Select clustering metrics for radar
     metric_names = [
@@ -25,7 +29,7 @@ def save_radar_chart(results: list[ModelResult], filename: str = "radar_comparis
     ]
     available_metrics = [m for m in metric_names if any(m in r.metrics for r in results)]
     if not available_metrics:
-        print("  ⚠️  No common metrics available for radar chart")
+        logger.info("  ⚠️  No common metrics available for radar chart")
         return
 
     # Normalize scores for radar (1 = best, 0 = worst)
@@ -82,7 +86,7 @@ def save_radar_chart(results: list[ModelResult], filename: str = "radar_comparis
     path = OUTPUT_DIR / filename
     plt.savefig(path, dpi=150, bbox_inches="tight")
     plt.close()
-    print(f"  ✅ Radar chart saved: {path}")
+    logger.info(f"  ✅ Radar chart saved: {path}")
 
 
 def save_bar_comparison(results: list[ModelResult], metric: str, filename: str | None = None) -> None:
@@ -120,7 +124,7 @@ def save_bar_comparison(results: list[ModelResult], metric: str, filename: str |
     path = OUTPUT_DIR / filename
     plt.savefig(path, dpi=150, bbox_inches="tight")
     plt.close()
-    print(f"  ✅ Bar chart saved: {path}")
+    logger.info(f"  ✅ Bar chart saved: {path}")
 
 
 def save_elbow_plot(inertias, k_range, filename: str = "elbow_curve.png") -> None:
@@ -153,7 +157,7 @@ def save_elbow_plot(inertias, k_range, filename: str = "elbow_curve.png") -> Non
     path = OUTPUT_DIR / filename
     plt.savefig(path, dpi=150, bbox_inches="tight")
     plt.close()
-    print(f"  ✅ Elbow curve saved: {path}")
+    logger.info(f"  ✅ Elbow curve saved: {path}")
 
 
 def save_k_distance_plot(k_dist: np.ndarray, filename: str = "k_distance_plot.png") -> None:
@@ -182,7 +186,7 @@ def save_k_distance_plot(k_dist: np.ndarray, filename: str = "k_distance_plot.pn
     path = OUTPUT_DIR / filename
     plt.savefig(path, dpi=150, bbox_inches="tight")
     plt.close()
-    print(f"  ✅ k-Distance plot saved: {path}")
+    logger.info(f"  ✅ k-Distance plot saved: {path}")
 
 
 def save_cluster_visualization(X_2d: np.ndarray, labels: np.ndarray, title: str, filename: str) -> None:
@@ -211,7 +215,7 @@ def save_cluster_visualization(X_2d: np.ndarray, labels: np.ndarray, title: str,
     path = OUTPUT_DIR / filename
     plt.savefig(path, dpi=150, bbox_inches="tight")
     plt.close()
-    print(f"  ✅ Cluster viz saved: {path}")
+    logger.info(f"  ✅ Cluster viz saved: {path}")
 
 
 def save_heatmap_comparison(results: list[ModelResult], filename: str = "performance_heatmap.png") -> None:
@@ -239,7 +243,7 @@ def save_heatmap_comparison(results: list[ModelResult], filename: str = "perform
     key_metrics = [m for m in key_metrics if any(m in r.metrics for r in results)]
 
     if not key_metrics:
-        print("  ⚠️  No common metrics for heatmap")
+        logger.info("  ⚠️  No common metrics for heatmap")
         return
 
     data = []
@@ -284,7 +288,7 @@ def save_heatmap_comparison(results: list[ModelResult], filename: str = "perform
     path = OUTPUT_DIR / filename
     plt.savefig(path, dpi=150, bbox_inches="tight")
     plt.close()
-    print(f"  ✅ Heatmap saved: {path}")
+    logger.info(f"  ✅ Heatmap saved: {path}")
 
 
 def save_interactive_radar(results: list[ModelResult], filename: str = "interactive_radar.html") -> None:
@@ -330,7 +334,7 @@ def save_interactive_radar(results: list[ModelResult], filename: str = "interact
 
     path = OUTPUT_DIR / filename
     fig.write_html(path)
-    print(f"  ✅ Interactive radar saved: {path}")
+    logger.info(f"  ✅ Interactive radar saved: {path}")
 
 
 def save_summary_report(results: list[ModelResult], df: pd.DataFrame) -> None:
@@ -393,7 +397,7 @@ def save_summary_report(results: list[ModelResult], df: pd.DataFrame) -> None:
         f.write("  Recommendation Model Comparison — LibraryMS\n")
         f.write("=" * 70 + "\n")
 
-    print(f"  ✅ Summary report saved: {path}")
+    logger.info(f"  ✅ Summary report saved: {path}")
 
 
 # 4. MAIN PIPELINE
