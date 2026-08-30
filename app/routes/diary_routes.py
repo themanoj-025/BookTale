@@ -11,8 +11,9 @@ from app.routes.feature_shared import (
     h,
     cat_color,
 )
-from app.services.reading.diary import (
 from flask import Response
+
+from app.services.reading.diary import (
     RATING_LABELS,
     RATING_SCORES,
     rating_badge_html,
