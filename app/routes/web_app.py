@@ -338,115 +338,14 @@ def render_auth_page(title: str, content: str, **kw: Any) -> str:
     return render_template("auth_base.html", title=title, auth_content=content, session={}, **kw)
 
 
-def _initials(name: str) -> str:
-    parts = name.strip().split()
-    if not parts:
-        return "?"
-    if len(parts) >= 2:
-        return (parts[0][0] + parts[-1][0]).upper()
-    return parts[0][:2].upper()
 
-
-def _avatar_color(name) -> dict:
-    colors = [
-        "#4f46e5", "#059669", "#d97706", "#dc2626",
-        "#0891b2", "#7c3aed", "#db2777", "#ca8a04",
-    ]
-    return colors[zlib.crc32(str(name).encode("utf-8")) % len(colors)]
-
-
-def _avatar_html(name: str, size: int = 32) -> str:
-    i = _initials(name)
-    c = _avatar_color(name)
-    return (
-        f'<div class="avatar" style="width:{size}px;height:{size}px;background:{c}20;color:{c};'
-        f'font-size:{size // 2}px;font-weight:700;border-radius:50%;display:inline-flex;'
-        f'align-items:center;justify-content:center;flex-shrink:0;" title="{h(name)}">{h(i)}</div>'
-    )
-
-
-CAT_COLORS = {
-    "Fiction": "#4f46e5", "Non-Fiction": "#059669", "Science": "#0891b2",
-    "Technology": "#7c3aed", "History": "#d97706", "Philosophy": "#be185d",
-    "Art": "#db2777", "Biography": "#ca8a04", "Children": "#16a34a",
-    "Comics": "#e11d48", "Poetry": "#9333ea", "Drama": "#ea580c",
-    "Education": "#2563eb", "Reference": "#64748b", "Religion": "#78716c",
-    "Self-Help": "#0d9488", "Cooking": "#f97316", "Travel": "#0ea5e9",
-    "Music": "#8b5cf6", "Sports": "#22c55e", "Other": "#6b7280",
-}
-
-
-def cat_color(c: str) -> str:
-    return CAT_COLORS.get(c, CAT_COLORS["Other"])
-
-
-app.jinja_env.globals["_avatar_html"] = _avatar_html
-app.jinja_env.globals["_initials"] = _initials
-
-
-# ════════════════════════════════════════════════════════════════════════════
-# Error handlers
-# ════════════════════════════════════════════════════════════════════════════
-
-_ERROR_PAGES = {
-    400: ("400", "Bad Request", "⚠️", "The request could not be understood. Check the submitted data and try again."),
-    401: ("401", "Unauthorized", "🔒", "You need to sign in to access this page."),
-    403: ("403", "Forbidden", "⛔", "You don't have permission to access this resource."),
-    404: ("404", "Page Not Found", "🔍", "The page you're looking for doesn't exist or was moved."),
-    405: ("405", "Method Not Allowed", "🚫", "This URL doesn't accept that request method."),
-    409: ("409", "Conflict", "⚔️", "The request conflicts with the current state of the resource."),
-    413: ("413", "Request Too Large", "📦", "The uploaded file or request is too large."),
-    415: ("415", "Unsupported Media Type", "🧩", "The request payload is in an unsupported format."),
-    422: ("422", "Unprocessable Entity", "📋", "The request was well-formed but could not be processed."),
-    429: ("429", "Too Many Requests", "🐌", "You've made too many requests. Please slow down and try again shortly."),
-    500: ("500", "Server Error", "🛠️", "Something went wrong on our end. Please try again later."),
-}
-
-
-def _error_response(status: int, message: str) -> tuple:
-    if request.path.startswith("/api/") and request.path != "/api/docs":
-        return jsonify({"data": None, "error": {"code": status, "message": message}}), status
-    _code, _title, _icon, _msg = _ERROR_PAGES.get(status, _ERROR_PAGES[500])
-    return (
-        render_template(
-            "errors/error_page.html",
-            title=f"{_code} {_title}",
-            error_title=_title,
-            error_message=_msg,
-            icon=_icon,
-        ),
-        status,
-    )
-
-
-for _code in sorted(set(_ERROR_PAGES) - {404, 500}):
-
-    def _make_handler(code: int) -> Any:
-        def _handler(e) -> None:
-            return _error_response(code, _ERROR_PAGES[code][3])
-        return _handler
-
-    app.register_error_handler(_code, _make_handler(_code))
-
-
-@app.errorhandler(404)
-def _not_found(e) -> Response:
-    return _error_response(404, _ERROR_PAGES[404][3])
-
-
-@app.errorhandler(500)
-def _server_error(e) -> dict:
-    from app.core.logger import log as _err_log
-    _err_log(f"unhandled exception: {e!r}", "error")
-    return _error_response(500, _ERROR_PAGES[500][3])
-
-
-# ════════════════════════════════════════════════════════════════════════════
-# Health endpoints
-# ════════════════════════════════════════════════════════════════════════════
-
-
-@app.route("/healthz")
+# Helpers extracted to web_app_helpers.py
+from app.routes.web_app_helpers import (
+    _initials,
+    _avatar_color,
+    _avatar_html,
+    cat_color,
+)
 def healthz() -> dict[str, str]:
     return jsonify({"status": "ok"}), 200
 
