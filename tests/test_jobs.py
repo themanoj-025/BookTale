@@ -8,6 +8,7 @@ the bounded pool when Redis is unreachable, and the cron next-run helper.
 
 import os
 import sys
+import pytest
 
 
 pytestmark = pytest.mark.slow

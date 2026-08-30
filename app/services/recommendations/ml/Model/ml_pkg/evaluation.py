@@ -1,6 +1,7 @@
 """Model result, evaluation, content-based filtering."""
 
 from __future__ import annotations
+from app.services.recommendations.ml.Model.ml_pkg.data_loading import N_CLUSTERS, RANDOM_STATE, TOP_N_RECS
 from app.services.recommendations.ml.Model.ml_pkg.models import ALGORITHM_COLORS
 from sklearn.cluster import KMeans
 from sklearn.metrics import calinski_harabasz_score
