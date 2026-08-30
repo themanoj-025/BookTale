@@ -16,6 +16,7 @@ from app.routes.social_shared import init_shared_state
 from app.routes.social_api import register_social_api_routes
 from app.routes.review_routes import register_review_routes
 from app.routes.gamification_routes import register_gamification_routes
+from collections.abc import Callable
 
 
 def init_social_routes(

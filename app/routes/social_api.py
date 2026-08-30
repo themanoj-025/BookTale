@@ -23,6 +23,7 @@ from app.routes.social_shared import (
 
 # Re-export module-level refs that init_social_routes may mutate at startup.
 from app.routes.social_shared import lib, book_lists
+from flask import Response
 
 lib; book_lists  # referenced by init_social_routes at startup
 

@@ -1,6 +1,15 @@
 """Chart and visualization functions."""
 
 from __future__ import annotations
+from app.services.recommendations.ml.Model.ml_pkg.models import ALGORITHM_COLORS
+from app.services.recommendations.ml.Model.ml_pkg.models import ModelResult
+from app.services.recommendations.ml.Model.ml_pkg.models import OUTPUT_DIR
+from app.services.recommendations.ml.Model.ml_pkg.models import PLOTLY_AVAILABLE
+import plotly.graph_objects as go
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 def save_radar_chart(results: list[ModelResult], filename: str = "radar_comparison.png") -> None:
     """Create a radar chart comparing algorithms across key metrics."""

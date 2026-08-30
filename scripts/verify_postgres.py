@@ -38,6 +38,7 @@ Config.DATABASE_URL = database_url
 from alembic import command
 from alembic.config import Config as AlembicConfig
 from sqlalchemy import create_engine, inspect
+import psycopg2
 
 EXPECTED_TABLES = sorted(
     [

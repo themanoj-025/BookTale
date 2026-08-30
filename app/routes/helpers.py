@@ -12,6 +12,7 @@ from datetime import datetime
 from functools import wraps
 
 from flask import redirect, render_template, session, url_for
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
