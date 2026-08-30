@@ -17,6 +17,10 @@ from app.core.utils import (
 )
 from app.services.books.library import Library
 from app.services.notifications.notifications import NotificationManager
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 
 def show_notification_badge(notif_mgr: NotificationManager, user_id: str) -> None:
@@ -58,8 +62,8 @@ def _show_notifications(notif_mgr: NotificationManager, user_id: str, unread_onl
         ts = format_date(n["created_at"])
         type_icons = {"overdue": "⏰", "reservation_available": "📢", "fine": "💰"}
         icon = type_icons.get(n["type"], "📌")
-        print(f"  {read_status} {icon} {n['message']}")
-        print(f"              {ts}")
+        logger.info(f"  {read_status} {icon} {n['message']}")
+        logger.info(f"              {ts}")
         print()
     if not unread_only and confirm("Mark all as read?"):
         notif_mgr.mark_all_read(user_id)

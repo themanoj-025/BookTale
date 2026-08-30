@@ -17,6 +17,10 @@ import math
 import os
 import re
 from collections import defaultdict
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 # Global in-memory cache for the seed dataset
 _SEED_BOOKS: list[dict] = []
@@ -291,7 +295,7 @@ def _load_seed_data(force: bool = False) -> None:
         os.path.dirname(os.path.abspath(__file__)), "ml", "Dataset", "books.csv"
     )
     if not os.path.exists(csv_path):
-        print(f"  [SEED DATA] CSV not found at: {csv_path}")
+        logger.warning(f"  [SEED DATA] CSV not found at: {csv_path}")
         _SEED_LOADED = True  # Mark as loaded so we don't retry every time
         return
 
@@ -368,11 +372,9 @@ def _load_seed_data(force: bool = False) -> None:
 
         _SEED_CATEGORIES = list(_SEED_BY_CATEGORY.keys())
         _SEED_LOADED = True
-        print(
-            f"  [SEED DATA] Loaded {len(_SEED_BOOKS)} books from Goodreads dataset ({len(_SEED_CATEGORIES)} categories)"
-        )
+        logger.info(f"  [SEED DATA] Loaded {len(_SEED_BOOKS)} books from Goodreads dataset ({len(_SEED_CATEGORIES)} categories)")
     except (FileNotFoundError, csv.Error) as e:
-        print(f"  [SEED DATA ERROR] Could not load CSV: {e}")
+        logger.error(f"  [SEED DATA ERROR] Could not load CSV: {e}")
         _SEED_LOADED = True
 
 

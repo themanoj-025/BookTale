@@ -12,6 +12,10 @@ from rich.panel import Panel
 from rich.prompt import Confirm, Prompt
 from rich.table import Table
 from rich.text import Text
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 console = Console()
 
@@ -33,7 +37,7 @@ def header(title: str) -> None:
 
 def pause() -> None:
     """Wait for user to press Enter."""
-    console.print("\n[yellow]  Press Enter to continue...[/yellow]")
+    logger.info("\n[yellow]  Press Enter to continue...[/yellow]")
     input()
 
 
@@ -89,41 +93,41 @@ def menu(title: str, options: list, subtitle: str = "") -> str:
         border_style="cyan",
         subtitle=subtitle or None,
     )
-    console.print(panel)
+    logger.info("%s", panel)
 
     table = Table(box=box.SIMPLE, show_header=False, padding=(0, 2))
     table.add_column("#", style="cyan", width=4)
     table.add_column("Option", style="white")
     for i, opt in enumerate(options, 1):
         table.add_row(str(i), opt)
-    console.print(table)
+    logger.info("%s", table)
     console.print()
 
     while True:
         choice = Prompt.ask("  Enter choice", default="1")
         if choice.isdigit() and 1 <= int(choice) <= len(options):
             return choice
-        console.print("[red]  ❌ Invalid choice. Try again.[/red]")
+        logger.info("[red]  ❌ Invalid choice. Try again.[/red]")
 
 
 def print_success(message: str) -> None:
     """Print a success message."""
-    console.print(f"[green]  ✅ {message}[/green]")
+    logger.info(f"[green]  ✅ {message}[/green]")
 
 
 def print_error(message: str) -> None:
     """Print an error message."""
-    console.print(f"[red]  ❌ {message}[/red]")
+    logger.info(f"[red]  ❌ {message}[/red]")
 
 
 def print_warning(message: str) -> None:
     """Print a warning message."""
-    console.print(f"[yellow]  ⚠️  {message}[/yellow]")
+    logger.info(f"[yellow]  ⚠️  {message}[/yellow]")
 
 
 def print_info(message: str) -> None:
     """Print an info message."""
-    console.print(f"[cyan]  ℹ️  {message}[/cyan]")
+    logger.info(f"[cyan]  ℹ️  {message}[/cyan]")
 
 
 def create_table(title: str, columns: list[str], rows: list[list[str]]) -> Table:
