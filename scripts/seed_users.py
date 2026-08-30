@@ -24,6 +24,10 @@ from app.config.settings import Config
 from app.db.storage_adapter import create_storage
 from app.models.user import User
 from app.services.auth.auth import hash_password
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 # ─
 
@@ -634,7 +638,7 @@ def generate_users(count: int = 5000) -> dict[str, User]:
     default_password = _secrets.token_urlsafe(12)
     hashed_pw = hash_password(default_password)
 
-    print(f"  Generating {count} users...")
+    logger.info(f"  Generating {count} users...")
     for i in range(count):
         # Generate unique user_id
         while True:
@@ -703,18 +707,18 @@ def generate_users(count: int = 5000) -> dict[str, User]:
         users[uid] = user
 
         if (i + 1) % 1000 == 0:
-            print(f"    Generated {i + 1}/{count} users...")
+            logger.info(f"    Generated {i + 1}/{count} users...")
 
-    print(f"  ✅ Generated {len(users)} users")
+    logger.info(f"  ✅ Generated {len(users)} users")
     return users
 
 
 def main() -> None:
     """Main entry point."""
-    print("=" * 60)
-    print("  📚 LibraryMS - User Data Seeder")
-    print("  Generating 5,000 realistic users")
-    print("=" * 60)
+    logger.info("=" * 60)
+    logger.info("  📚 LibraryMS - User Data Seeder")
+    logger.info("  Generating 5,000 realistic users")
+    logger.info("=" * 60)
 
     keep_existing = "--keep" in sys.argv
 
@@ -723,12 +727,12 @@ def main() -> None:
 
     # Load existing users
     existing_users = storage.load_users()
-    print(f"\n  Existing users in database: {len(existing_users)}")
+    logger.info(f"\n  Existing users in database: {len(existing_users)}")
 
     if keep_existing:
-        print("  Keeping existing users and adding 5,000 more...")
+        logger.info("  Keeping existing users and adding 5,000 more...")
     else:
-        print("  Overwriting all users (--keep to preserve existing)...")
+        logger.info("  Overwriting all users (--keep to preserve existing)...")
 
     # Generate new users
     new_users = generate_users(5000)
@@ -741,7 +745,7 @@ def main() -> None:
 
     # Save
     storage.save_users(all_users)
-    print(f"\n  ✅ Saved {len(all_users)} users to {Config.USERS_FILE}")
+    logger.info(f"\n  ✅ Saved {len(all_users)} users to {Config.USERS_FILE}")
 
     # Quick stats
     roles = {}
@@ -750,17 +754,17 @@ def main() -> None:
         roles[u.role] = roles.get(u.role, 0) + 1
         statuses[u.membership_status] = statuses.get(u.membership_status, 0) + 1
 
-    print("\n  📊 User Statistics:")
-    print(f"     Total users:  {len(all_users)}")
-    print(f"     Admins:       {roles.get('admin', 0)}")
-    print(f"     Librarians:   {roles.get('librarian', 0)}")
-    print(f"     Users:        {roles.get('user', 0)}")
-    print(f"     Active:       {statuses.get('Active', 0)}")
-    print(f"     Expired:      {statuses.get('Expired', 0)}")
-    print(f"     Blocked:      {statuses.get('Blocked', 0)}")
+    logger.info("\n  📊 User Statistics:")
+    logger.info(f"     Total users:  {len(all_users)}")
+    logger.info(f"     Admins:       {roles.get('admin', 0)}")
+    logger.info(f"     Librarians:   {roles.get('librarian', 0)}")
+    logger.info(f"     Users:        {roles.get('user', 0)}")
+    logger.info(f"     Active:       {statuses.get('Active', 0)}")
+    logger.info(f"     Expired:      {statuses.get('Expired', 0)}")
+    logger.info(f"     Blocked:      {statuses.get('Blocked', 0)}")
     # (Seed-user default password intentionally redacted from output for security.)
-    print("  💡 Admin login: ADMIN001 (password generated on first boot)")
-    print("=" * 60)
+    logger.info("  💡 Admin login: ADMIN001 (password generated on first boot)")
+    logger.info("=" * 60)
 
 
 if __name__ == "__main__":

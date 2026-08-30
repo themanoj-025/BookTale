@@ -10,6 +10,10 @@ import sys
 import time
 import webbrowser
 import contextlib
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 # Ensure we're in the project directory
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -33,22 +37,20 @@ FLASK_URL = f"http://localhost:{FLASK_PORT}"
 def safe_print(text) -> None:
     """Print text, gracefully handling UnicodeEncodeError on Windows cp1252."""
     try:
-        print(text)
+        logger.info("%s", text)
     except UnicodeEncodeError:
         # Fallback: strip non-ASCII characters
-        print(text.encode("ascii", errors="replace").decode("ascii"))
+        logger.error("%s", text.encode("ascii", errors="replace").decode("ascii"))
 
 
 def print_banner() -> dict:
     """Display a clean launch banner."""
-    safe_print(
-        """
+    logger.info("""
   +=============================================+
   |     Library Management System v3.0          |
   |     Python + Flask + Bootstrap 5            |
   +=============================================+
-"""
-    )
+""")
 
 
 def launch_web() -> None:
@@ -58,9 +60,9 @@ def launch_web() -> None:
     that occur when Flask/SocketIO writes verbose debug output.
     Output goes directly to the terminal.
     """
-    safe_print(f"  [NET] Starting web server at http://0.0.0.0:{FLASK_PORT}...")
-    safe_print("  [LOCK] Admin login: ADMIN001 (password printed once on first boot)")
-    safe_print("  [HINT] Press Ctrl+K to search books anywhere")
+    logger.info(f"  [NET] Starting web server at http://0.0.0.0:{FLASK_PORT}...")
+    logger.info("  [LOCK] Admin login: ADMIN001 (password printed once on first boot)")
+    logger.info("  [HINT] Press Ctrl+K to search books anywhere")
     print()
 
     env = os.environ.copy()
@@ -77,7 +79,7 @@ def launch_web() -> None:
 
 def launch_cli() -> None:
     """Launch the CLI application in a subprocess."""
-    safe_print("  [CLI] Starting CLI interface...")
+    logger.info("  [CLI] Starting CLI interface...")
     print()
 
     env = os.environ.copy()
@@ -94,18 +96,18 @@ def launch_cli() -> None:
 def show_menu() -> None:
     """Display the launcher menu."""
     print_banner()
-    safe_print("  Select launch mode:\n")
-    safe_print("  1. [WEB] Web Dashboard only  (http://localhost:5000)")
-    safe_print("  2. [CLI] CLI only             (Terminal interface)")
-    safe_print("  3. [WEB+CLI] Both            (Web + CLI side-by-side)")
-    safe_print("  4. [X] Quit")
+    logger.info("  Select launch mode:\n")
+    logger.info("  1. [WEB] Web Dashboard only  (http://localhost:5000)")
+    logger.info("  2. [CLI] CLI only             (Terminal interface)")
+    logger.info("  3. [WEB+CLI] Both            (Web + CLI side-by-side)")
+    logger.info("  4. [X] Quit")
     print()
 
     while True:
         choice = input("  Enter choice [1]: ").strip() or "1"
         if choice in ("1", "2", "3", "4"):
             return choice
-        safe_print("  [X] Invalid choice. Try 1-4.")
+        logger.info("  [X] Invalid choice. Try 1-4.")
 
 
 def main() -> None:
@@ -120,14 +122,14 @@ def main() -> None:
         elif mode in ("both", "b", "all", "a"):
             choice = "3"
         else:
-            print(f"  [X] Unknown option: {sys.argv[1]}")
-            print("  Usage: python start.py [--web|--cli|--both]")
+            logger.info(f"  [X] Unknown option: {sys.argv[1]}")
+            logger.info("  Usage: python start.py [--web|--cli|--both]")
             sys.exit(1)
     else:
         choice = show_menu()
 
     if choice == "4":
-        safe_print("  [OK] Goodbye!")
+        logger.info("  [OK] Goodbye!")
         return
 
     print_banner()
@@ -137,7 +139,7 @@ def main() -> None:
         web_proc = launch_web()
         processes.append(("Web", web_proc))
         # Health check: wait for port to be ready before opening browser
-        print(f"  [WAIT] Waiting for server on port {FLASK_PORT}...", end="", flush=True)
+        logger.info(f"  [WAIT] Waiting for server on port {FLASK_PORT}...")
         port_ready = False
         for _attempt in range(30):  # Up to 60 seconds
             time.sleep(2)
@@ -153,23 +155,23 @@ def main() -> None:
             # Check if process crashed
             if web_proc.poll() is not None:
                 print()
-                safe_print(f"  [X] Server process exited early (code {web_proc.returncode}).")
-                safe_print("     Run 'python web_app.py' directly to see error details.")
+                logger.info(f"  [X] Server process exited early (code {web_proc.returncode}).")
+                logger.error("     Run 'python web_app.py' directly to see error details.")
                 print()
                 return  # Exit without suggesting browser
-            print(".", end="", flush=True)
+            logger.info(".")
 
         if port_ready:
-            safe_print(" READY!")
-            print(f"  [WEB] Opening browser at {FLASK_URL}")
+            logger.info(" READY!")
+            logger.info(f"  [WEB] Opening browser at {FLASK_URL}")
             with contextlib.suppress(Exception):
                 webbrowser.open(FLASK_URL)
         else:
             print()
             if web_proc.poll() is None:
-                safe_print(f"  [!] Server is running but port {FLASK_PORT} is not responding yet.")
-            safe_print(f"  [WEB] Open {FLASK_URL} manually in your browser.")
-            safe_print("  [AUTH] Admin login: ADMIN001 (password printed once on first boot)")
+                logger.info(f"  [!] Server is running but port {FLASK_PORT} is not responding yet.")
+            logger.info(f"  [WEB] Open {FLASK_URL} manually in your browser.")
+            logger.info("  [AUTH] Admin login: ADMIN001 (password printed once on first boot)")
 
     if choice in ("2", "3"):
         cli_proc = launch_cli()
@@ -179,24 +181,24 @@ def main() -> None:
         return
 
     print()
-    print("  --------------------------------------------")
-    safe_print("  [OK] Library Management System is running!")
+    logger.info("  --------------------------------------------")
+    logger.info("  [OK] Library Management System is running!")
     for name, proc in processes:
         status = "running" if proc.poll() is None else f"exited ({proc.returncode})"
-        safe_print(f"     {name}: {status}")
+        logger.info(f"     {name}: {status}")
     print()
-    safe_print("  [WEB] http://localhost:5000")
-    safe_print("  [AUTH] Admin login: ADMIN001 (password printed once on first boot)")
-    safe_print("  [HINT] Shortcut: Ctrl+K to search books")
+    logger.info("  [WEB] http://localhost:5000")
+    logger.info("  [AUTH] Admin login: ADMIN001 (password printed once on first boot)")
+    logger.info("  [HINT] Shortcut: Ctrl+K to search books")
     print()
-    safe_print("  Press any key to stop the server, or Ctrl+C to quit.")
-    print("  --------------------------------------------")
+    logger.info("  Press any key to stop the server, or Ctrl+C to quit.")
+    logger.info("  --------------------------------------------")
 
     # Wait for keypress to shut down
     def shutdown_all() -> None:
         """Terminate all running processes cleanly."""
         print()
-        safe_print("  [STOP] Shutting down...")
+        logger.info("  [STOP] Shutting down...")
         for n, proc in processes:
             if proc.poll() is None:
                 proc.terminate()
@@ -204,8 +206,8 @@ def main() -> None:
                     proc.wait(timeout=5)
                 except subprocess.TimeoutExpired:
                     proc.kill()
-                print(f"     {n}: stopped")
-        print("  [OK] All services stopped. Goodbye! [OK]")
+                logger.info(f"     {n}: stopped")
+        logger.info("  [OK] All services stopped. Goodbye! [OK]")
 
     try:
         if sys.platform == "win32":
@@ -224,7 +226,7 @@ def main() -> None:
                         all_dead = False
                         break
                 if all_dead:
-                    print("\n  [i]  All processes have exited.")
+                    logger.info("\n  [i]  All processes have exited.")
                     return
                 time.sleep(0.2)
         else:
@@ -242,7 +244,7 @@ def main() -> None:
                         all_dead = False
                         break
                 if all_dead:
-                    print("\n  [i]  All processes have exited.")
+                    logger.info("\n  [i]  All processes have exited.")
                     return
     except KeyboardInterrupt:
         shutdown_all()

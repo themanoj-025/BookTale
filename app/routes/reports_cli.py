@@ -14,6 +14,10 @@ from app.core.utils import (
     print_success,
 )
 from app.services.books.library import Library
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 
 def reports_menu(lib: Library) -> None:
@@ -33,30 +37,28 @@ def reports_menu(lib: Library) -> None:
             data = lib.report_most_issued()
             header("📚 Most Issued Books")
             for i, r in enumerate(data, 1):
-                print(
-                    f"  {i:2}. [{r['id']}] {r['title']} — {r['author']} " f"| Issued {r['count']}×"
-                )
+                logger.info(f"  {i:2}. [{r['id']}] {r['title']} — {r['author']} " f"| Issued {r['count']}×")
         elif choice == "2":
             data = lib.report_active_users()
             header("🏆 Most Active Users")
             for i, r in enumerate(data, 1):
-                print(f"  {i:2}. [{r['user_id']}] {r['name']} — {r['total_issues']} issues")
+                logger.info(f"  {i:2}. [{r['user_id']}] {r['name']} — {r['total_issues']} issues")
         elif choice == "3":
             header("📅 Issue Counts")
-            print(f"  Today         : {lib.report_issued_today()} books")
-            print(f"  This Month    : {lib.report_issued_this_month()} books")
+            logger.info(f"  Today         : {lib.report_issued_today()} books")
+            logger.info(f"  This Month    : {lib.report_issued_this_month()} books")
         elif choice == "4":
             r = lib.report_fine_collection()
             header("💰 Fine Collection Report")
-            print(f"  Total Fines   : ₹{r['total']:.2f}")
-            print(f"  Collected     : ₹{r['collected']:.2f}")
-            print(f"  Pending       : ₹{r['pending']:.2f}")
-            print(f"  Transactions  : {r['count']}")
+            logger.info(f"  Total Fines   : ₹{r['total']:.2f}")
+            logger.info(f"  Collected     : ₹{r['collected']:.2f}")
+            logger.info(f"  Pending       : ₹{r['pending']:.2f}")
+            logger.info(f"  Transactions  : {r['count']}")
         elif choice == "5":
             data = lib.report_category_count()
             header("🗂  Category-wise Book Count")
             for cat, cnt in data.items():
-                print(f"  {cat:<20} : {cnt} book(s)")
+                logger.info(f"  {cat:<20} : {cnt} book(s)")
         elif choice == "6":
             break
         pause()
@@ -65,10 +67,10 @@ def reports_menu(lib: Library) -> None:
 def export_reports_menu(lib: Library) -> None:
     """Export various reports to CSV."""
     header("📤 EXPORT REPORTS TO CSV")
-    print("  1. Export Most Issued Books")
-    print("  2. Export All Books Inventory")
-    print("  3. Export Active Users")
-    print("  4. Export All Transactions")
+    logger.info("  1. Export Most Issued Books")
+    logger.info("  2. Export All Books Inventory")
+    logger.info("  3. Export Active Users")
+    logger.info("  4. Export All Transactions")
     choice = input("  Choice: ").strip()
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     os.makedirs(Config.DATA_DIR, exist_ok=True)

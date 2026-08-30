@@ -73,6 +73,10 @@ from app.routes.backup_cli import (
     backup_restore_menu,
     logs_menu,
 )
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 
 # ─
@@ -276,7 +280,7 @@ def my_books(lib: Library, auth: AuthManager) -> None:
     now = datetime.now()
 
     if not user.books_issued:
-        print("  You have no books currently issued.")
+        logger.info("  You have no books currently issued.")
     else:
         for bid in user.books_issued:
             book = books_store.get(bid)
@@ -298,8 +302,8 @@ def my_books(lib: Library, auth: AuthManager) -> None:
                     if now > due
                     else colored("On time", "green")
                 )
-                print(f"  📖 {title}")
-                print(f"     Due: {due.strftime('%d %b %Y')} | {status}")
+                logger.info(f"  📖 {title}")
+                logger.info(f"     Due: {due.strftime('%d %b %Y')} | {status}")
     pause()
 
 
@@ -323,8 +327,7 @@ def main() -> None:
 
     bootstrap(storage, auth)
 
-    console.print(
-        """
+    logger.info("""
 [cyan]
   ╔══════════════════════════════════════════╗
   ║   📚 Library Management System v2.0     ║
@@ -332,8 +335,7 @@ def main() -> None:
   ║   + Recommendations Engine              ║
   ╚══════════════════════════════════════════╝
 [/cyan]
-    """
-    )
+    """)
 
     try:
         while True:
@@ -364,7 +366,7 @@ def main() -> None:
         path = create_backup(triggered_by="auto-exit")
         log("Auto-backup on program exit", "System", path)
         print_success(f"Backup saved: {os.path.basename(path)}")
-        console.print("[cyan]  Goodbye! 👋\n[/cyan]")
+        logger.info("[cyan]  Goodbye! 👋\n[/cyan]")
 
 
 if __name__ == "__main__":

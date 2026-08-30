@@ -15,6 +15,10 @@ from app.core.utils import (
 from app.services.auth.auth import AuthManager
 from app.services.books.library import Library
 from app.storage.storage import Storage
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 
 def issue_return_menu(lib: Library, auth: AuthManager) -> None:
@@ -74,7 +78,7 @@ def overdue_menu(lib: Library) -> None:
                 for r in records
             ],
         )
-        console.print(table)
+        logger.info("%s", table)
     pause()
 
 
@@ -86,7 +90,7 @@ def fine_management_menu(lib: Library, auth: AuthManager) -> None:
         print_error("User not found.")
         pause()
         return
-    print(f"\n  {user.name} — Unpaid Fine: ₹{user.unpaid_fine:.2f}")
+    logger.info(f"\n  {user.name} — Unpaid Fine: ₹{user.unpaid_fine:.2f}")
     if user.unpaid_fine > 0:
         try:
             amount = float(input("  Amount to collect (0 = full): ").strip() or "0")
@@ -108,13 +112,13 @@ def reservations_menu(lib: Library, storage: Storage) -> None:
     books = storage.load_books()
     users = storage.load_users()
     if not res:
-        print("  No active reservations.")
+        logger.info("  No active reservations.")
     for bid, queue in res.items():
         book = books.get(bid)
         title = book.title if book else bid
         avail = book.available_copies if book else 0
-        print(f"\n  📗 {title} (Available: {avail})")
+        logger.info(f"\n  📗 {title} (Available: {avail})")
         for i, uid in enumerate(queue, 1):
             u = users.get(uid)
-            print(f"     {i}. {u.name if u else uid} [{uid}]")
+            logger.info(f"     {i}. {u.name if u else uid} [{uid}]")
     pause()

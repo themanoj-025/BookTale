@@ -24,10 +24,14 @@ from sklearn.metrics import r2_score
 import time
 from sklearn.model_selection import train_test_split
 import xgboost as xgb
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 def knn_model(X: np.ndarray) -> ModelResult:
     """KNN-based recommendation using nearest neighbors."""
-    print("  🔄 KNN (k-Nearest Neighbors)...", end=" ", flush=True)
+    logger.info("  🔄 KNN (k-Nearest Neighbors)...")
     start = time.time()
     result = ModelResult("KNN", ALGORITHM_COLORS["KNN"])
 
@@ -42,7 +46,7 @@ def knn_model(X: np.ndarray) -> ModelResult:
 
     evaluate_recommendation(pd.DataFrame(), neighbor_sim, result)
     result.time_taken = time.time() - start
-    print(f"✅ ({result.time_taken:.2f}s)")
+    logger.info(f"✅ ({result.time_taken:.2f}s)")
     return result
 
 
@@ -51,7 +55,7 @@ def knn_model(X: np.ndarray) -> ModelResult:
 
 def kmeans_model(X: np.ndarray, df: pd.DataFrame) -> ModelResult:
     """K-Means clustering with multiple initializations."""
-    print("  🔄 K-Means Clustering...", end=" ", flush=True)
+    logger.info("  🔄 K-Means Clustering...")
     start = time.time()
     result = ModelResult("K-Means", ALGORITHM_COLORS["K-Means"])
 
@@ -87,7 +91,7 @@ def kmeans_model(X: np.ndarray, df: pd.DataFrame) -> ModelResult:
 
     evaluate_recommendation(df, sim_matrix, result)
     result.time_taken = time.time() - start
-    print(f"✅ ({result.time_taken:.2f}s)")
+    logger.info(f"✅ ({result.time_taken:.2f}s)")
     return result, inertias, k_range
 
 
@@ -96,7 +100,7 @@ def kmeans_model(X: np.ndarray, df: pd.DataFrame) -> ModelResult:
 
 def dbscan_model(X: np.ndarray, df: pd.DataFrame) -> ModelResult:
     """DBSCAN density-based clustering with auto eps tuning."""
-    print("  🔄 DBSCAN...", end=" ", flush=True)
+    logger.info("  🔄 DBSCAN...")
     start = time.time()
     result = ModelResult("DBSCAN", ALGORITHM_COLORS["DBSCAN"])
 
@@ -126,7 +130,7 @@ def dbscan_model(X: np.ndarray, df: pd.DataFrame) -> ModelResult:
 
     evaluate_recommendation(df, sim_matrix, result)
     result.time_taken = time.time() - start
-    print(f"✅ ({result.time_taken:.2f}s)")
+    logger.info(f"✅ ({result.time_taken:.2f}s)")
     return result, k_dist
 
 
@@ -135,7 +139,7 @@ def dbscan_model(X: np.ndarray, df: pd.DataFrame) -> ModelResult:
 
 def pca_kmeans_model(X: np.ndarray, df: pd.DataFrame) -> ModelResult:
     """PCA dimensionality reduction followed by K-Means."""
-    print("  🔄 PCA + K-Means...", end=" ", flush=True)
+    logger.info("  🔄 PCA + K-Means...")
     start = time.time()
     result = ModelResult("PCA+K-Means", ALGORITHM_COLORS["PCA+K-Means"])
 
@@ -170,7 +174,7 @@ def pca_kmeans_model(X: np.ndarray, df: pd.DataFrame) -> ModelResult:
 
     evaluate_recommendation(df, sim_matrix, result)
     result.time_taken = time.time() - start
-    print(f"✅ ({result.time_taken:.2f}s)")
+    logger.info(f"✅ ({result.time_taken:.2f}s)")
     return result, pca
 
 
@@ -179,7 +183,7 @@ def pca_kmeans_model(X: np.ndarray, df: pd.DataFrame) -> ModelResult:
 
 def tsne_kmeans_model(X: np.ndarray, df: pd.DataFrame) -> ModelResult:
     """t-SNE dimensionality reduction followed by K-Means."""
-    print("  🔄 t-SNE + K-Means...", end=" ", flush=True)
+    logger.info("  🔄 t-SNE + K-Means...")
     start = time.time()
     result = ModelResult("t-SNE+K-Means", ALGORITHM_COLORS["t-SNE+K-Means"])
 
@@ -207,7 +211,7 @@ def tsne_kmeans_model(X: np.ndarray, df: pd.DataFrame) -> ModelResult:
 
     evaluate_recommendation(df, sim_matrix, result)
     result.time_taken = time.time() - start
-    print(f"✅ ({result.time_taken:.2f}s)")
+    logger.info(f"✅ ({result.time_taken:.2f}s)")
     return result, X_tsne
 
 
@@ -216,7 +220,7 @@ def tsne_kmeans_model(X: np.ndarray, df: pd.DataFrame) -> ModelResult:
 
 def svd_model(X: np.ndarray, df: pd.DataFrame) -> ModelResult:
     """Truncated SVD for matrix factorization and recommendation."""
-    print("  🔄 SVD Matrix Factorization...", end=" ", flush=True)
+    logger.info("  🔄 SVD Matrix Factorization...")
     start = time.time()
     result = ModelResult("SVD", ALGORITHM_COLORS["SVD"])
 
@@ -239,7 +243,7 @@ def svd_model(X: np.ndarray, df: pd.DataFrame) -> ModelResult:
 
     evaluate_recommendation(df, sim_matrix, result)
     result.time_taken = time.time() - start
-    print(f"✅ ({result.time_taken:.2f}s)")
+    logger.info(f"✅ ({result.time_taken:.2f}s)")
     return result
 
 
@@ -248,12 +252,12 @@ def svd_model(X: np.ndarray, df: pd.DataFrame) -> ModelResult:
 
 def xgboost_model(df: pd.DataFrame, X: np.ndarray) -> ModelResult:
     """XGBoost regression for rating prediction."""
-    print("  🔄 XGBoost Regression...", end=" ", flush=True)
+    logger.info("  🔄 XGBoost Regression...")
     start = time.time()
     result = ModelResult("XGBoost", ALGORITHM_COLORS["XGBoost"])
 
     if not XGB_AVAILABLE:
-        print("⚠️ (XGBoost not installed, skipping)")
+        logger.info("⚠️ (XGBoost not installed, skipping)")
         result.add_metric("RMSE", -1.0)
         result.add_metric("MAE", -1.0)
         result.add_metric("R²", -1.0)
@@ -287,7 +291,7 @@ def xgboost_model(df: pd.DataFrame, X: np.ndarray) -> ModelResult:
         result.metrics["Top Feature Importance"] = float(model.feature_importances_.max())
 
     result.time_taken = time.time() - start
-    print(f"✅ ({result.time_taken:.2f}s)")
+    logger.info(f"✅ ({result.time_taken:.2f}s)")
     return result, model
 
 
@@ -296,7 +300,7 @@ def xgboost_model(df: pd.DataFrame, X: np.ndarray) -> ModelResult:
 
 def hybrid_model(X: np.ndarray, X_tfidf: np.ndarray, df: pd.DataFrame) -> ModelResult:
     """Hybrid: combines content-based similarity with collaborative clustering."""
-    print("  🔄 Hybrid Model (Content + Collaborative)...", end=" ", flush=True)
+    logger.info("  🔄 Hybrid Model (Content + Collaborative)...")
     start = time.time()
     result = ModelResult("Hybrid", ALGORITHM_COLORS["Hybrid"])
 
@@ -326,7 +330,7 @@ def hybrid_model(X: np.ndarray, X_tfidf: np.ndarray, df: pd.DataFrame) -> ModelR
     evaluate_clustering(X, cluster_labels, result)
     evaluate_recommendation(df, hybrid_sim, result)
     result.time_taken = time.time() - start
-    print(f"✅ ({result.time_taken:.2f}s)")
+    logger.info(f"✅ ({result.time_taken:.2f}s)")
     return result
 
 
@@ -335,7 +339,7 @@ def hybrid_model(X: np.ndarray, X_tfidf: np.ndarray, df: pd.DataFrame) -> ModelR
 
 def neural_network_model(X: np.ndarray, df: pd.DataFrame) -> ModelResult:
     """Simple MLP neural network for rating prediction."""
-    print("  🔄 Neural Network (MLP)...", end=" ", flush=True)
+    logger.info("  🔄 Neural Network (MLP)...")
     start = time.time()
     result = ModelResult("Neural Net", ALGORITHM_COLORS["Neural Net"])
 
@@ -378,7 +382,7 @@ def neural_network_model(X: np.ndarray, df: pd.DataFrame) -> ModelResult:
             result.labels = labels
 
     result.time_taken = time.time() - start
-    print(f"✅ ({result.time_taken:.2f}s)")
+    logger.info(f"✅ ({result.time_taken:.2f}s)")
     return result
 
 
@@ -387,7 +391,7 @@ def neural_network_model(X: np.ndarray, df: pd.DataFrame) -> ModelResult:
 
 def agglomerative_model(X: np.ndarray, df: pd.DataFrame) -> ModelResult:
     """Hierarchical agglomerative clustering."""
-    print("  🔄 Agglomerative Clustering...", end=" ", flush=True)
+    logger.info("  🔄 Agglomerative Clustering...")
     start = time.time()
     result = ModelResult("Agglomerative", ALGORITHM_COLORS["Agglomerative"])
 
@@ -414,7 +418,7 @@ def agglomerative_model(X: np.ndarray, df: pd.DataFrame) -> ModelResult:
 
     evaluate_recommendation(df, sim_matrix, result)
     result.time_taken = time.time() - start
-    print(f"✅ ({result.time_taken:.2f}s)")
+    logger.info(f"✅ ({result.time_taken:.2f}s)")
     return result
 
 

@@ -48,6 +48,10 @@ from app.db.models import (
     User,
     WishlistSuggestion,
 )
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 
 def _load(path: str) -> list[object]:
@@ -59,7 +63,7 @@ def _load(path: str) -> list[object]:
         with open(path, encoding="utf-8") as f:
             return json.load(f)
     except (json.JSONDecodeError, OSError) as e:
-        print(f"  ! SKIP {os.path.basename(path)}: {e}")
+        logger.info(f"  ! SKIP {os.path.basename(path)}: {e}")
         return []
 
 
@@ -89,7 +93,7 @@ def _safe_add_all(db, rows: list, name: str) -> dict:
             loaded += 1
         except (json.JSONDecodeError, OSError, ValueError) as e:
             skipped += 1
-            print(f"  ! SKIP {name} row: {e}")
+            logger.info(f"  ! SKIP {name} row: {e}")
     return {"source": len(rows), "loaded": loaded, "skipped": skipped}
 
 
@@ -288,27 +292,27 @@ def main() -> int:
     args = parser.parse_args()
 
     if args.dry_run:
-        print("=== DRY RUN: current DB counts ===")
+        logger.info("=== DRY RUN: current DB counts ===")
         for name, c in verify().items():
-            print(f"  {name:<24} {c['loaded']}")
+            logger.info(f"  {name:<24} {c['loaded']}")
         return 0
 
-    print("=== Migrating JSON -> DB ===")
+    logger.info("=== Migrating JSON -> DB ===")
     create_all()
     report = migrate()
 
-    print(f"\n{'Entity':<24} {'Source':>8} {'Loaded':>8} {'Skipped':>8}   OK")
+    logger.info(f"\n{'Entity':<24} {'Source':>8} {'Loaded':>8} {'Skipped':>8}   OK")
     ok = True
     for name, c in sorted(report.items()):
         match = c["source"] == c["loaded"]
         ok = ok and match
         status = "✓" if match else "✗ MISMATCH"
-        print(f"  {name:<24} {c['source']:>8} {c['loaded']:>8} " f"{c['skipped']:>8}   {status}")
+        logger.info(f"  {name:<24} {c['source']:>8} {c['loaded']:>8} " f"{c['skipped']:>8}   {status}")
 
     if not ok:
-        print("\nMIGRATION FAILED: row counts disagree (see MISMATCH rows).")
+        logger.error("\nMIGRATION FAILED: row counts disagree (see MISMATCH rows).")
         return 1
-    print("\nMigration complete: every entity verified 1:1.")
+    logger.info("\nMigration complete: every entity verified 1:1.")
     return 0
 
 

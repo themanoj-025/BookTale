@@ -70,7 +70,7 @@ RESULTS = []
 def check(num: int, name: str, ok: bool, note: str = "") -> None:
     RESULTS.append((num, name, ok))
     mark = "✅" if ok else "❌"
-    print(f"  {mark} #{num:<2} {name}" + (f"  [{note}]" if note else ""))
+    logger.info(f"  {mark} #{num:<2} {name}" + (f"  [{note}]" if note else ""))
 
 
 def admin_session() -> None:
@@ -82,7 +82,7 @@ def admin_session() -> None:
 
 
 # ═══════════════════════════════════════════════════════════════════
-print("== A. Auth & Accounts (DB-backed) ==")
+logger.info("== A. Auth & Accounts (DB-backed) ==")
 
 r = client.get("/")
 check(1, "Landing page loads", r.status_code == 200)
@@ -149,7 +149,7 @@ finally:
 check(9, "Insecure SECRET_KEY refuses boot", _refused)
 
 # ═══════════════════════════════════════════════════════════════════
-print("== B. Library Core ==")
+logger.info("== B. Library Core ==")
 
 # /books and /book detail are login_required — log back in first.
 client.post("/login", data={"user_id": "MEM-SMOKE1", "password": "secret123456"})
@@ -238,7 +238,7 @@ r = client.get("/admin/users")
 check(20, "Admin user management renders", r.status_code == 200)
 
 # ═══════════════════════════════════════════════════════════════════
-print("== C. Social & Community ==")
+logger.info("== C. Social & Community ==")
 
 from app.services.books.reviews import ReviewManager
 from app.services.social.social import SocialFeed
@@ -295,7 +295,7 @@ ok, msg, prog = rp.update_progress("MEM-SMOKE1", bid, current_page=100)
 check(32, "Reading progress update", ok)
 
 # ═══════════════════════════════════════════════════════════════════
-print("== D. Admin / Settings / Content ==")
+logger.info("== D. Admin / Settings / Content ==")
 
 r = client.get("/settings")
 check(33, "Settings page renders", r.status_code == 200)
@@ -332,9 +332,13 @@ nm.add_notification("MEM-SMOKE1", "like", "Someone liked your post")
 check(39, "Notification created + unread badge", nm.get_unread_count("MEM-SMOKE1") >= 1)
 
 # ═══════════════════════════════════════════════════════════════════
-print("== E. Stability & Security ==")
+logger.info("== E. Stability & Security ==")
 
 from app.db.storage_adapter import DbStorage
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 store2 = DbStorage()
 check(
@@ -372,12 +376,12 @@ check(
 # E43/E44 are Phase 4/7 gates (CSRF, healthz) — marked as future phases in the
 # checklist; not yet implemented, so they are skipped here on purpose.
 
-print("\n" + "=" * 60)
+logger.info("\n" + "=" * 60)
 passed = sum(1 for _, _, ok in RESULTS if ok)
 failed = [r for r in RESULTS if not r[2]]
-print(f"SMOKE CHECKLIST: {passed}/{len(RESULTS)} passed")
+logger.info(f"SMOKE CHECKLIST: {passed}/{len(RESULTS)} passed")
 if failed:
-    print("FAILED:", ", ".join(f"#{n} {name}" for n, name, _ in failed))
+    logger.error("FAILED:", ", ".join(f"#{n} {name}" for n, name, _ in failed))
     sys.exit(1)
-print("ALL SMOKE JOURNEYS PASSED on the relational layer ✅")
+logger.info("ALL SMOKE JOURNEYS PASSED on the relational layer ✅")
 sys.exit(0)
