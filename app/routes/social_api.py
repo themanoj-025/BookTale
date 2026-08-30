@@ -25,7 +25,8 @@ from app.routes.social_shared import (
 from app.routes.social_shared import lib, book_lists
 from flask import Response
 
-lib; book_lists  # referenced by init_social_routes at startup
+# referenced by init_social_routes at startup
+__all__ = ['book_lists', 'lib']
 
 
 def register_social_api_routes(app, _rate_limit) -> None:

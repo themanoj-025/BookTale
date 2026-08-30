@@ -13,8 +13,11 @@ Usage:
 Exit codes: 0 = all checks passed, 1 = any check failed.
 """
 
+import logging
 import os
 import sys
+
+logger = logging.getLogger(__name__)
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 

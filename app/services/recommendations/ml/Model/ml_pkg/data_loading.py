@@ -49,14 +49,14 @@ logger = logging.getLogger(__name__)
 
 
 try:
-    import xgboost as xgb
+    import xgboost as xgb  # noqa: F401
 
     XGB_AVAILABLE = True
 except ImportError:
     XGB_AVAILABLE = False
 
 try:
-    import plotly.graph_objects as go
+    import plotly.graph_objects as go  # noqa: F401
 
     PLOTLY_AVAILABLE = True
 except ImportError:

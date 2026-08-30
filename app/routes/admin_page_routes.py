@@ -7,10 +7,14 @@ Routes: /admin/users, /admin/audit, /admin/overdue, /reports
 from collections import Counter
 from datetime import datetime, timedelta
 
+import logging
+
 from flask import request, session
 
 from app.routes.helpers import avatar_html
 from flask import render_template
+
+logger = logging.getLogger(__name__)
 
 from app.routes.page_state import (
     admin_required,

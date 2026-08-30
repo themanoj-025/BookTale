@@ -23,11 +23,14 @@ NOTE: must import web_app AFTER redirecting Config paths (module-level bootstrap
 creates the admin + tables at import time).
 """
 
+import logging
 import os
 import sys
 import tempfile
 import threading
 from datetime import datetime
+
+logger = logging.getLogger(__name__)
 
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, PROJECT_ROOT)
