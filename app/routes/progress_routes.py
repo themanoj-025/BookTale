@@ -8,9 +8,11 @@ from datetime import datetime
 
 from flask import jsonify, request, session
 
-from app.routes.feature_shared import (
 from typing import Any
+
 from flask import Response
+
+from app.routes.feature_shared import (
     _progress,
     _challenge,
     _storage,
