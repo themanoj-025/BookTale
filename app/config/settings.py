@@ -147,9 +147,9 @@ def _load_settings_overrides() -> None:
             else:
                 setattr(Config, _key, _val)
     except (ValueError, OSError) as _e:
-        import sys as _sys
+        import logging as _log
 
-        print("[Config] Warning: Could not load settings override:", _e, file=_sys.stderr)
+        _log.getLogger(__name__).warning("Could not load settings override: %s", _e)
 
 
 # Known-insecure defaults that must never be used in any environment.
