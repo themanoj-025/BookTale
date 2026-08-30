@@ -5,9 +5,8 @@ from urllib.parse import quote
 
 from flask import jsonify, redirect, render_template, request, session, url_for
 
-from app.routes.helpers import cat_color, get_current_user
+from app.routes.helpers import cat_color
 from app.routes.page_state import (
-    h,
     lib,
     login_required,
     notif_mgr,

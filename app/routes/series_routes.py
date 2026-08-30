@@ -3,9 +3,9 @@ series_routes.py - Book Series pages and API endpoints.
 Extracted from feature_routes.py for focused maintenance.
 """
 
-from flask import jsonify, redirect, render_template, request, session, url_for
+from flask import jsonify, redirect, request, session, url_for
 
-from app.routes.feature_shared import _series, _storage, h, cat_color
+from app.routes.feature_shared import _series, h, cat_color
 
 
 def register_series_routes(app, login_required, admin_required, render_page, _rate_limit) -> None:

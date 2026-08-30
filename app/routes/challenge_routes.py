@@ -8,7 +8,7 @@ from datetime import datetime
 
 from flask import jsonify, request, session
 
-from app.routes.feature_shared import _challenge, h, cat_color, _avatar_html as avatar_html
+from app.routes.feature_shared import _challenge, h, _avatar_html as avatar_html
 
 
 def register_challenge_routes(app, login_required, render_page, _rate_limit) -> None:

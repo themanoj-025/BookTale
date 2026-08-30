@@ -4,18 +4,10 @@ for feature routes. Extracted from feature_routes.py for focused maintenance.
 """
 
 import html
-import json
 import zlib
 from datetime import datetime
 
-from flask import session
 
-from app.services.reading.diary import (
-    RATING_LABELS,
-    RATING_SCORES,
-    rating_badge_html,
-    star_rating_html,
-)
 
 # ── Module-level shared state (populated by init_feature_routes) ──
 

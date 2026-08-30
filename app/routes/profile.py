@@ -4,7 +4,6 @@ import contextlib
 import logging
 from datetime import datetime
 
-from flask import session
 
 from app.routes.helpers import avatar_html
 from app.routes.page_state import (
@@ -38,7 +37,7 @@ def register_profile_routes(app) -> None:
 
         gd = gamification.get_user_gamification(user_id) if gamification else {}
         diary_stats = diary_mgr.get_stats(user_id) if diary_mgr else {}
-        shelf_counts = review_mgr.get_shelf_counts(user_id) if review_mgr else {}
+        review_mgr.get_shelf_counts(user_id) if review_mgr else {}
 
         av = avatar_html(user.name, 80)
 

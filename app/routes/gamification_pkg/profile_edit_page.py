@@ -2,7 +2,7 @@
 
 from flask import session
 
-from app.routes.social_shared import avatar_html, get_current_user, render_page, storage
+from app.routes.social_shared import avatar_html, render_page, storage
 from app.routes.helpers import h
 
 

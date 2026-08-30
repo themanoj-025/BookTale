@@ -4,7 +4,6 @@ admin_routes.py - Admin routes (admin settings, admin fines).
 Extracted from web_app.py to reduce file size and improve maintainability.
 """
 
-import contextlib
 import html
 import os
 from functools import wraps

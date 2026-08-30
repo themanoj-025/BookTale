@@ -25,10 +25,8 @@ Algorithms Tested:
 
 # Fix Windows console encoding
 import io
-import math
 import os
 import sys
-import time
 import warnings
 from pathlib import Path
 
@@ -41,23 +39,7 @@ import pandas as pd
 
 matplotlib.use("Agg")  # Non-interactive backend
 import matplotlib.pyplot as plt
-import seaborn as sns
-from sklearn.cluster import DBSCAN, AgglomerativeClustering, KMeans
-from sklearn.decomposition import PCA, TruncatedSVD
 from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.manifold import TSNE
-from sklearn.metrics import (
-    calinski_harabasz_score,
-    davies_bouldin_score,
-    mean_absolute_error,
-    mean_squared_error,
-    r2_score,
-    silhouette_score,
-)
-from sklearn.metrics.pairwise import cosine_similarity
-from sklearn.model_selection import train_test_split
-from sklearn.neighbors import NearestNeighbors
-from sklearn.neural_network import MLPRegressor
 
 # Scikit-learn
 from sklearn.preprocessing import LabelEncoder, StandardScaler
