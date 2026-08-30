@@ -29,6 +29,9 @@ from app.db.repositories import BookRepository, TransactionRepository, library_s
 from app.db.service import LibraryService
 
 
+
+
+pytestmark = pytest.mark.slow
 @pytest.fixture()
 def db_env(monkeypatch):
     """Point the engine at a throwaway SQLite file; rebuild on teardown.

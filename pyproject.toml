@@ -35,8 +35,13 @@ ignore = [
 ]
 
 [tool.pytest.ini_options]
+addopts = "-m 'not slow'"
 minversion = "7.0"
 testpaths = ["tests"]
+
+markers = [
+    "slow: integration tests (database, HTTP, ML models) — excluded from default run; use pytest -m slow"
+]
 
 [tool.mypy]
 ignore_missing_imports = true
