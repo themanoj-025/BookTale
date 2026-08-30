@@ -38,6 +38,8 @@ from app.services.books.library import Library
 from app.storage.storage import Storage
 
 
+
+pytestmark = pytest.mark.slow
 @pytest.fixture()
 def db_env(monkeypatch):
     """Point the engine at a throwaway SQLite file; rebuild on teardown."""
@@ -616,6 +618,7 @@ def test_audit_log_roundtrip_and_search(db_env):
 def test_audit_log_pagination(db_env):
     """Audit search paginates (newest first) and count is total, not page size."""
     from app.db.repositories import AuditLogRepository
+
 
     with dbmod.session_scope() as db:
         repo = AuditLogRepository(db)
