@@ -35,7 +35,7 @@ ignore = [
 ]
 
 [tool.pytest.ini_options]
-addopts = "-m 'not slow'"
+addopts = "-m 'not slow' --cov --cov-fail-under=70"
 minversion = "7.0"
 testpaths = ["tests"]
 
