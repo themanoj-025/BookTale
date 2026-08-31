@@ -8,7 +8,6 @@ import contextlib
 import html
 import os
 import sys
-import zlib
 from typing import Any
 from functools import wraps
 
@@ -341,10 +340,10 @@ def render_auth_page(title: str, content: str, **kw: Any) -> str:
 
 # Helpers extracted to web_app_helpers.py
 from app.routes.web_app_helpers import (
-    _initials,
-    _avatar_color,
-    _avatar_html,
-    cat_color,
+    _initials,  # noqa: F401
+    _avatar_color,  # noqa: F401
+    _avatar_html,  # noqa: F401
+    cat_color,  # noqa: F401
 )
 def healthz() -> dict[str, str]:
     return jsonify({"status": "ok"}), 200
