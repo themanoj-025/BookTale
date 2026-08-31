@@ -37,7 +37,7 @@ from app.jobs import jobs, tasks
 
 
 @pytest.fixture(autouse=True)
-def _no_redis(monkeypatch):
+def _no_redis(monkeypatch) -> None:
     """Force the facade onto its fallback path for every test in this file.
 
     Tests here must never touch a real Redis. We stub the reachability probe
@@ -56,7 +56,7 @@ def _no_redis(monkeypatch):
 
 
 class TestCoverFetchJob:
-    def test_persists_cover_on_success(self, monkeypatch):
+    def test_persists_cover_on_success(self, monkeypatch) -> None:
         """A successful fetch updates cover_url/description/metadata."""
         from app.models.book import Book
 
@@ -72,10 +72,10 @@ class TestCoverFetchJob:
         books = {"BK-2026-0001": book}
 
         class _FakeStorage:
-            def load_books(self, force=False):
+            def load_books(self, force=False) -> None:
                 return books
 
-            def save_books(self, b):
+            def save_books(self, b) -> None:
                 books.update(b)
 
         monkeypatch.setattr(
@@ -99,7 +99,7 @@ class TestCoverFetchJob:
         assert book.pages == 250
         assert book.genres == ["Fiction"]
 
-    def test_no_cover_does_not_crash(self, monkeypatch):
+    def test_no_cover_does_not_crash(self, monkeypatch) -> None:
         """A failed fetch returns ok=False and leaves the book untouched."""
         from app.models.book import Book
 
@@ -115,10 +115,10 @@ class TestCoverFetchJob:
         books = {"BK-2026-0001": book}
 
         class _FakeStorage:
-            def load_books(self, force=False):
+            def load_books(self, force=False) -> None:
                 return books
 
-            def save_books(self, b):
+            def save_books(self, b) -> None:
                 books.update(b)
 
         monkeypatch.setattr(
@@ -137,12 +137,12 @@ class TestCoverFetchJob:
         assert result["ok"] is False
         assert book.cover_fetched is False  # untouched
 
-    def test_missing_book_is_handled(self, monkeypatch):
+    def test_missing_book_is_handled(self, monkeypatch) -> None:
         class _FakeStorage:
-            def load_books(self, force=False):
+            def load_books(self, force=False) -> None:
                 return {}
 
-            def save_books(self, b):
+            def save_books(self, b) -> None:
                 pass
 
         monkeypatch.setattr(
@@ -159,7 +159,7 @@ class TestCoverFetchJob:
 
 
 class TestOverdueEmailJob:
-    def test_nothing_overdue_returns_zeros(self, monkeypatch):
+    def test_nothing_overdue_returns_zeros(self, monkeypatch) -> None:
         """Empty overdue list -> zero summary, no SMTP attempt."""
         calls = {"batch": 0}
         monkeypatch.setattr(
@@ -174,7 +174,7 @@ class TestOverdueEmailJob:
         assert result["total"] == 0
         assert calls["batch"] == 0  # never called send_overdue_batch
 
-    def test_overdue_batch_is_sent(self, monkeypatch):
+    def test_overdue_batch_is_sent(self, monkeypatch) -> None:
         overdue = [{"user_id": "U1", "book": "B", "days_overdue": 2}]
         monkeypatch.setattr(
             "app.db.service.LibraryService",
@@ -190,7 +190,7 @@ class TestOverdueEmailJob:
 
 
 class TestTokenPurgeJob:
-    def test_returns_removed_count(self, monkeypatch):
+    def test_returns_removed_count(self, monkeypatch) -> None:
         monkeypatch.setattr("app.services.auth.auth.purge_expired_tokens", lambda: 7)
         assert tasks.job_purge_expired_tokens() == 7
 
@@ -201,13 +201,13 @@ class TestTokenPurgeJob:
 
 
 class TestJobsFacade:
-    def test_fallback_pool_runs_job(self, monkeypatch):
+    def test_fallback_pool_runs_job(self, monkeypatch) -> None:
         """With Redis unreachable, the job still executes on the local pool."""
         captured = []
         monkeypatch.setattr("app.jobs.tasks.job_fetch_book_cover", lambda *a: captured.append(a))
 
         # Make the pool submit synchronously so the test is deterministic.
-        def _sync_submit(fn, *args):
+        def _sync_submit(fn, *args) -> None:
             fn(*args)
 
         monkeypatch.setattr(
@@ -229,7 +229,7 @@ class TestJobsFacade:
         # RQ args only (book_id, title, author, isbn) — no storage.
         assert captured[0] == ("BK-1", "T", "A", "123")
 
-    def test_pool_path_keeps_caller_storage(self, monkeypatch):
+    def test_pool_path_keeps_caller_storage(self, monkeypatch) -> None:
         """The in-process fallback passes the caller's storage handle through
         so the cover write lands in the caller's data store (the RQ path
         cannot serialize it and the worker builds its own)."""
@@ -237,7 +237,7 @@ class TestJobsFacade:
         fake_storage = object()
         monkeypatch.setattr("app.jobs.tasks.job_fetch_book_cover", lambda *a: captured.append(a))
 
-        def _sync_submit(fn, *args):
+        def _sync_submit(fn, *args) -> None:
             fn(*args)
 
         monkeypatch.setattr(
@@ -257,7 +257,7 @@ class TestJobsFacade:
         # storage appended after the four RQ args, and is the same object.
         assert captured[0] == ("BK-1", "T", "A", "123", fake_storage)
 
-    def test_rq_path_never_receives_storage(self, monkeypatch):
+    def test_rq_path_never_receives_storage(self, monkeypatch) -> None:
         """When Redis IS reachable the job is enqueued with the 4 RQ args
         ONLY — the caller's storage handle must never be serialized to RQ
         (the worker builds its own via create_storage)."""
@@ -265,10 +265,10 @@ class TestJobsFacade:
         enqueued = {}
 
         class _FakeQueue:
-            def __init__(self, name, connection=None):
+            def __init__(self, name, connection=None) -> None:
                 pass
 
-            def enqueue(self, fn, *args, **kwargs):
+            def enqueue(self, fn, *args, **kwargs) -> None:
                 enqueued["fn"] = fn
                 enqueued["args"] = args
 
@@ -278,7 +278,7 @@ class TestJobsFacade:
         jobs.enqueue_cover_fetch("BK-1", "T", "A", "123", storage=object())
         assert enqueued["args"] == ("BK-1", "T", "A", "123")
 
-    def test_fallback_path_is_bounded_pool(self):
+    def test_fallback_path_is_bounded_pool(self) -> None:
         """The fallback executor is a ThreadPoolExecutor (bounded), never an
         unbounded raw thread."""
         pool = jobs._get_pool()
@@ -288,14 +288,14 @@ class TestJobsFacade:
         )
         assert pool._max_workers == Config.COVER_FETCH_WORKERS
 
-    def test_disabled_flag_still_runs_on_pool(self, monkeypatch):
+    def test_disabled_flag_still_runs_on_pool(self, monkeypatch) -> None:
         monkeypatch.setattr(Config, "BACKGROUND_JOBS_ENABLED", False)
         calls = []
         monkeypatch.setattr("app.jobs.tasks.job_purge_expired_tokens", lambda: calls.append(1) or 0)
 
         captured = []
 
-        def _sync_submit(fn, *args):
+        def _sync_submit(fn, *args) -> None:
             captured.append(fn(*args))
 
         monkeypatch.setattr(
@@ -321,7 +321,7 @@ class TestJobsFacade:
 
 
 class TestCronNextRun:
-    def test_next_run_after_now_is_strictly_future(self):
+    def test_next_run_after_now_is_strictly_future(self) -> None:
         """The computed next run must be strictly after the reference time."""
         pytest.importorskip("croniter")
         from app.jobs import worker
@@ -330,7 +330,7 @@ class TestCronNextRun:
         nxt = worker._next_run_after("0 9 * * *", after=base)
         assert nxt > base
 
-    def test_cron_respects_expression(self):
+    def test_cron_respects_expression(self) -> None:
         """'0 9 * * *' lands on 09:00, minute=0."""
         pytest.importorskip("croniter")
         from datetime import datetime as _dt
@@ -358,7 +358,7 @@ class TestWorkerSchemaEnsure:
     occurrence (RQ itself does not auto-retry).
     """
 
-    def test_cold_worker_creates_schema(self, monkeypatch):
+    def test_cold_worker_creates_schema(self, monkeypatch) -> None:
         """A worker that starts before the web app still creates tables."""
         called = []
         monkeypatch.setattr("app.db.database.create_all", lambda: called.append(True))
@@ -368,10 +368,10 @@ class TestWorkerSchemaEnsure:
         worker._ensure_schema()
         assert called, "create_all() must run on worker startup"
 
-    def test_schema_failure_is_non_fatal(self, monkeypatch):
+    def test_schema_failure_is_non_fatal(self, monkeypatch) -> None:
         """DB down at worker start: log, never raise (RQ retries the job)."""
 
-        def _boom():
+        def _boom() -> None:
             raise RuntimeError("db unreachable")
 
         monkeypatch.setattr("app.db.database.create_all", _boom)
@@ -380,7 +380,7 @@ class TestWorkerSchemaEnsure:
 
         worker._ensure_schema()  # must not raise
 
-    def test_json_backend_skips_schema(self, monkeypatch):
+    def test_json_backend_skips_schema(self, monkeypatch) -> None:
         """Legacy JSON backend needs no relational tables — skip create_all."""
         called = []
         monkeypatch.setattr("app.db.database.create_all", lambda: called.append(True))

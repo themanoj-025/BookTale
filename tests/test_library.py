@@ -27,7 +27,7 @@ from app.storage.storage import Storage
 
 
 @pytest.fixture(autouse=True)
-def clean_data_dirs():
+def clean_data_dirs() -> None:
     """Use temporary directories for each test to ensure isolation."""
     tmpdir = tempfile.mkdtemp()
     old_data = Config.DATA_DIR
@@ -135,7 +135,7 @@ def sample_book(lib: Library) -> str:
 
 
 class TestBook:
-    def test_book_creation(self):
+    def test_book_creation(self) -> None:
         """Test that a Book object is created correctly."""
         book = Book(
             book_id="BK-2026-0001",
@@ -150,7 +150,7 @@ class TestBook:
         assert book.available_copies == 3
         assert not book.is_deleted
 
-    def test_book_to_dict_from_dict(self):
+    def test_book_to_dict_from_dict(self) -> None:
         """Test serialization/deserialization."""
         book = Book(
             book_id="BK-2026-0001",
@@ -166,7 +166,7 @@ class TestBook:
         assert book2.title == "Test"
         assert book2.available_copies == 3
 
-    def test_book_display(self):
+    def test_book_display(self) -> None:
         """Test display string."""
         book = Book(
             book_id="BK-2026-0001",
@@ -187,7 +187,7 @@ class TestBook:
 
 
 class TestUser:
-    def test_user_creation(self):
+    def test_user_creation(self) -> None:
         """Test User creation with defaults."""
         user = User(
             user_id="U001",
@@ -201,7 +201,7 @@ class TestUser:
         assert len(user.books_issued) == 0
         assert user.unpaid_fine == 0.0
 
-    def test_user_is_active(self):
+    def test_user_is_active(self) -> None:
         """Test active/blocked status."""
         user = User(
             user_id="U001",
@@ -215,7 +215,7 @@ class TestUser:
         user.membership_status = "Blocked"
         assert user.is_active() is False
 
-    def test_user_can_borrow(self):
+    def test_user_can_borrow(self) -> None:
         """Test borrow limit logic."""
         user = User(
             user_id="U001",
@@ -229,7 +229,7 @@ class TestUser:
         user.books_issued = ["BK-1", "BK-2", "BK-3"]
         assert user.can_borrow() is False  # Max 3
 
-    def test_user_to_dict_from_dict(self):
+    def test_user_to_dict_from_dict(self) -> None:
         """Test serialization/deserialization."""
         user = User(
             user_id="U001",
@@ -249,7 +249,7 @@ class TestUser:
 
 
 class TestAuth:
-    def test_hash_password(self):
+    def test_hash_password(self) -> None:
         """Test password hashing with bcrypt."""
         hashed = hash_password("test123")
         assert hashed.startswith("$2b$"), "bcrypt hash should start with $2b$"
@@ -257,7 +257,7 @@ class TestAuth:
         assert verify_password("test123", hashed) is True
         assert verify_password("wrong", hashed) is False
 
-    def test_login_success(self, storage: Storage, lib: Library, admin_user: str):
+    def test_login_success(self, storage: Storage, lib: Library, admin_user: str) -> None:
         """Test successful login."""
         auth = AuthManager(storage)
         user = auth.login("ADMIN001", "admin123")
@@ -266,7 +266,7 @@ class TestAuth:
         assert auth.is_logged_in() is True
         assert auth.require_role("admin") is True
 
-    def test_login_failure(self, storage: Storage, lib: Library, admin_user: str):
+    def test_login_failure(self, storage: Storage, lib: Library, admin_user: str) -> None:
         """Test failed login."""
         from app.core.exceptions import AuthenticationError
 
@@ -274,7 +274,7 @@ class TestAuth:
         with pytest.raises(AuthenticationError):
             auth.login("ADMIN001", "wrong_password")
 
-    def test_login_nonexistent(self, storage: Storage):
+    def test_login_nonexistent(self, storage: Storage) -> None:
         """Test login with non-existent user."""
         from app.core.exceptions import AuthenticationError
 
@@ -282,7 +282,7 @@ class TestAuth:
         with pytest.raises(AuthenticationError):
             auth.login("FAKE", "anything")
 
-    def test_logout(self, storage: Storage, lib: Library, admin_user: str):
+    def test_logout(self, storage: Storage, lib: Library, admin_user: str) -> None:
         """Test logout clears session."""
         auth = AuthManager(storage)
         auth.login("ADMIN001", "admin123")
@@ -290,7 +290,7 @@ class TestAuth:
         auth.logout()
         assert auth.is_logged_in() is False
 
-    def test_require_role(self, storage: Storage, lib: Library, admin_user: str, normal_user: str):
+    def test_require_role(self, storage: Storage, lib: Library, admin_user: str, normal_user: str) -> None:
         """Test role checking."""
         auth = AuthManager(storage)
         auth.login("ADMIN001", "admin123")
@@ -307,31 +307,31 @@ class TestAuth:
 
 
 class TestLibrary:
-    def test_add_book(self, lib: Library):
+    def test_add_book(self, lib: Library) -> None:
         """Test adding a book."""
         ok, result = lib.add_book("Title", "Author", "1111111111", "Fiction", 2, actor="test")
         assert ok is True
         assert result.startswith("BK-")
 
-    def test_add_book_duplicate_isbn(self, lib: Library):
+    def test_add_book_duplicate_isbn(self, lib: Library) -> None:
         """Test adding duplicate ISBN fails."""
         lib.add_book("Book 1", "Author", "1111111111", "Fiction", 1, actor="test")
         ok, result = lib.add_book("Book 2", "Author", "1111111111", "Fiction", 1, actor="test")
         assert ok is False
         assert "already exists" in result
 
-    def test_get_book(self, lib: Library):
+    def test_get_book(self, lib: Library) -> None:
         """Test retrieving a book."""
         _ok, bid = lib.add_book("Test", "Author", "1111111111", "Fiction", 1, actor="test")
         book = lib.get_book(bid)
         assert book is not None
         assert book.title == "Test"
 
-    def test_get_book_not_found(self, lib: Library):
+    def test_get_book_not_found(self, lib: Library) -> None:
         """Test getting a non-existent book."""
         assert lib.get_book("FAKE") is None
 
-    def test_search_books(self, lib: Library):
+    def test_search_books(self, lib: Library) -> None:
         """Test searching books by various fields."""
         lib.add_book("Harry Potter", "J.K. Rowling", "1111111111", "Fiction", 1, actor="test")
         lib.add_book("The Hobbit", "J.R.R. Tolkien", "2222222222", "Fiction", 1, actor="test")
@@ -345,7 +345,7 @@ class TestLibrary:
         results = lib.search_books(category="Fiction")
         assert len(results) == 2
 
-    def test_update_book(self, lib: Library):
+    def test_update_book(self, lib: Library) -> None:
         """Test updating a book."""
         ok, bid = lib.add_book("Original", "Author", "1111111111", "Fiction", 1, actor="test")
         ok, _msg = lib.update_book(bid, title="Updated")
@@ -353,7 +353,7 @@ class TestLibrary:
         book = lib.get_book(bid)
         assert book.title == "Updated"
 
-    def test_delete_book(self, lib: Library):
+    def test_delete_book(self, lib: Library) -> None:
         """Test soft-deleting a book."""
         ok, bid = lib.add_book("Test", "Author", "1111111111", "Fiction", 1, actor="test")
         ok, _msg = lib.delete_book(bid, actor="test")
@@ -361,7 +361,7 @@ class TestLibrary:
         book = lib.get_book(bid)
         assert book.is_deleted is True
 
-    def test_register_user(self, lib: Library):
+    def test_register_user(self, lib: Library) -> None:
         """Test user registration."""
         ok, _msg = lib.register_user(
             "U001",
@@ -374,7 +374,7 @@ class TestLibrary:
         )
         assert ok is True
 
-    def test_register_duplicate_user(self, lib: Library):
+    def test_register_duplicate_user(self, lib: Library) -> None:
         """Test duplicate user registration fails."""
         lib.register_user(
             "U001",
@@ -397,7 +397,7 @@ class TestLibrary:
         assert ok is False
         assert "already exists" in msg
 
-    def test_block_unblock_user(self, lib: Library):
+    def test_block_unblock_user(self, lib: Library) -> None:
         """Test blocking and unblocking users."""
         lib.register_user(
             "U001",
@@ -419,7 +419,7 @@ class TestLibrary:
         user = lib.get_user("U001")
         assert user.membership_status == "Active"
 
-    def test_renew_membership(self, lib: Library):
+    def test_renew_membership(self, lib: Library) -> None:
         """Test membership renewal."""
         lib.register_user(
             "U001",
@@ -434,7 +434,7 @@ class TestLibrary:
         assert ok is True
         assert "30" in msg or "renewed" in msg
 
-    def test_issue_book(self, lib: Library):
+    def test_issue_book(self, lib: Library) -> None:
         """Test issuing a book to a user."""
         lib.register_user(
             "U001",
@@ -450,7 +450,7 @@ class TestLibrary:
         assert ok is True
         assert "issued" in msg.lower() or "due" in msg.lower()
 
-    def test_issue_book_not_available(self, lib: Library):
+    def test_issue_book_not_available(self, lib: Library) -> None:
         """Test issuing an unavailable book creates reservation."""
         lib.register_user(
             "U001",
@@ -466,7 +466,7 @@ class TestLibrary:
         assert ok is False
         assert "reservation" in msg.lower() or "unavailable" in msg.lower()
 
-    def test_issue_book_max_limit(self, lib: Library):
+    def test_issue_book_max_limit(self, lib: Library) -> None:
         """Test borrow limit enforcement."""
         lib.register_user(
             "U001",
@@ -489,7 +489,7 @@ class TestLibrary:
         assert ok is False
         assert "limit" in msg.lower()
 
-    def test_return_book(self, lib: Library):
+    def test_return_book(self, lib: Library) -> None:
         """Test returning a book."""
         lib.register_user(
             "U001",
@@ -506,7 +506,7 @@ class TestLibrary:
         assert ok is True
         assert fine >= 0
 
-    def test_return_book_not_issued(self, lib: Library):
+    def test_return_book_not_issued(self, lib: Library) -> None:
         """Test returning a book not issued to user."""
         lib.register_user(
             "U001",
@@ -522,7 +522,7 @@ class TestLibrary:
         assert ok is False
         assert "not issued" in msg.lower()
 
-    def test_pay_fine(self, lib: Library):
+    def test_pay_fine(self, lib: Library) -> None:
         """Test fine payment."""
         lib.register_user(
             "U001",
@@ -545,7 +545,7 @@ class TestLibrary:
         user = lib.get_user("U001")
         assert user.unpaid_fine == 50.0
 
-    def test_get_overdue_list(self, lib: Library):
+    def test_get_overdue_list(self, lib: Library) -> None:
         """Test overdue list retrieval."""
         lib.register_user(
             "U001",
@@ -577,7 +577,7 @@ class TestLibrary:
 
 
 class TestRecommender:
-    def test_recommend_similar_books(self, lib: Library, storage: Storage):
+    def test_recommend_similar_books(self, lib: Library, storage: Storage) -> None:
         """Test content-based recommendations."""
         _ok1, bid1 = lib.add_book(
             "Harry Potter 1", "J.K. Rowling", "1111111111", "Fiction", 2, actor="test"
@@ -593,7 +593,7 @@ class TestRecommender:
         # Harry Potter 2 should be the top recommendation (same author + category)
         assert recs[0]["book_id"] == bid2
 
-    def test_recommend_trending(self, lib: Library, storage: Storage):
+    def test_recommend_trending(self, lib: Library, storage: Storage) -> None:
         """Test trending recommendations."""
         _ok, bid1 = lib.add_book("Popular Book", "Author", "1111111111", "Fiction", 5, actor="test")
         lib.add_book("Unpopular Book", "Author2", "2222222222", "Science", 5, actor="test")
@@ -608,7 +608,7 @@ class TestRecommender:
         assert len(recs) > 0
         assert recs[0]["book_id"] == bid1
 
-    def test_recommend_by_category(self, lib: Library, storage: Storage):
+    def test_recommend_by_category(self, lib: Library, storage: Storage) -> None:
         """Test category-based recommendations."""
         # Add many books to avoid seed data cold-start fallback
         lib.add_book("Fiction 1", "Author", "1111111111", "Fiction", 1, actor="test")
@@ -626,7 +626,7 @@ class TestRecommender:
         recs = recommender.recommend_by_category("Fiction")
         assert len(recs) == 5
 
-    def test_recommend_for_user(self, lib: Library, storage: Storage):
+    def test_recommend_for_user(self, lib: Library, storage: Storage) -> None:
         """Test personalized user recommendations."""
         lib.register_user(
             "U001",
@@ -651,7 +651,7 @@ class TestRecommender:
         recs = recommender.recommend_for_user("U001")
         assert len(recs) > 0
 
-    def test_get_all_categories(self, lib: Library, storage: Storage):
+    def test_get_all_categories(self, lib: Library, storage: Storage) -> None:
         """Test category listing."""
         # Add many books to avoid seed data cold-start fallback
         lib.add_book("Book 1", "Author", "1111111111", "Fiction", 1, actor="test")
@@ -674,13 +674,13 @@ class TestRecommender:
 
 
 class TestNotifications:
-    def test_add_notification(self, storage: Storage):
+    def test_add_notification(self, storage: Storage) -> None:
         """Test adding a notification."""
         notif_mgr = NotificationManager(storage)
         nid = notif_mgr.add_notification("U001", "test", "Hello!")
         assert nid.startswith("NOTIF-")
 
-    def test_get_unread_count(self, storage: Storage):
+    def test_get_unread_count(self, storage: Storage) -> None:
         """Test unread notification count."""
         notif_mgr = NotificationManager(storage)
         notif_mgr.add_notification("U001", "test", "Msg 1")
@@ -689,14 +689,14 @@ class TestNotifications:
         assert notif_mgr.get_unread_count("U001") == 2
         assert notif_mgr.get_unread_count("U002") == 1
 
-    def test_mark_as_read(self, storage: Storage):
+    def test_mark_as_read(self, storage: Storage) -> None:
         """Test marking notifications as read."""
         notif_mgr = NotificationManager(storage)
         nid = notif_mgr.add_notification("U001", "test", "Hello!")
         notif_mgr.mark_as_read(nid)
         assert notif_mgr.get_unread_count("U001") == 0
 
-    def test_mark_all_read(self, storage: Storage):
+    def test_mark_all_read(self, storage: Storage) -> None:
         """Test marking all notifications as read."""
         notif_mgr = NotificationManager(storage)
         notif_mgr.add_notification("U001", "test", "Msg 1")
@@ -704,7 +704,7 @@ class TestNotifications:
         notif_mgr.mark_all_read("U001")
         assert notif_mgr.get_unread_count("U001") == 0
 
-    def test_overdue_notification(self, storage: Storage):
+    def test_overdue_notification(self, storage: Storage) -> None:
         """Test overdue notification creation."""
         notif_mgr = NotificationManager(storage)
         notif_mgr.notify_overdue("U001", "The Great Book", 5, 25.0)
@@ -712,7 +712,7 @@ class TestNotifications:
         assert len(notifs) == 1
         assert "overdue" in notifs[0]["message"].lower()
 
-    def test_reservation_notification(self, storage: Storage):
+    def test_reservation_notification(self, storage: Storage) -> None:
         """Test reservation available notification."""
         notif_mgr = NotificationManager(storage)
         notif_mgr.notify_reservation_available("U001", "The Great Book")
@@ -725,7 +725,7 @@ class TestNotifications:
 
 
 class TestStorage:
-    def test_save_load_books(self, storage: Storage):
+    def test_save_load_books(self, storage: Storage) -> None:
         """Test saving and loading books."""
         book = Book(
             book_id="BK-1",
@@ -741,7 +741,7 @@ class TestStorage:
         assert "BK-1" in loaded
         assert loaded["BK-1"].title == "Test"
 
-    def test_save_load_users(self, storage: Storage):
+    def test_save_load_users(self, storage: Storage) -> None:
         """Test saving and loading users."""
         user = User(
             user_id="U001",
@@ -756,7 +756,7 @@ class TestStorage:
         assert "U001" in loaded
         assert loaded["U001"].name == "John"
 
-    def test_append_transaction(self, storage: Storage):
+    def test_append_transaction(self, storage: Storage) -> None:
         """Test appending transactions."""
         txn = {
             "txn_id": "TXN-1",
@@ -773,7 +773,7 @@ class TestStorage:
         assert len(txns) == 1
         assert txns[0]["txn_id"] == "TXN-1"
 
-    def test_append_fine(self, storage: Storage):
+    def test_append_fine(self, storage: Storage) -> None:
         """Test appending fines."""
         fine = {
             "user_id": "U001",
@@ -786,7 +786,7 @@ class TestStorage:
         fines = storage.load_fines()
         assert len(fines) == 1
 
-    def test_append_notification(self, storage: Storage):
+    def test_append_notification(self, storage: Storage) -> None:
         """Test appending notifications."""
         notif = {
             "notif_id": "NOTIF-1",
@@ -800,7 +800,7 @@ class TestStorage:
         notifs = storage.load_notifications()
         assert len(notifs) == 1
 
-    def test_clear_cache(self, storage: Storage):
+    def test_clear_cache(self, storage: Storage) -> None:
         """Test cache clearing."""
         storage.load_books()
         storage.clear_cache()
@@ -811,7 +811,7 @@ class TestStorage:
 
 
 class TestBackup:
-    def test_create_backup(self, storage: Storage):
+    def test_create_backup(self, storage: Storage) -> None:
         """Test creating a backup."""
         # Save some data first
         book = Book(
@@ -828,13 +828,13 @@ class TestBackup:
         path = create_backup(triggered_by="test")
         assert os.path.exists(path)
 
-    def test_list_backups(self):
+    def test_list_backups(self) -> None:
         """Test listing backups."""
         create_backup(triggered_by="test")
         backups = list_backups()
         assert len(backups) > 0
 
-    def test_create_and_restore(self, storage: Storage):
+    def test_create_and_restore(self, storage: Storage) -> None:
         """Test restore operation."""
         book = Book(
             book_id="BK-1",
@@ -854,14 +854,14 @@ class TestBackup:
 
 
 class TestLogger:
-    def test_log(self):
+    def test_log(self) -> None:
         """Test logging an entry."""
         log("Test action", "test_user", "extra info")
         logs = get_logs(10)
         assert len(logs) >= 1
         assert "Test action" in logs[-1]
 
-    def test_log_empty(self):
+    def test_log_empty(self) -> None:
         """Test getting logs when none exist."""
         logs = get_logs(10)
         assert isinstance(logs, list)

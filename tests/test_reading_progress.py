@@ -16,7 +16,7 @@ def _write_progress(tmp_path, data: dict) -> None:
     (tmp_path / "reading_progress.json").write_text(json.dumps(data), encoding="utf-8")
 
 
-def test_get_user_reading_list_returns_total_pages(monkeypatch, tmp_path):
+def test_get_user_reading_list_returns_total_pages(monkeypatch, tmp_path) -> None:
     from app.config.settings import Config
 
     # Point the data dir (dynamic lookups) and book file (static) at tmp_path.
@@ -48,7 +48,7 @@ def test_get_user_reading_list_returns_total_pages(monkeypatch, tmp_path):
     assert entry["percentage"] == 25.0
 
 
-def test_get_user_reading_list_other_user_empty(monkeypatch, tmp_path):
+def test_get_user_reading_list_other_user_empty(monkeypatch, tmp_path) -> None:
     from app.config.settings import Config
 
     monkeypatch.setattr(Config, "DATA_DIR", str(tmp_path))

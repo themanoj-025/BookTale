@@ -33,7 +33,7 @@ from app.db.service import LibraryService
 
 pytestmark = pytest.mark.slow
 @pytest.fixture()
-def db_env(monkeypatch):
+def db_env(monkeypatch) -> None:
     """Point the engine at a throwaway SQLite file; rebuild on teardown.
 
     The engine is cached by URL, so we patch Config.DATABASE_URL to a unique
@@ -52,7 +52,7 @@ def db_env(monkeypatch):
     dbmod._session_factory = None
 
 
-def _seed(users: int = 1, copies: int = 1, book_id: str = "BK-1"):
+def _seed(users: int = 1, copies: int = 1, book_id: str = "BK-1") -> None:
     """Seed N users + one book; returns (session_factory, user_ids, book_id)."""
     factory = get_session_factory()
     with factory() as db:
@@ -94,7 +94,7 @@ def _seed(users: int = 1, copies: int = 1, book_id: str = "BK-1"):
 # ════════════════════════════════════════════════════════════════════
 
 
-def test_last_copy_race_no_oversell(db_env):
+def test_last_copy_race_no_oversell(db_env) -> None:
     """20 threads racing for the last copy: exactly 1 wins, 19 get a clean
     'No copies available' error, and available_copies never goes negative."""
     factory, user_ids, book_id = _seed(users=20, copies=1)
@@ -103,7 +103,7 @@ def test_last_copy_race_no_oversell(db_env):
     results: list = []
     barrier = threading.Barrier(20)
 
-    def attempt(uid: str):
+    def attempt(uid: str) -> None:
         barrier.wait()
         ok, msg = service.issue_book(uid, book_id)
         results.append((uid, ok, msg))
@@ -130,7 +130,7 @@ def test_last_copy_race_no_oversell(db_env):
         assert txn_count == 1  # exactly one open txn, not 20
 
 
-def test_double_issue_same_user_rejected(db_env):
+def test_double_issue_same_user_rejected(db_env) -> None:
     """A user cannot issue the same book twice, even under contention."""
     factory, _user_ids, book_id = _seed(users=1, copies=5)
     service = LibraryService(factory)
@@ -141,7 +141,7 @@ def test_double_issue_same_user_rejected(db_env):
     assert "already has this book issued" in msg2
 
 
-def test_borrow_limit_enforced(db_env):
+def test_borrow_limit_enforced(db_env) -> None:
     """MAX_BORROW_LIMIT caps concurrent books per user."""
     factory, _user_ids, _ = _seed(users=1, copies=10)
     service = LibraryService(factory)
@@ -175,7 +175,7 @@ def test_borrow_limit_enforced(db_env):
 # ════════════════════════════════════════════════════════════════════
 
 
-def test_crash_mid_issue_rolls_back(db_env):
+def test_crash_mid_issue_rolls_back(db_env) -> None:
     """If something raises after the copy is decremented, the whole txn
     rolls back: no copy lost, no dangling txn, user's list untouched."""
     factory, _user_ids, book_id = _seed(users=1, copies=1)
@@ -189,7 +189,7 @@ def test_crash_mid_issue_rolls_back(db_env):
     class Boom(Exception):
         pass
 
-    def raiser(*args, **kwargs):
+    def raiser(*args, **kwargs) -> None:
         raise Boom("simulated crash mid-issue")
 
     svc_mod.Transaction = raiser
@@ -208,7 +208,7 @@ def test_crash_mid_issue_rolls_back(db_env):
         assert db.query(Transaction).count() == 0  # no dangling txn
 
 
-def test_return_book_atomic(db_env):
+def test_return_book_atomic(db_env) -> None:
     """Return closes the txn, restores the copy, and applies fine atomically."""
     factory, _user_ids, book_id = _seed(users=1, copies=1)
     service = LibraryService(factory)
@@ -232,7 +232,7 @@ def test_return_book_atomic(db_env):
         assert user.unpaid_fine == fine
 
 
-def test_return_notifies_next_reservation(db_env):
+def test_return_notifies_next_reservation(db_env) -> None:
     """Returning a book serves the next user in the reservation queue and
     creates a notification for them (the _pop_reservation_queue path)."""
     factory, _user_ids, book_id = _seed(users=2, copies=1)
@@ -262,7 +262,7 @@ def test_return_notifies_next_reservation(db_env):
         assert db.query(Reservation).filter(Reservation.book_id == book_id).count() == 0
 
 
-def test_reserve_book_idempotent(db_env):
+def test_reserve_book_idempotent(db_env) -> None:
     """reserve_book adds a user once; a second call reports already queued."""
     factory, _user_ids, book_id = _seed(users=1, copies=1)
     service = LibraryService(factory)
@@ -274,7 +274,7 @@ def test_reserve_book_idempotent(db_env):
     assert "already in reservation queue" in msg2
 
 
-def test_pay_fine_partial(db_env):
+def test_pay_fine_partial(db_env) -> None:
     """pay_fine accepts partial payments and tracks the remainder."""
     factory, _user_ids, book_id = _seed(users=1, copies=1)
     service = LibraryService(factory)
@@ -300,7 +300,7 @@ def test_pay_fine_partial(db_env):
         assert db.get(User, "U000").unpaid_fine == 0.0
 
 
-def test_overdue_list_tolerates_legacy_dates(db_env):
+def test_overdue_list_tolerates_legacy_dates(db_env) -> None:
     """Legacy '%d %b %Y' due dates must not crash get_overdue_list."""
     factory, _user_ids, book_id = _seed(users=1, copies=1)
     service = LibraryService(factory)
@@ -319,7 +319,7 @@ def test_overdue_list_tolerates_legacy_dates(db_env):
 # ════════════════════════════════════════════════════════════════════
 
 
-def test_migration_parity(db_env, monkeypatch):
+def test_migration_parity(db_env, monkeypatch) -> None:
     """Seed JSON files, run the one-shot migration, assert row counts match."""
     tmpdir = tempfile.mkdtemp(prefix="booktale_json_")
 
@@ -428,7 +428,7 @@ def test_migration_parity(db_env, monkeypatch):
         assert counts["source"] == counts["loaded"], f"{name} parity broken"
 
 
-def test_migration_missing_files_are_empty(db_env, monkeypatch):
+def test_migration_missing_files_are_empty(db_env, monkeypatch) -> None:
     """No JSON files at all -> migration succeeds with zero counts."""
     tmpdir = tempfile.mkdtemp(prefix="booktale_empty_")
     monkeypatch.setattr(Config, "DATA_DIR", tmpdir)
@@ -444,7 +444,7 @@ def test_migration_missing_files_are_empty(db_env, monkeypatch):
 # ════════════════════════════════════════════════════════════════════
 
 
-def test_search_pagination_and_filters(db_env):
+def test_search_pagination_and_filters(db_env) -> None:
     factory, _user_ids, _ = _seed(users=1, copies=1)
     with factory() as db:
         db.add_all(
@@ -500,7 +500,7 @@ def test_search_pagination_and_filters(db_env):
         assert popular[0].book_id == "BK-12"
 
 
-def test_overdue_list_indexed(db_env):
+def test_overdue_list_indexed(db_env) -> None:
     factory, _user_ids, book_id = _seed(users=1, copies=1)
     service = LibraryService(factory)
     service.issue_book("U000", book_id)
@@ -515,7 +515,7 @@ def test_overdue_list_indexed(db_env):
         assert overdue[0]["days_overdue"] == 3
 
 
-def test_library_stats_aggregates(db_env):
+def test_library_stats_aggregates(db_env) -> None:
     factory, _user_ids, book_id = _seed(users=1, copies=2)
     service = LibraryService(factory)
     service.issue_book("U000", book_id)

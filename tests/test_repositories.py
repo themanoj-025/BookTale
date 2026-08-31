@@ -21,14 +21,14 @@ pytestmark = pytest.mark.slow
 
 
 @pytest.fixture
-def engine():
+def engine() -> None:
     engine = create_engine("sqlite:///:memory:")
     Base.metadata.create_all(engine)
     return engine
 
 
 @pytest.fixture
-def session(engine):
+def session(engine) -> None:
     with Session(engine) as session:
         yield session
 
