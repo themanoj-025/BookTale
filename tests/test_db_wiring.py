@@ -41,7 +41,7 @@ from app.storage.storage import Storage
 
 pytestmark = pytest.mark.slow
 @pytest.fixture()
-def db_env(monkeypatch):
+def db_env(monkeypatch) -> None:
     """Point the engine at a throwaway SQLite file; rebuild on teardown."""
     tmpdir = tempfile.mkdtemp(prefix="booktale_wire_")
     url = "sqlite:///" + os.path.join(tmpdir, "test.db")
@@ -95,7 +95,7 @@ def _seed_books(store, *book_ids: str) -> None:
 # ─────────────────────────────────────────────────────────────────────
 
 
-def test_books_roundtrip(store):
+def test_books_roundtrip(store) -> None:
     books = {
         "BK-1": Book(
             book_id="BK-1",
@@ -128,7 +128,7 @@ def test_books_roundtrip(store):
     assert loaded["BK-2"].available_copies == 0
 
 
-def test_users_roundtrip(store):
+def test_users_roundtrip(store) -> None:
     users = {
         "MEM-1": User(
             user_id="MEM-1",
@@ -151,7 +151,7 @@ def test_users_roundtrip(store):
     assert loaded["MEM-1"].reading_default_goal == 20
 
 
-def test_transactions_roundtrip_and_update(store):
+def test_transactions_roundtrip_and_update(store) -> None:
     _seed_users(store, "MEM-1")
     _seed_books(store, "BK-1")
     txn = {
@@ -174,7 +174,7 @@ def test_transactions_roundtrip_and_update(store):
     assert store.load_transactions()[0]["fine"] == 5.0
 
 
-def test_reservations_shape(store):
+def test_reservations_shape(store) -> None:
     _seed_users(store, "MEM-1", "MEM-2", "MEM-3")
     _seed_books(store, "BK-1", "BK-2")
     store.save_reservations({"BK-1": ["MEM-1", "MEM-2"]})
@@ -184,7 +184,7 @@ def test_reservations_shape(store):
     assert store.load_reservations() == {"BK-2": ["MEM-3"]}
 
 
-def test_fines_and_notifications(store):
+def test_fines_and_notifications(store) -> None:
     _seed_users(store, "MEM-1")
     _seed_books(store, "BK-1")
     store.append_fine(
@@ -214,7 +214,7 @@ def test_fines_and_notifications(store):
     assert store.load_notifications() == []
 
 
-def test_posts_full_shape_roundtrip(store):
+def test_posts_full_shape_roundtrip(store) -> None:
     _seed_users(store, "MEM-1", "MEM-2", "MEM-3")
     post = {
         "post_id": "POST-1",
@@ -242,7 +242,7 @@ def test_posts_full_shape_roundtrip(store):
     assert p["is_pinned"] is True
 
 
-def test_post_delete_cascades_comments(store):
+def test_post_delete_cascades_comments(store) -> None:
     _seed_users(store, "MEM-1", "MEM-2")
     store.append_post(
         {
@@ -297,7 +297,7 @@ def test_post_delete_cascades_comments(store):
     assert store.load_comments() == []
 
 
-def test_soft_delete_book_persists_through_adapter(store):
+def test_soft_delete_book_persists_through_adapter(store) -> None:
     """Library.delete_book is a SOFT delete (is_deleted=True + save_books, the
     dict keeps the row — same as the JSON layer kept it in books.json forever).
     The upsert-only save_books must persist that flag so a reload still sees
@@ -324,7 +324,7 @@ def test_soft_delete_book_persists_through_adapter(store):
     assert "BK-1" in reloaded  # row kept, mirroring JSON semantics
 
 
-def test_comments_follows_reviews_bookshelves_roundtrip(store):
+def test_comments_follows_reviews_bookshelves_roundtrip(store) -> None:
     _seed_users(store, "MEM-1", "MEM-2")
     _seed_books(store, "BK-1")
     store.append_post(
@@ -401,7 +401,7 @@ def test_comments_follows_reviews_bookshelves_roundtrip(store):
     assert s["shelf"] == "reading" and s["book_id"] == "BK-1"
 
 
-def test_clear_cache_is_noop(store):
+def test_clear_cache_is_noop(store) -> None:
     store.clear_cache()  # must not raise
 
 
@@ -410,7 +410,7 @@ def test_clear_cache_is_noop(store):
 # ─────────────────────────────────────────────────────────────────────
 
 
-def test_library_delegates_on_db(db_env):
+def test_library_delegates_on_db(db_env) -> None:
     store = DbStorage()
     lib = Library(store)
     assert lib._service is not None  # transactional service wired in
@@ -419,7 +419,7 @@ def test_library_delegates_on_db(db_env):
     assert json_lib._service is None
 
 
-def test_library_issue_no_oversell_through_app_object(db_env):
+def test_library_issue_no_oversell_through_app_object(db_env) -> None:
     """20 threads racing for the last copy via the app's own Library object:
     exactly one success, losers get a clean reservation message."""
     store = DbStorage()
@@ -432,7 +432,7 @@ def test_library_issue_no_oversell_through_app_object(db_env):
     results = []  # (user_index, ok, msg) — index captured, NOT list position
     lock = threading.Lock()
 
-    def _try(i: int):
+    def _try(i: int) -> None:
         ok, msg = lib.issue_book(f"MEM-{i}", book_id, actor="Librarian")
         with lock:
             results.append((i, ok, msg))
@@ -460,17 +460,17 @@ def test_library_issue_no_oversell_through_app_object(db_env):
 # ─────────────────────────────────────────────────────────────────────
 
 
-def test_factory_returns_json_backend(monkeypatch):
+def test_factory_returns_json_backend(monkeypatch) -> None:
     monkeypatch.setenv("STORAGE_BACKEND", "json")
     assert isinstance(create_storage(), Storage)
 
 
-def test_factory_returns_db_backend(monkeypatch, db_env):
+def test_factory_returns_db_backend(monkeypatch, db_env) -> None:
     monkeypatch.setenv("STORAGE_BACKEND", "db")
     assert isinstance(create_storage(), DbStorage)
 
 
-def test_factory_defaults_to_db_backend(monkeypatch, db_env):
+def test_factory_defaults_to_db_backend(monkeypatch, db_env) -> None:
     """Unset STORAGE_BACKEND resolves to the relational backend (production
     default) — not silently falling back to JSON."""
     monkeypatch.delenv("STORAGE_BACKEND", raising=False)
@@ -482,7 +482,7 @@ def test_factory_defaults_to_db_backend(monkeypatch, db_env):
 # ─────────────────────────────────────────────────────────────────────
 
 
-def test_migrated_post_preserves_social_columns(monkeypatch, tmp_path):
+def test_migrated_post_preserves_social_columns(monkeypatch, tmp_path) -> None:
     """A JSON post with upvotes/downvotes/comment_count/is_pinned migrates and
     round-trips through DbStorage with every field intact."""
     from scripts.migrate_json_to_db import migrate as run_migration
@@ -564,7 +564,7 @@ def test_migrated_post_preserves_social_columns(monkeypatch, tmp_path):
 # ─────────────────────────────────────────────────────────────────────
 
 
-def test_audit_log_roundtrip_and_search(db_env):
+def test_audit_log_roundtrip_and_search(db_env) -> None:
     """Audit entries persist, list newest-first, and filter by query/action."""
     from app.db.repositories import AuditLogRepository
 
@@ -615,7 +615,7 @@ def test_audit_log_roundtrip_and_search(db_env):
         assert all(r["ip_address"] for r in all_rows)
 
 
-def test_audit_log_pagination(db_env):
+def test_audit_log_pagination(db_env) -> None:
     """Audit search paginates (newest first) and count is total, not page size."""
     from app.db.repositories import AuditLogRepository
 

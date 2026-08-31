@@ -33,7 +33,7 @@ from app.db.models import AuthToken
 
 
 @pytest.fixture(autouse=True)
-def _isolated_db(tmp_path):
+def _isolated_db(tmp_path) -> None:
     """Run each test against its own temp SQLite DB; restore global state.
 
     The auth token functions go through db.database.session_scope (the
@@ -83,21 +83,21 @@ def _force_expiry(token: str) -> None:
 
 
 class TestResetToken:
-    def test_round_trip(self):
+    def test_round_trip(self) -> None:
         tok = authmod.generate_reset_token("MEM-1")
         assert authmod.verify_reset_token(tok) == "MEM-1"
 
-    def test_consumed_once(self):
+    def test_consumed_once(self) -> None:
         tok = authmod.generate_reset_token("MEM-2")
         assert authmod.consume_reset_token(tok) == "MEM-2"
         # Single-use: a second consume (or verify) finds nothing.
         assert authmod.verify_reset_token(tok) is None
         assert authmod.consume_reset_token(tok) is None
 
-    def test_unknown_token_rejected(self):
+    def test_unknown_token_rejected(self) -> None:
         assert authmod.verify_reset_token("does-not-exist") is None
 
-    def test_expired_token_rejected_and_reaped(self):
+    def test_expired_token_rejected_and_reaped(self) -> None:
         tok = authmod.generate_reset_token("MEM-4")
         _force_expiry(tok)
         assert authmod.verify_reset_token(tok) is None
@@ -108,25 +108,25 @@ class TestResetToken:
 
 
 class TestVerifyToken:
-    def test_round_trip(self):
+    def test_round_trip(self) -> None:
         tok = authmod.generate_verify_token("MEM-3")
         assert authmod.verify_email_token(tok) == "MEM-3"
         assert authmod.consume_verify_token(tok) == "MEM-3"
         assert authmod.verify_email_token(tok) is None
 
-    def test_expired_verify_token_rejected(self):
+    def test_expired_verify_token_rejected(self) -> None:
         tok = authmod.generate_verify_token("MEM-5")
         _force_expiry(tok)
         assert authmod.verify_email_token(tok) is None
 
-    def test_purpose_isolation(self):
+    def test_purpose_isolation(self) -> None:
         """A reset token must never validate as an email-verify token."""
         tok = authmod.generate_reset_token("MEM-9")
         assert authmod.verify_email_token(tok) is None
 
 
 class TestPersistenceAndCleanup:
-    def test_token_lives_in_db_not_memory(self):
+    def test_token_lives_in_db_not_memory(self) -> None:
         """The token must be a DB row — the whole point vs. in-memory dicts."""
         tok = authmod.generate_reset_token("MEM-6")
         with session_scope() as db:
@@ -136,7 +136,7 @@ class TestPersistenceAndCleanup:
             assert row.purpose == "reset"
             assert row.expires_at > datetime.now().isoformat()
 
-    def test_token_survives_process_restart(self, _isolated_db):
+    def test_token_survives_process_restart(self, _isolated_db) -> None:
         """A brand-new process pointed at the same DB file must verify it.
 
         This is the P1 regression: in-memory dicts lost every token on
@@ -168,7 +168,7 @@ class TestPersistenceAndCleanup:
             r.stdout or ""
         ), f"token lost on restart: stdout={r.stdout!r} stderr={r.stderr!r}"
 
-    def test_purge_removes_only_expired(self):
+    def test_purge_removes_only_expired(self) -> None:
         fresh = authmod.generate_reset_token("MEM-7")
         stale = authmod.generate_reset_token("MEM-8")
         _force_expiry(stale)
