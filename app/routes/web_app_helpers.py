@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-import hashlib
-from typing import Any
+import html
+import zlib
 
 
 def _initials(name: str) -> str:
@@ -29,7 +29,7 @@ def _avatar_html(name: str, size: int = 32) -> str:
     return (
         f'<div class="avatar" style="width:{size}px;height:{size}px;background:{c}20;color:{c};'
         f'font-size:{size // 2}px;font-weight:700;border-radius:50%;display:inline-flex;'
-        f'align-items:center;justify-content:center;flex-shrink:0;" title="{h(name)}">{h(i)}</div>'
+        f'align-items:center;justify-content:center;flex-shrink:0;" title="{html.escape(name)}">{html.escape(i)}</div>'
     )
 
 
@@ -48,8 +48,7 @@ def cat_color(c: str) -> str:
     return CAT_COLORS.get(c, CAT_COLORS["Other"])
 
 
-app.jinja_env.globals["_avatar_html"] = _avatar_html
-app.jinja_env.globals["_initials"] = _initials
+
 
 
 # ════════════════════════════════════════════════════════════════════════════
