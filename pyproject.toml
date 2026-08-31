@@ -34,6 +34,9 @@ ignore = [
     "PLC0206", # dict-index-missing-items — Jupyter notebook cells
 ]
 
+[tool.ruff.lint.per-file-ignores]
+"*.ipynb" = ["ANN201"]  # Jupyter notebooks don't need return type hints
+
 [tool.pytest.ini_options]
 addopts = "-m 'not slow' --cov --cov-fail-under=70"
 minversion = "7.0"
