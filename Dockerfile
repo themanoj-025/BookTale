@@ -9,7 +9,7 @@
 # ══════════════════════════════════════════════════════════════════════════════
 # Stage 1: Builder
 # ══════════════════════════════════════════════════════════════════════════════
-FROM python:3.12-slim AS builder
+FROM python:3.14-slim AS builder
 
 # System deps for psycopg2-binary and python-magic
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -42,7 +42,7 @@ RUN node scripts/build_frontend.mjs
 # ══════════════════════════════════════════════════════════════════════════════
 # Stage 2: Runtime
 # ══════════════════════════════════════════════════════════════════════════════
-FROM python:3.12-slim AS runtime
+FROM python:3.14-slim AS runtime
 
 # Runtime deps
 RUN apt-get update && apt-get install -y --no-install-recommends \
