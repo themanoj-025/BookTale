@@ -58,13 +58,13 @@ from web_app import app, storage
 
 
 @pytest.fixture()
-def client():
+def client() -> None:
     app.config["TESTING"] = True
     with app.test_client() as c:
         yield c
 
 
-def _login(client, uid="ADMIN001", password="TestAdmin123"):
+def _login(client, uid="ADMIN001", password="TestAdmin123") -> None:
     """Log in as the bootstrap-created admin (cookie persists on client)."""
     resp = client.post("/login", data={"user_id": uid, "password": password})
     assert resp.status_code in (200, 302), f"login failed: {resp.status_code}"
@@ -72,7 +72,7 @@ def _login(client, uid="ADMIN001", password="TestAdmin123"):
 
 
 class TestPrivilegeEscalation:
-    def test_register_accepts_only_user_role(self, client):
+    def test_register_accepts_only_user_role(self, client) -> None:
         """POST /register with role=admin must be silently downgraded to user."""
         resp = client.post(
             "/register",
@@ -91,7 +91,7 @@ class TestPrivilegeEscalation:
             users["MEM-9001"].role == "user"
         ), "self-registration must never create an admin account"
 
-    def test_register_with_librarian_role_downgraded(self, client):
+    def test_register_with_librarian_role_downgraded(self, client) -> None:
         """role=librarian from a public form must also be downgraded."""
         client.post(
             "/register",
@@ -107,7 +107,7 @@ class TestPrivilegeEscalation:
         assert "MEM-9002" in users
         assert users["MEM-9002"].role == "user"
 
-    def test_register_duplicate_still_rejected(self, client):
+    def test_register_duplicate_still_rejected(self, client) -> None:
         """Downgrade must not break existing duplicate-ID handling."""
         data = {
             "user_id": "MEM-9003",
@@ -130,7 +130,7 @@ class TestPasswordPolicy:
     registration, password reset, and the settings password change.
     """
 
-    def test_register_rejects_short_password(self, client):
+    def test_register_rejects_short_password(self, client) -> None:
         """A 9-char password must be rejected and the user never created."""
         resp = client.post(
             "/register",
@@ -145,7 +145,7 @@ class TestPasswordPolicy:
         assert "at least 12 characters" in resp.get_data(as_text=True)
         assert "MEM-SHORT1" not in storage.load_users()
 
-    def test_register_accepts_12_char_password(self, client):
+    def test_register_accepts_12_char_password(self, client) -> None:
         """A 12-char password registers normally."""
         resp = client.post(
             "/register",
@@ -159,7 +159,7 @@ class TestPasswordPolicy:
         assert resp.status_code == 200
         assert "MEM-LONG1" in storage.load_users()
 
-    def test_settings_password_change_rejects_short(self, client):
+    def test_settings_password_change_rejects_short(self, client) -> None:
         """Changing your password to <12 chars via /api/settings/save fails."""
         _login(client)
         resp = client.post(
@@ -170,7 +170,7 @@ class TestPasswordPolicy:
         assert body["success"] is False
         assert "12 characters" in body.get("error", "")
 
-    def test_settings_password_change_accepts_long(self, client):
+    def test_settings_password_change_accepts_long(self, client) -> None:
         """A 12+ char password change via settings succeeds."""
         users = storage.load_users()
         original_hash = users["ADMIN001"].password_hash
@@ -194,7 +194,7 @@ class TestPasswordPolicy:
 
 
 class TestBootSecurity:
-    def test_validate_secure_config_rejects_default_key(self):
+    def test_validate_secure_config_rejects_default_key(self) -> None:
         from app.config.settings import validate_secure_config
 
         original = Config.SECRET_KEY
@@ -205,7 +205,7 @@ class TestBootSecurity:
         finally:
             Config.SECRET_KEY = original
 
-    def test_validate_secure_config_rejects_empty_key(self):
+    def test_validate_secure_config_rejects_empty_key(self) -> None:
         from app.config.settings import validate_secure_config
 
         original = Config.SECRET_KEY
@@ -216,7 +216,7 @@ class TestBootSecurity:
         finally:
             Config.SECRET_KEY = original
 
-    def test_validate_secure_config_accepts_strong_key(self):
+    def test_validate_secure_config_accepts_strong_key(self) -> None:
         from app.config.settings import validate_secure_config
 
         original = Config.SECRET_KEY
@@ -228,7 +228,7 @@ class TestBootSecurity:
 
 
 class TestSettingsOverride:
-    def test_settings_override_applied_after_write(self):
+    def test_settings_override_applied_after_write(self) -> None:
         """Regression: settings_override.json must actually change Config values."""
         from app.config.settings import _load_settings_overrides
 
@@ -251,7 +251,7 @@ class TestCrashSiteRoutes:
     """HTTP 200 regression tests for the malformed %-format crash sites."""
 
     @pytest.fixture(autouse=True)
-    def logged_in_admin_with_book(self, client):
+    def logged_in_admin_with_book(self, client) -> None:
         import uuid
 
         _login(client)
@@ -271,24 +271,24 @@ class TestCrashSiteRoutes:
         storage.save_users(users)
         yield
 
-    def test_reading_calendar_renders(self, client):
+    def test_reading_calendar_renders(self, client) -> None:
         resp = client.get("/reading-calendar")
         assert resp.status_code == 200
 
-    def test_analytics_renders(self, client):
+    def test_analytics_renders(self, client) -> None:
         resp = client.get("/analytics")
         assert resp.status_code == 200
 
-    def test_admin_users_renders(self, client):
+    def test_admin_users_renders(self, client) -> None:
         resp = client.get("/admin/users")
         assert resp.status_code == 200
 
-    def test_books_renders(self, client):
+    def test_books_renders(self, client) -> None:
         """Exercises the nested BOOKS_GRID %-format path with a real book card."""
         resp = client.get("/books")
         assert resp.status_code == 200
 
-    def test_book_detail_renders(self, client):
+    def test_book_detail_renders(self, client) -> None:
         """Regression: /books/<bid> renders the Jinja book_detail template.
 
         Converting book_detail_page from a hand-built CONTENT string to
@@ -310,7 +310,7 @@ class TestCrashSiteRoutes:
         # look up 'Frank+Herbert' -> empty author page for multi-word authors).
         assert "/author/Frank%20Herbert" in body
 
-    def test_reports_renders(self, client):
+    def test_reports_renders(self, client) -> None:
         """Regression: /reports renders the Jinja reports template.
 
         Same root cause as test_book_detail_renders (dropped notif_count
@@ -321,11 +321,11 @@ class TestCrashSiteRoutes:
         assert resp.status_code == 200
         assert "Library Health" in resp.get_data(as_text=True)
 
-    def test_profile_renders(self, client):
+    def test_profile_renders(self, client) -> None:
         resp = client.get("/profile/ADMIN001")
         assert resp.status_code == 200
 
-    def test_welcome_renders(self, client):
+    def test_welcome_renders(self, client) -> None:
         """Regression: /welcome renders its reviews-count stat without NameError.
 
         The reviews_data definition lives in welcome_page (where it's rendered)
@@ -335,7 +335,7 @@ class TestCrashSiteRoutes:
         resp = client.get("/welcome")
         assert resp.status_code == 200
 
-    def test_features_renders(self, client):
+    def test_features_renders(self, client) -> None:
         """Features page renders without the now-removed unused reviews_data."""
         resp = client.get("/features")
         assert resp.status_code == 200
@@ -351,7 +351,7 @@ class TestPhase3JinjaPages:
     - The asset() helper resolves content-hashed build URLs with a safe fallback.
     """
 
-    def test_login_page_renders(self, client):
+    def test_login_page_renders(self, client) -> None:
         resp = client.get("/login")
         assert resp.status_code == 200
         body = resp.get_data(as_text=True)
@@ -360,25 +360,25 @@ class TestPhase3JinjaPages:
         # No leftover raw string-templating markers.
         assert "auth_content" not in body
 
-    def test_register_page_renders(self, client):
+    def test_register_page_renders(self, client) -> None:
         resp = client.get("/register")
         assert resp.status_code == 200
         body = resp.get_data(as_text=True)
         assert "Create Your Account" in body
         assert 'name="role"' in body
 
-    def test_forgot_password_page_renders(self, client):
+    def test_forgot_password_page_renders(self, client) -> None:
         resp = client.get("/forgot-password")
         assert resp.status_code == 200
         assert "Forgot Password?" in resp.get_data(as_text=True)
 
-    def test_forgot_password_post_anti_enumeration(self, client):
+    def test_forgot_password_post_anti_enumeration(self, client) -> None:
         """POST /forgot-password always shows the generic success screen."""
         resp = client.post("/forgot-password", data={"identity": "nobody@example.com"})
         assert resp.status_code == 200
         assert "Check Your Email" in resp.get_data(as_text=True)
 
-    def test_registered_page_escapes_name(self, client):
+    def test_registered_page_escapes_name(self, client) -> None:
         """XSS round-trip: a <script> payload in the display name must render escaped.
 
         The pre-Phase-3 code concatenated name/email raw into HTML ('<h2>Welcome, '
@@ -405,7 +405,7 @@ class TestPhase3JinjaPages:
         users = storage.load_users()
         assert users["MEM-9101"].name == payload
 
-    def test_registered_page_escapes_email(self, client):
+    def test_registered_page_escapes_email(self, client) -> None:
         """Email rendered on the registered page is autoescaped too."""
         payload = 'x@y.com" onmouseover="alert(1)'
         resp = client.post(
@@ -426,21 +426,21 @@ class TestPhase3JinjaPages:
         assert "&#34; onmouseover=&#34;" in body
         assert 'onmouseover="alert(1)' not in body
 
-    def test_landing_page_renders_for_guests(self, client):
+    def test_landing_page_renders_for_guests(self, client) -> None:
         """GET / and /landing render the Jinja landing template for guests."""
         for path in ("/", "/landing"):
             resp = client.get(path)
             assert resp.status_code == 200, f"{path} returned {resp.status_code}"
             assert "Get Started Free" in resp.get_data(as_text=True)
 
-    def test_landing_page_redirects_logged_in(self, client):
+    def test_landing_page_redirects_logged_in(self, client) -> None:
         """A logged-in user is sent to the feed, not the landing page."""
         _login(client)
         resp = client.get("/landing")
         assert resp.status_code == 302
         assert "/feed" in resp.headers.get("Location", "")
 
-    def test_features_and_welcome_render_new_templates(self, client):
+    def test_features_and_welcome_render_new_templates(self, client) -> None:
         """Converted marketing pages render (and contain template markers)."""
         resp = client.get("/features")
         assert resp.status_code == 200
@@ -449,7 +449,7 @@ class TestPhase3JinjaPages:
         assert resp.status_code == 200
         assert "Welcome to BookSocial" in resp.get_data(as_text=True)
 
-    def test_asset_helper_resolves_manifest(self):
+    def test_asset_helper_resolves_manifest(self) -> None:
         """asset() maps logical paths to content-hashed URLs when built."""
         from web_app import asset
 
@@ -459,7 +459,7 @@ class TestPhase3JinjaPages:
         if url.startswith("/static/dist/"):
             assert ".min.js" in url
 
-    def test_asset_helper_fallback_on_missing_manifest(self, monkeypatch):
+    def test_asset_helper_fallback_on_missing_manifest(self, monkeypatch) -> None:
         """asset() falls back to /static/<path> when the manifest is absent."""
         from web_app import asset
 
@@ -478,7 +478,7 @@ class TestXssServerSide:
     PAYLOAD = "<script>alert(1)</script>"
     PAYLOAD_ATTR = '"><img src=x onerror=alert(1)>'
 
-    def _seed_book_with_payload(self):
+    def _seed_book_with_payload(self) -> None:
         from app.models.book import Book
 
         books = storage.load_books()
@@ -493,7 +493,7 @@ class TestXssServerSide:
         )
         storage.save_books(books)
 
-    def test_books_page_escapes_payload_title_and_author(self, client):
+    def test_books_page_escapes_payload_title_and_author(self, client) -> None:
         """Books page is now a Jinja template (autoescape ON): raw payload must
         never appear; escaped forms must."""
         resp = client.post(
@@ -517,7 +517,7 @@ class TestXssServerSide:
         assert "<img src=x onerror=alert(1)>" not in html
         assert "&gt;&lt;img" in html
 
-    def test_books_search_value_is_escaped(self, client):
+    def test_books_search_value_is_escaped(self, client) -> None:
         """q echoes into the form input value — attribute-escaped by Jinja."""
         resp = client.post(
             "/register",
@@ -536,7 +536,7 @@ class TestXssServerSide:
         assert "<script>alert(1)</script>" not in html
         assert 'value="&lt;script&gt;alert(1)&lt;/script&gt;"' in html
 
-    def test_notifications_template_renders(self, client):
+    def test_notifications_template_renders(self, client) -> None:
         """Converted Jinja notifications page renders 200 (template exercised)."""
         _login(client)
         resp = client.get("/notifications")
@@ -548,7 +548,7 @@ class TestXssServerSide:
 class TestCSRFProtection:
     """Phase 4: CSRF is enabled by default; tokenless state-changing POSTs 400."""
 
-    def test_post_without_csrf_token_rejected(self, client):
+    def test_post_without_csrf_token_rejected(self, client) -> None:
         """When CSRF is ON, a POST without a valid token is rejected (400)."""
         app.config["WTF_CSRF_ENABLED"] = True  # suite opted out; force it on
         try:
@@ -559,7 +559,7 @@ class TestCSRFProtection:
         finally:
             app.config["WTF_CSRF_ENABLED"] = False
 
-    def test_post_with_csrf_token_accepted(self, client):
+    def test_post_with_csrf_token_accepted(self, client) -> None:
         """The same POST succeeds once a session-bound token is included."""
         import re
 
@@ -581,7 +581,7 @@ class TestCSRFProtection:
         finally:
             app.config["WTF_CSRF_ENABLED"] = False
 
-    def test_csrf_flag_defaults_enabled(self):
+    def test_csrf_flag_defaults_enabled(self) -> None:
         """Secure-by-default: booting without WTF_CSRF_ENABLED keeps CSRF ON."""
         import subprocess
 
@@ -619,11 +619,11 @@ class TestCSRFProtection:
 class TestReadyz:
     """Phase 7: /readyz must not leak internal error details to clients."""
 
-    def test_readyz_hides_internal_error_details(self, client, monkeypatch):
+    def test_readyz_hides_internal_error_details(self, client, monkeypatch) -> None:
         """DB failure -> 503 with a generic message, never str(e) internals."""
         import app.db.database as dbmod
 
-        def _boom():
+        def _boom() -> None:
             raise RuntimeError(
                 "psycopg2.OperationalError: connection to server at "
                 "db.internal:5432 failed: FATAL: password authentication failed"
@@ -643,7 +643,7 @@ class TestReadyz:
 class TestRateLimiting:
     """Phase 4: auth endpoints carry per-IP rate limits; limit breach -> 429."""
 
-    def test_auth_routes_have_rate_limit_decorator(self):
+    def test_auth_routes_have_rate_limit_decorator(self) -> None:
         """login/register/forgot/reset must be decorated with @limiter.limit."""
         from web_app import (
             forgot_password_page,
@@ -662,7 +662,7 @@ class TestRateLimiting:
                 view, "__wrapper-limiter-instance"
             ), f"{view.__name__} is missing a rate-limit decorator"
 
-    def test_rate_limit_returns_429_after_breach(self):
+    def test_rate_limit_returns_429_after_breach(self) -> None:
         """The wired limiter returns 429 once a per-route limit is exceeded."""
         from flask import Flask
         from flask_limiter import Limiter
@@ -675,7 +675,7 @@ class TestRateLimiting:
 
         @probe.route("/login", methods=["POST"])
         @lim.limit("3 per minute")
-        def login():
+        def login() -> None:
             return "ok"
 
         with probe.test_client() as c:
@@ -689,7 +689,7 @@ class TestRateLimiting:
     # lock a user out. Mirrors the real login_page decorator config
     # (methods=["POST"], exempt_when on GET, deduct_when on g._login_failed).
 
-    def _make_split_login_probe(self):
+    def _make_split_login_probe(self) -> None:
         from flask import Flask, g, request
         from flask_limiter import Limiter
         from flask_limiter.util import get_remote_address
@@ -706,7 +706,7 @@ class TestRateLimiting:
             exempt_when=lambda: request.method == "GET",
             deduct_when=lambda response: getattr(g, "_login_failed", False),
         )
-        def login():
+        def login() -> None:
             if request.method == "GET":
                 return "page", 200
             if request.form.get("pw") == "ok":
@@ -716,7 +716,7 @@ class TestRateLimiting:
 
         return probe
 
-    def test_login_get_page_loads_never_rate_limited(self):
+    def test_login_get_page_loads_never_rate_limited(self) -> None:
         """GET /login page loads must not count toward the POST-only budget."""
         probe = self._make_split_login_probe()
         with probe.test_client() as c:
@@ -725,7 +725,7 @@ class TestRateLimiting:
             # Budget untouched: a failed POST is still allowed.
             assert c.post("/login", data={"pw": "wrong"}).status_code == 401
 
-    def test_login_successful_attempts_do_not_count(self):
+    def test_login_successful_attempts_do_not_count(self) -> None:
         """Successful logins must not consume the per-IP failure budget."""
         probe = self._make_split_login_probe()
         with probe.test_client() as c:
@@ -736,7 +736,7 @@ class TestRateLimiting:
                 assert c.post("/login", data={"pw": "wrong"}).status_code == 401
             assert c.post("/login", data={"pw": "wrong"}).status_code == 429
 
-    def test_login_only_failed_attempts_breach_limit(self):
+    def test_login_only_failed_attempts_breach_limit(self) -> None:
         """Failed credential attempts accumulate: 3 allowed, 4th -> 429."""
         probe = self._make_split_login_probe()
         with probe.test_client() as c:
@@ -750,7 +750,7 @@ class TestRateLimiting:
     # budget (deduct_when on g._pw_change_failed). Ordinary settings toggles
     # and successful password changes must never throttle the user.
 
-    def test_settings_save_has_explicit_rate_limit(self):
+    def test_settings_save_has_explicit_rate_limit(self) -> None:
         """api_save_settings must carry a limiter decorator (not just the
         global default)."""
         from web_app import api_save_settings
@@ -759,7 +759,7 @@ class TestRateLimiting:
             api_save_settings, "__wrapper-limiter-instance"
         ), "api_save_settings is missing an explicit rate-limit decorator"
 
-    def _make_settings_save_probe(self):
+    def _make_settings_save_probe(self) -> None:
         from flask import Flask, g, request
         from flask_limiter import Limiter
         from flask_limiter.util import get_remote_address
@@ -774,7 +774,7 @@ class TestRateLimiting:
             "3 per minute",
             deduct_when=lambda response: getattr(g, "_pw_change_failed", False),
         )
-        def save_settings():
+        def save_settings() -> None:
             data = request.get_json() or {}
             # Mirrors api_save_settings exactly: a wrong current password
             # flags a failed attempt but still returns HTTP 200 with
@@ -786,7 +786,7 @@ class TestRateLimiting:
 
         return probe
 
-    def test_settings_toggles_never_consume_budget(self):
+    def test_settings_toggles_never_consume_budget(self) -> None:
         """Ordinary settings saves (no password change) must not be throttled."""
         probe = self._make_settings_save_probe()
         with probe.test_client() as c:
@@ -802,7 +802,7 @@ class TestRateLimiting:
             assert resp.status_code == 200
             assert resp.get_json()["success"] is False
 
-    def test_successful_password_change_does_not_count(self):
+    def test_successful_password_change_does_not_count(self) -> None:
         """A correct current-password change must not consume the budget."""
         probe = self._make_settings_save_probe()
         with probe.test_client() as c:
@@ -827,7 +827,7 @@ class TestRateLimiting:
             )
             assert resp.status_code == 429
 
-    def test_failed_password_changes_breach_limit(self):
+    def test_failed_password_changes_breach_limit(self) -> None:
         """Failed current-password guesses accumulate: 3 allowed, 4th -> 429."""
         probe = self._make_settings_save_probe()
         with probe.test_client() as c:
@@ -851,7 +851,7 @@ class TestRateLimiting:
     # consume the per-IP budget (deduct_when on g._admin_pw_failed);
     # successful saves are never throttled.
 
-    def test_admin_settings_save_has_explicit_rate_limit(self):
+    def test_admin_settings_save_has_explicit_rate_limit(self) -> None:
         """api_save_admin_settings must carry a limiter decorator."""
         from web_app import api_save_admin_settings
 
@@ -859,7 +859,7 @@ class TestRateLimiting:
             api_save_admin_settings, "__wrapper-limiter-instance"
         ), "api_save_admin_settings is missing an explicit rate-limit decorator"
 
-    def _make_admin_settings_probe(self):
+    def _make_admin_settings_probe(self) -> None:
         from flask import Flask, g, request
         from flask_limiter import Limiter
         from flask_limiter.util import get_remote_address
@@ -874,7 +874,7 @@ class TestRateLimiting:
             "3 per minute",
             deduct_when=lambda response: getattr(g, "_admin_pw_failed", False),
         )
-        def save_admin_settings():
+        def save_admin_settings() -> None:
             data = request.get_json() or {}
             # Mirrors api_save_admin_settings exactly: a wrong current admin
             # password flags a failed attempt but still returns HTTP 200 with
@@ -886,7 +886,7 @@ class TestRateLimiting:
 
         return probe
 
-    def test_admin_settings_successful_saves_do_not_count(self):
+    def test_admin_settings_successful_saves_do_not_count(self) -> None:
         """Correct admin-password saves must not consume the budget."""
         probe = self._make_admin_settings_probe()
         with probe.test_client() as c:
@@ -902,7 +902,7 @@ class TestRateLimiting:
             resp = c.post("/api/admin/settings/save", json={"current_admin_password": "bad"})
             assert resp.status_code == 429
 
-    def test_admin_settings_failed_verifications_breach_limit(self):
+    def test_admin_settings_failed_verifications_breach_limit(self) -> None:
         """Failed admin-password guesses accumulate: 3 allowed, 4th -> 429."""
         probe = self._make_admin_settings_probe()
         with probe.test_client() as c:
@@ -919,7 +919,7 @@ class TestRateLimiting:
     # consume the per-IP budget (deduct_when on g._profile_email_changed);
     # name/bio edits are never throttled.
 
-    def test_profile_update_has_explicit_rate_limit(self):
+    def test_profile_update_has_explicit_rate_limit(self) -> None:
         """api_profile_update must carry a limiter decorator (via view_functions)."""
         import web_app
 
@@ -929,7 +929,7 @@ class TestRateLimiting:
             view, "__wrapper-limiter-instance"
         ), "api_profile_update is missing an explicit rate-limit decorator"
 
-    def _make_profile_update_probe(self):
+    def _make_profile_update_probe(self) -> None:
         from flask import Flask, g, request
         from flask_limiter import Limiter
         from flask_limiter.util import get_remote_address
@@ -944,7 +944,7 @@ class TestRateLimiting:
             "3 per minute",
             deduct_when=lambda response: getattr(g, "_profile_email_changed", False),
         )
-        def profile_update():
+        def profile_update() -> None:
             data = request.get_json() or {}
             if "email" in data:
                 g._profile_email_changed = True
@@ -952,7 +952,7 @@ class TestRateLimiting:
 
         return probe
 
-    def test_profile_update_non_email_edits_never_count(self):
+    def test_profile_update_non_email_edits_never_count(self) -> None:
         """Name/bio edits must never consume the per-IP budget."""
         probe = self._make_profile_update_probe()
         with probe.test_client() as c:
@@ -963,7 +963,7 @@ class TestRateLimiting:
             resp = c.post("/api/profile/update", json={"email": "a@b.io"})
             assert resp.status_code == 200
 
-    def test_profile_update_email_changes_breach_limit(self):
+    def test_profile_update_email_changes_breach_limit(self) -> None:
         """Email changes accumulate: 3 allowed, 4th -> 429."""
         probe = self._make_profile_update_probe()
         with probe.test_client() as c:
@@ -978,7 +978,7 @@ class TestRateLimiting:
     # wishlist moderate are admin destructive/moderation actions. All carry
     # explicit limits below the global 200/min default.
 
-    def test_upload_has_explicit_rate_limit(self):
+    def test_upload_has_explicit_rate_limit(self) -> None:
         import web_app
 
         view = web_app.app.view_functions.get("api_upload")
@@ -987,7 +987,7 @@ class TestRateLimiting:
             view, "__wrapper-limiter-instance"
         ), "api_upload is missing an explicit rate-limit decorator"
 
-    def test_series_delete_has_explicit_rate_limit(self):
+    def test_series_delete_has_explicit_rate_limit(self) -> None:
         import web_app
 
         view = web_app.app.view_functions.get("api_series_delete")
@@ -996,7 +996,7 @@ class TestRateLimiting:
             view, "__wrapper-limiter-instance"
         ), "api_series_delete is missing an explicit rate-limit decorator"
 
-    def test_wishlist_moderate_has_explicit_rate_limit(self):
+    def test_wishlist_moderate_has_explicit_rate_limit(self) -> None:
         import web_app
 
         view = web_app.app.view_functions.get("api_moderate_suggestion")
@@ -1005,7 +1005,7 @@ class TestRateLimiting:
             view, "__wrapper-limiter-instance"
         ), "api_moderate_suggestion is missing an explicit rate-limit decorator"
 
-    def test_upload_plain_limit_breaches_429(self):
+    def test_upload_plain_limit_breaches_429(self) -> None:
         """A plain limit on uploads: 3 allowed, 4th -> 429."""
         from flask import Flask
         from flask_limiter import Limiter
@@ -1018,7 +1018,7 @@ class TestRateLimiting:
 
         @probe.route("/api/upload", methods=["POST"])
         @lim.limit("3 per minute")
-        def upload():
+        def upload() -> None:
             return {"success": True}
 
         with probe.test_client() as c:
@@ -1034,7 +1034,7 @@ class TestRateLimiting:
     # session, IP fallback), so each ACCOUNT gets its own budget regardless of
     # where the requests originate.
 
-    def _make_per_user_pw_probe(self):
+    def _make_per_user_pw_probe(self) -> None:
         from flask import Flask, g, request, session
         from flask_limiter import Limiter
         from flask_limiter.util import get_remote_address
@@ -1045,7 +1045,7 @@ class TestRateLimiting:
         lim = Limiter(key_func=get_remote_address, storage_uri="memory://")
         lim.init_app(probe)
 
-        def user_key():
+        def user_key() -> None:
             uid = session.get("user_id")
             return f"user:{uid}" if uid else f"ip:{request.remote_addr}"
 
@@ -1055,7 +1055,7 @@ class TestRateLimiting:
             key_func=user_key,
             deduct_when=lambda response: getattr(g, "_pw_change_failed", False),
         )
-        def save_settings():
+        def save_settings() -> None:
             data = request.get_json() or {}
             if data.get("current_password") != "ok":
                 g._pw_change_failed = True
@@ -1064,7 +1064,7 @@ class TestRateLimiting:
 
         return probe
 
-    def test_password_change_budget_is_per_account_not_per_ip(self):
+    def test_password_change_budget_is_per_account_not_per_ip(self) -> None:
         """User A exhausting its budget must not throttle User B on the same IP."""
         probe = self._make_per_user_pw_probe()
         with probe.test_client() as c:
@@ -1085,7 +1085,7 @@ class TestRateLimiting:
                 assert resp.get_json()["success"] is False
             assert c.post("/api/settings/save", json={"current_password": "bad"}).status_code == 429
 
-    def test_password_change_per_user_successes_never_count(self):
+    def test_password_change_per_user_successes_never_count(self) -> None:
         """Successful changes must not consume the per-account budget."""
         probe = self._make_per_user_pw_probe()
         with probe.test_client() as c:
@@ -1105,7 +1105,7 @@ class TestRateLimiting:
                 assert resp.get_json()["success"] is False
             assert c.post("/api/settings/save", json={"current_password": "bad"}).status_code == 429
 
-    def test_user_key_scopes_to_account_inside_request_context(self):
+    def test_user_key_scopes_to_account_inside_request_context(self) -> None:
         """_user_key() must embed the session account id (distinct per user).
 
         Decorator presence on api_save_settings / api_save_admin_settings is
@@ -1134,7 +1134,7 @@ class TestRateLimiting:
     # Three tiers: content spam (30/min), engagement manipulation (60/min),
     # create-heavy surfaces like clubs/wishlist suggestions (10/min).
 
-    def test_shared_surface_content_endpoints_have_rate_limits(self):
+    def test_shared_surface_content_endpoints_have_rate_limits(self) -> None:
         """posts/comments/replies/reviews/lists must carry explicit limits."""
         import web_app
 
@@ -1159,7 +1159,7 @@ class TestRateLimiting:
                 view, "__wrapper-limiter-instance"
             ), f"{name} is missing an explicit rate-limit decorator"
 
-    def test_engagement_endpoints_have_rate_limits(self):
+    def test_engagement_endpoints_have_rate_limits(self) -> None:
         """likes/votes/helpful/follows/upvotes: 60/min engagement ceiling."""
         import web_app
 
@@ -1180,7 +1180,7 @@ class TestRateLimiting:
                 view, "__wrapper-limiter-instance"
             ), f"{name} is missing an explicit rate-limit decorator"
 
-    def test_ai_chat_has_explicit_rate_limit(self):
+    def test_ai_chat_has_explicit_rate_limit(self) -> None:
         """api_ai_chat carries a 30/min ceiling (companion spam / load)."""
         import web_app
 
@@ -1190,7 +1190,7 @@ class TestRateLimiting:
             view, "__wrapper-limiter-instance"
         ), "api_ai_chat is missing an explicit rate-limit decorator"
 
-    def _make_shared_surface_probe(self):
+    def _make_shared_surface_probe(self) -> None:
         """Plain-limit probe mirroring the 30/min content endpoints."""
         from flask import Flask
         from flask_limiter import Limiter
@@ -1203,12 +1203,12 @@ class TestRateLimiting:
 
         @probe.route("/api/posts", methods=["POST"])
         @lim.limit("3 per minute")
-        def create_post():
+        def create_post() -> None:
             return {"success": True}
 
         return probe
 
-    def test_shared_surface_plain_limit_breaches_429(self):
+    def test_shared_surface_plain_limit_breaches_429(self) -> None:
         """A 30/min-style plain content limit: 3 allowed, 4th -> 429."""
         probe = self._make_shared_surface_probe()
         with probe.test_client() as c:
@@ -1216,7 +1216,7 @@ class TestRateLimiting:
                 assert c.post("/api/posts").status_code == 200
             assert c.post("/api/posts").status_code == 429
 
-    def _make_comment_get_post_probe(self):
+    def _make_comment_get_post_probe(self) -> None:
         """GET+POST probe mirroring api_comments (methods=["POST"])."""
         from flask import Flask
         from flask_limiter import Limiter
@@ -1229,12 +1229,12 @@ class TestRateLimiting:
 
         @probe.route("/api/posts/<post_id>/comments", methods=["GET", "POST"])
         @lim.limit("3 per minute", methods=["POST"])
-        def comments(post_id):
+        def comments(post_id) -> None:
             return "ok", 200
 
         return probe
 
-    def test_comment_get_loads_never_consume_budget(self):
+    def test_comment_get_loads_never_consume_budget(self) -> None:
         """GET fetches on the GET+POST comments route never count toward POST."""
         probe = self._make_comment_get_post_probe()
         with probe.test_client() as c:
@@ -1252,7 +1252,7 @@ class TestRateLimiting:
     # load in a minute returned 429 (a real journey breaker). Fixed to mirror
     # the login route's GET-exempt split. These probes lock the fix in.
 
-    def _make_auth_form_probe(self):
+    def _make_auth_form_probe(self) -> None:
         """GET+POST probe mirroring register/forgot/reset decorator config
         (5/min scoped to POST, GET exempt)."""
         from flask import Flask, request
@@ -1270,12 +1270,12 @@ class TestRateLimiting:
             methods=["POST"],
             exempt_when=lambda: request.method == "GET",
         )
-        def auth_form():
+        def auth_form() -> None:
             return "ok", 200
 
         return probe
 
-    def test_auth_form_get_page_loads_never_consume_budget(self):
+    def test_auth_form_get_page_loads_never_consume_budget(self) -> None:
         """GET page loads on register/forgot/reset must never 429 (8x the limit)."""
         probe = self._make_auth_form_probe()
         with probe.test_client() as c:
@@ -1286,7 +1286,7 @@ class TestRateLimiting:
                 assert c.post("/auth-form").status_code == 200
             assert c.post("/auth-form").status_code == 429
 
-    def test_auth_form_post_budget_breaches_429(self):
+    def test_auth_form_post_budget_breaches_429(self) -> None:
         """POST submissions still accumulate: 5 allowed, 6th -> 429."""
         probe = self._make_auth_form_probe()
         with probe.test_client() as c:
@@ -1294,7 +1294,7 @@ class TestRateLimiting:
                 assert c.post("/auth-form").status_code == 200
             assert c.post("/auth-form").status_code == 429
 
-    def test_auth_form_decorators_scope_to_post(self):
+    def test_auth_form_decorators_scope_to_post(self) -> None:
         """The real register/forgot/reset decorators must be POST-scoped with
         GET exempt — otherwise GET page loads burn the anti-spam budget."""
         import inspect
@@ -1344,7 +1344,7 @@ class TestRedisLimiterStorage:
         except (OSError, ConnectionError, TimeoutError):
             return False
 
-    def test_limiter_storage_uri_uses_redis_by_default(self):
+    def test_limiter_storage_uri_uses_redis_by_default(self) -> None:
         """The app-wide limiter must be Redis-backed, not memory://."""
         import web_app
 
@@ -1352,7 +1352,7 @@ class TestRedisLimiterStorage:
         assert uri == Config.REDIS_URL, f"limiter storage is {uri!r}, expected Redis"
         assert uri.startswith("redis://"), "storage must be Redis by default"
 
-    def test_limiter_storage_uri_override_to_memory(self, monkeypatch):
+    def test_limiter_storage_uri_override_to_memory(self, monkeypatch) -> None:
         """RATELIMIT_STORAGE_URI=memory:// must force in-process budgets."""
         from web_app import _limiter_storage_uri
 
@@ -1361,7 +1361,7 @@ class TestRedisLimiterStorage:
         monkeypatch.delenv("RATELIMIT_STORAGE_URI", raising=False)
         assert _limiter_storage_uri() == Config.REDIS_URL
 
-    def test_redis_budget_shared_across_limiter_instances(self):
+    def test_redis_budget_shared_across_limiter_instances(self) -> None:
         """Two limiter instances on the same Redis share ONE budget.
 
         This is the multi-gunicorn-worker property: instance A burning the
@@ -1378,7 +1378,7 @@ class TestRedisLimiterStorage:
 
         prefix = f"booktale-test-{uuid.uuid4().hex[:8]}"
 
-        def _build():
+        def _build() -> None:
             probe = Flask(__name__)
             probe.config["RATELIMIT_ENABLED"] = True
             lim = Limiter(
@@ -1390,7 +1390,7 @@ class TestRedisLimiterStorage:
 
             @probe.route("/limited", methods=["POST"])
             @lim.limit("3 per minute")
-            def limited():
+            def limited() -> None:
                 return "ok"
 
             return probe, lim
@@ -1417,7 +1417,7 @@ class TestRedisLimiterStorage:
         except (OSError, ConnectionError, TimeoutError):
             pass
 
-    def test_redis_budget_survives_limiter_recreation(self):
+    def test_redis_budget_survives_limiter_recreation(self) -> None:
         """A fresh limiter (simulating a worker restart) inherits the budget.
 
         In-memory storage resets on restart; Redis must not. Create a limiter,
@@ -1434,7 +1434,7 @@ class TestRedisLimiterStorage:
 
         prefix = f"booktale-restart-{uuid.uuid4().hex[:8]}"
 
-        def _build():
+        def _build() -> None:
             probe = Flask(__name__)
             probe.config["RATELIMIT_ENABLED"] = True
             lim = Limiter(
@@ -1446,7 +1446,7 @@ class TestRedisLimiterStorage:
 
             @probe.route("/limited", methods=["POST"])
             @lim.limit("4 per minute")
-            def limited():
+            def limited() -> None:
                 return "ok"
 
             return probe
@@ -1475,14 +1475,14 @@ class TestAdminAuditLog:
     """Admin audit trail: /admin/audit page + audit rows written by the save
     endpoint (who/what/when/from-where)."""
 
-    def _audit_rows(self, **kwargs):
+    def _audit_rows(self, **kwargs) -> None:
         import app.db.database as dbmod
         from app.db.repositories import AuditLogRepository
 
         with dbmod.session_scope() as db:
             return AuditLogRepository(db).search(**kwargs)
 
-    def test_admin_audit_page_renders_for_admin(self, client):
+    def test_admin_audit_page_renders_for_admin(self, client) -> None:
         """GET /admin/audit renders 200 for an admin with the search UI."""
         _login(client)
         resp = client.get("/admin/audit")
@@ -1491,7 +1491,7 @@ class TestAdminAuditLog:
         assert "Audit Log" in body
         assert 'name="q"' in body  # search box present
 
-    def test_admin_audit_page_forbidden_for_non_admin(self, client):
+    def test_admin_audit_page_forbidden_for_non_admin(self, client) -> None:
         """A regular user is turned away (page_routes' admin_required renders
         the Forbidden page at 200 — same behavior as /admin/users)."""
         client.post(
@@ -1511,7 +1511,7 @@ class TestAdminAuditLog:
         # Defense in depth: the audit table markup must never reach a non-admin.
         assert "audit-table" not in body
 
-    def test_admin_settings_save_writes_audit_row(self, client):
+    def test_admin_settings_save_writes_audit_row(self, client) -> None:
         """A successful admin-settings save records an audit row with old/new
         values, the acting admin, and the source IP."""
         _login(client)
@@ -1534,7 +1534,7 @@ class TestAdminAuditLog:
         assert row["old_value"] is not None  # previous Config value captured
         assert row["ip_address"]  # from where
 
-    def test_admin_settings_failed_verify_writes_audit_row(self, client):
+    def test_admin_settings_failed_verify_writes_audit_row(self, client) -> None:
         """A failed admin-password verification is recorded as auth.failed."""
         _login(client)
         resp = client.post(
@@ -1550,7 +1550,7 @@ class TestAdminAuditLog:
         rows = self._audit_rows(action="auth.failed", admin_id="ADMIN001")
         assert rows, "failed verification must write an auth.failed audit row"
 
-    def test_audit_trail_never_stores_secrets(self, client):
+    def test_audit_trail_never_stores_secrets(self, client) -> None:
         """SMTP/admin passwords are redacted in the audit trail.
 
         The endpoint rotates ADMIN001's password, which would break later tests
@@ -1591,12 +1591,12 @@ class TestErrorHandlers:
     """Phase 7: centralized error handlers — JSON envelope for API paths, a
     styled error page for browsers, never a raw traceback in production."""
 
-    def test_web_404_renders_error_page(self, client):
+    def test_web_404_renders_error_page(self, client) -> None:
         resp = client.get("/this-page-does-not-exist")
         assert resp.status_code == 404
         assert "Page Not Found" in resp.get_data(as_text=True)
 
-    def test_api_404_returns_json_envelope(self, client):
+    def test_api_404_returns_json_envelope(self, client) -> None:
         resp = client.get("/api/does-not-exist")
         assert resp.status_code == 404
         body = resp.get_json()
@@ -1604,12 +1604,12 @@ class TestErrorHandlers:
         assert body["error"]["code"] == 404
         assert body["error"]["message"]
 
-    def test_api_405_returns_json_envelope(self, client):
+    def test_api_405_returns_json_envelope(self, client) -> None:
         resp = client.post("/api/search")  # /api/search is GET-only
         assert resp.status_code == 405
         assert resp.get_json()["error"]["code"] == 405
 
-    def test_api_429_returns_json_envelope(self):
+    def test_api_429_returns_json_envelope(self) -> None:
         """The centralized handler shapes 429 responses as a JSON envelope.
 
         Unit-test the shared _error_response helper directly (a real 429 is
@@ -1626,7 +1626,7 @@ class TestErrorHandlers:
         assert body["error"]["code"] == 429
         assert body["error"]["message"]
 
-    def test_api_409_returns_json_envelope(self):
+    def test_api_409_returns_json_envelope(self) -> None:
         """The centralized handler shapes 409 responses as a JSON envelope.
 
         409 is in _ERROR_PAGES (Phase 7 spec list) and the handler loop is
@@ -1642,7 +1642,7 @@ class TestErrorHandlers:
         assert body["error"]["code"] == 409
         assert body["error"]["message"]
 
-    def test_500_returns_generic_page_never_internals(self, client, monkeypatch):
+    def test_500_returns_generic_page_never_internals(self, client, monkeypatch) -> None:
         """An unhandled exception -> 500 page; internal details never leak.
 
         The failure is injected by monkeypatching a storage call (registering
@@ -1653,7 +1653,7 @@ class TestErrorHandlers:
 
         app = web_app.app
 
-        def _boom(*args, **kwargs):
+        def _boom(*args, **kwargs) -> None:
             raise RuntimeError("secret-internal-detail")
 
         _login(client)
@@ -1675,7 +1675,7 @@ class TestApiDocs:
     """Phase 5: a real generated OpenAPI 3.1 spec at /api/openapi.json served
     by Swagger UI at /api/docs — making the README's docs claim true."""
 
-    def test_openapi_json_is_valid_31(self, client):
+    def test_openapi_json_is_valid_31(self, client) -> None:
         resp = client.get("/api/openapi.json")
         assert resp.status_code == 200
         spec = resp.get_json()
@@ -1683,7 +1683,7 @@ class TestApiDocs:
         assert spec["info"]["title"]
         assert spec["paths"]
 
-    def test_api_docs_swagger_ui_renders(self, client):
+    def test_api_docs_swagger_ui_renders(self, client) -> None:
         resp = client.get("/api/docs")
         assert resp.status_code == 200
         body = resp.get_data(as_text=True)
@@ -1697,7 +1697,7 @@ class TestUploadValidation:
     genuine image is re-encoded and served back."""
 
     @pytest.fixture(autouse=True)
-    def _isolate_uploads(self, tmp_path):
+    def _isolate_uploads(self, tmp_path) -> None:
         from app.config.settings import Config as _C
 
         original = _C.UPLOADS_DIR
@@ -1705,7 +1705,7 @@ class TestUploadValidation:
         yield
         _C.UPLOADS_DIR = original
 
-    def test_renamed_html_as_png_rejected(self, client):
+    def test_renamed_html_as_png_rejected(self, client) -> None:
         """An HTML file renamed to .png must be rejected by content check."""
         _login(client)
         payload = b"<html><script>alert(1)</script></html>"
@@ -1719,7 +1719,7 @@ class TestUploadValidation:
         assert body["success"] is False
         assert "valid image" in body.get("error", "")
 
-    def test_real_png_accepted_and_served(self, client):
+    def test_real_png_accepted_and_served(self, client) -> None:
         """A genuine 1x1 PNG uploads (re-encoded) and is served back."""
         _login(client)
         import base64
@@ -1744,7 +1744,7 @@ class TestUploadValidation:
 class TestXssClientSideSinks:
     """Phase 3: every client-side innerHTML sink calls the escape guards."""
 
-    def test_search_pickers_escape_title_and_author(self, client):
+    def test_search_pickers_escape_title_and_author(self, client) -> None:
         """Diary + progress book pickers route display through escapeHtml and
         onclick args through jsStr (JS-string-inside-HTML-attribute escaper)."""
         resp = client.post(
@@ -1773,7 +1773,7 @@ class TestXssClientSideSinks:
                 "booktaleUtils.jsStr(b.book_id)" in html
             ), f"{path}: onclick book_id not jsStr-escaped"
 
-    def test_bookmarks_list_escapes_note_and_title(self, client):
+    def test_bookmarks_list_escapes_note_and_title(self, client) -> None:
         """Reading-progress bookmarks interpolate book_title/note into innerHTML."""
         _login(client)
         resp = client.get("/reading-progress")
@@ -1782,7 +1782,7 @@ class TestXssClientSideSinks:
         assert "booktaleUtils.escapeHtml(b.book_title)" in html
         assert "booktaleUtils.escapeHtml(b.note)" in html
 
-    def test_diary_selected_message_escapes_title(self, client):
+    def test_diary_selected_message_escapes_title(self, client) -> None:
         """The 'Selected: <title>' echo goes through innerHTML — must escape."""
         _login(client)
         resp = client.get("/diary")
@@ -1790,7 +1790,7 @@ class TestXssClientSideSinks:
         html = resp.get_data(as_text=True)
         assert "booktaleUtils.escapeHtml(title)" in html
 
-    def test_base_sidebar_sinks_use_escape_guards(self, client):
+    def test_base_sidebar_sinks_use_escape_guards(self, client) -> None:
         """Trending sidebar (book titles) and who-to-follow (usernames) fetch via
         /api and interpolate into innerHTML — both must escape."""
         _login(client)
