@@ -1,6 +1,5 @@
 """Tests for app.core.utils validation functions."""
 
-from datetime import datetime
 
 from app.core.utils import (
     colored,
