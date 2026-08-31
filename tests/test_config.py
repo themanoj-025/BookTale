@@ -3,6 +3,8 @@
 import os
 from unittest.mock import patch
 
+import pytest
+
 from app.config.settings import Config, _INSECURE_SECRET_KEYS, validate_secure_config
 
 
@@ -45,18 +47,13 @@ class TestValidateSecureConfig:
     """Test validate_secure_config function."""
 
     def test_empty_secret_raises(self) -> None:
-        with patch.object(Config, "SECRET_KEY", ""):
-            with patch.dict(os.environ, {"SECRET_KEY": ""}, clear=False):
-                try:
-                    Config.SECRET_KEY = ""
-                    with patch(
-                        "app.config.settings.Config.SECRET_KEY", ""
-                    ):
-                        validate_secure_config()  # type: ignore[call-arg]
-                except RuntimeError as e:
-                    assert "SECRET_KEY" in str(e)
-                finally:
-                    Config.SECRET_KEY = os.getenv("SECRET_KEY", "")
+        with (
+            patch.object(Config, "SECRET_KEY", ""),
+            patch.dict(os.environ, {"SECRET_KEY": ""}, clear=False),
+            patch("app.config.settings.Config.SECRET_KEY", ""),
+            pytest.raises(RuntimeError, match="SECRET_KEY"),
+        ):
+            validate_secure_config()
 
     def test_known_insecure_keys(self) -> None:
         assert "" in _INSECURE_SECRET_KEYS
