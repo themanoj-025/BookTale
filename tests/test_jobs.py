@@ -10,6 +10,9 @@ import os
 import sys
 import pytest
 
+pytestmark = pytest.mark.integration
+
+
 
 pytestmark = pytest.mark.slow
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
@@ -30,7 +33,6 @@ os.environ.setdefault("DEFAULT_ADMIN_PASSWORD", "TestAdmin123")
 # database. None of these tests need a real DB (storage, LibraryService and
 # auth are monkeypatched), so the module stays side-effect-free.
 
-import pytest
 
 from app.config.settings import Config
 from app.jobs import jobs, tasks

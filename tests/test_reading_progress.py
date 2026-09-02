@@ -1,3 +1,7 @@
+import pytest
+
+pytestmark = pytest.mark.unit
+
 """
 tests/test_reading_progress.py - Regression tests for ReadingProgress.
 

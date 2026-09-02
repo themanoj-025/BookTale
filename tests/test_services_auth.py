@@ -8,6 +8,9 @@ import pytest
 
 from app.core.exceptions import AuthenticationError
 from app.services.auth.auth import (
+
+pytestmark = pytest.mark.unit
+
     AuthManager,
     hash_password,
     verify_password,

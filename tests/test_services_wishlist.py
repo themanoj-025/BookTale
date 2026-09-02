@@ -8,6 +8,9 @@ import pytest
 
 from app.services.reading.wishlist import Wishlist
 
+pytestmark = pytest.mark.unit
+
+
 
 @pytest.fixture()
 def mgr() -> Wishlist:

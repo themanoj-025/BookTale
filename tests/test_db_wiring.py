@@ -37,6 +37,9 @@ from app.models.user import User
 from app.services.books.library import Library
 from app.storage.storage import Storage
 
+pytestmark = pytest.mark.unit
+
+
 
 
 pytestmark = pytest.mark.slow
