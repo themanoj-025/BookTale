@@ -11,10 +11,11 @@ from sqlalchemy.orm import Session
 from app.db.database import Base
 from app.db.models import Book, User, Transaction, Fine, Notification, Reservation
 
-
-
-
 pytestmark = pytest.mark.slow
+
+
+
+
 @pytest.fixture
 def engine() -> None:
     """Create an in-memory SQLite engine."""

@@ -8,6 +8,9 @@ import pytest
 
 from app.services.reading.reading_progress import ReadingProgress
 
+pytestmark = pytest.mark.unit
+
+
 
 @pytest.fixture()
 def mgr() -> ReadingProgress:

@@ -8,6 +8,9 @@ import pytest
 
 from app.services.notifications.notifications import NotificationManager
 
+pytestmark = pytest.mark.unit
+
+
 
 @pytest.fixture()
 def mgr() -> NotificationManager:

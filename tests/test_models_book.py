@@ -1,3 +1,7 @@
+import pytest
+
+pytestmark = pytest.mark.integration
+
 """Tests for Book model (app/models/book.py)."""
 
 from app.models.book import CATEGORIES, Book

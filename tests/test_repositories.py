@@ -11,13 +11,14 @@ from sqlalchemy.orm import Session
 from app.db.database import Base
 from app.db.models import Book, User
 from app.db.repositories import (
+
+pytestmark = pytest.mark.slow
     BookRepository,
     TransactionRepository,
     UserRepository,
     _parse_dt,
 )
 
-pytestmark = pytest.mark.slow
 
 
 @pytest.fixture

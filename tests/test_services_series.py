@@ -8,6 +8,9 @@ import pytest
 
 from app.services.books.series import SeriesManager
 
+pytestmark = pytest.mark.unit
+
+
 
 @pytest.fixture()
 def mgr() -> SeriesManager:
