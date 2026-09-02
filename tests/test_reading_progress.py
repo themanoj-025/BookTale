@@ -1,3 +1,5 @@
+
+from __future__ import annotations
 import pytest
 
 pytestmark = pytest.mark.unit
@@ -11,7 +13,6 @@ total_pages from the book OR the stored entry and must never raise NameError
 every user's reading list page).
 """
 
-from __future__ import annotations
 
 import json
 
