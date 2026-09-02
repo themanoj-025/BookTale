@@ -12,6 +12,10 @@ import os
 import sys
 from datetime import datetime, timedelta
 
+import pytest
+
+pytestmark = pytest.mark.integration
+
 # This file lives at tests/test_auth_tokens.py — one level below the root.
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 sys.path.insert(0, PROJECT_ROOT)

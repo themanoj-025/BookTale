@@ -28,6 +28,9 @@ from app.db.models import Book, Transaction, User
 from app.db.repositories import BookRepository, TransactionRepository, library_stats
 from app.db.service import LibraryService
 
+pytestmark = pytest.mark.unit
+
+
 
 
 

@@ -8,6 +8,9 @@ import pytest
 
 from app.services.books.lists import BookLists
 
+pytestmark = pytest.mark.unit
+
+
 
 @pytest.fixture()
 def mgr(tmp_path: object) -> BookLists:

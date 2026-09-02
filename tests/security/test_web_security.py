@@ -19,6 +19,9 @@ import sys
 import tempfile
 import pytest
 
+pytestmark = pytest.mark.integration
+
+
 
 pytestmark = pytest.mark.slow
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
@@ -33,7 +36,6 @@ os.environ["DEFAULT_ADMIN_PASSWORD"] = "TestAdmin123"
 os.environ["WTF_CSRF_ENABLED"] = "0"
 os.environ["RATELIMIT_ENABLED"] = "0"
 
-import pytest
 
 from app.config.settings import Config
 

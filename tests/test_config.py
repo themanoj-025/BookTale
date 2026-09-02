@@ -7,6 +7,9 @@ import pytest
 
 from app.config.settings import Config, _INSECURE_SECRET_KEYS, validate_secure_config
 
+pytestmark = pytest.mark.integration
+
+
 
 class TestConfigDefaults:
     """Test Config class defaults."""
