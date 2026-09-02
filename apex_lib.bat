@@ -65,7 +65,7 @@ echo  ║     📚 Library Management System v2.0       ║
 echo  ║     🌐 Web Dashboard Mode                   ║
 echo  ╚══════════════════════════════════════════════╝
 echo.
-echo  🔐 Login: ADMIN001 / admin123
+echo  🔐 Login: ADMIN001 / (password set on first boot)
 echo  ⌨️  Press Ctrl+K to search books anywhere
 echo.
 timeout /t 2 /nobreak >nul
@@ -92,7 +92,7 @@ echo  ║     📚 Library Management System v2.0       ║
 echo  ║     🌐 + 🖥️  Both Modes                     ║
 echo  ╚══════════════════════════════════════════════╝
 echo.
-echo  🔐 Login: ADMIN001 / admin123
+echo  🔐 Login: ADMIN001 / (password set on first boot)
 echo  🔄 Web server launching in a separate window...
 echo.
 :: Launch web in a new window
