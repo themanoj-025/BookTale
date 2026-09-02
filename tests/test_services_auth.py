@@ -7,9 +7,9 @@ from unittest.mock import MagicMock
 import pytest
 
 from app.core.exceptions import AuthenticationError
-from app.services.auth.auth import (
 
 pytestmark = pytest.mark.unit
+from app.services.auth.auth import (
 
     AuthManager,
     hash_password,
