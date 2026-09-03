@@ -1,5 +1,10 @@
 """Lightweight circuit breaker for external API calls.
 
+CANONICAL COPY — this file is the single source of truth. It is synced
+verbatim into every portfolio repo by ``tools/sync_circuit_breaker.py``
+(see ``shared/README.md``). Make changes HERE, then re-run the sync;
+do not edit the per-repo copies directly.
+
 Usage:
     from circuit_breaker import CircuitBreaker
 
@@ -18,11 +23,12 @@ State transitions:
 
 from __future__ import annotations
 
+import functools
 import logging
 import time
+from collections.abc import Callable
 from enum import Enum
 from typing import Any
-from collections.abc import Callable
 
 logger = logging.getLogger(__name__)
 
@@ -52,7 +58,7 @@ class CircuitBreaker:
 
     @property
     def state(self) -> CircuitState:
-        if self._state == CircuitState.OPEN:  # noqa: SIM102 — nested ifs for clarity
+        if self._state == CircuitState.OPEN:
             if time.monotonic() - self._last_failure_time >= self.recovery_timeout:
                 self._state = CircuitState.HALF_OPEN
                 logger.info("Circuit breaker %s: OPEN -> HALF_OPEN", self.name)
@@ -80,8 +86,6 @@ class CircuitBreaker:
         return self.state == CircuitState.OPEN
 
     def __call__(self, fn: Callable[..., Any]) -> Callable[..., Any]:
-        import functools
-
         @functools.wraps(fn)
         async def wrapper(*args: Any, **kwargs: Any) -> Any:
             if self.is_open():
@@ -110,9 +114,16 @@ class CircuitBreaker:
             raise CircuitBreakerOpenError(f"Circuit breaker {self.name} is OPEN")
         return self
 
-    def __exit__(self, exc_type: type | None, exc_val: Exception | None, exc_tb: Any) -> None:
+    def __exit__(
+        self,
+        exc_type: type | None,
+        exc_val: Exception | None,
+        exc_tb: Any,
+    ) -> None:
         if exc_type is None:
             self.record_success()
+        elif exc_type is CircuitBreakerOpenError:
+            pass  # Don't count circuit breaker errors as failures
         else:
             self.record_failure()
 
