@@ -31,11 +31,12 @@ Config.RESERVATIONS_FILE = os.path.join(Config.DATA_DIR, "reservations.json")
 for _d in (Config.DATA_DIR, Config.LOGS_DIR, Config.BACKUPS_DIR):
     os.makedirs(_d, exist_ok=True)
 
+from flask.testing import FlaskClient
 from web_app import app
 
 
 @pytest.fixture()
-def client():  # type: ignore[no-untyped-def]
+def client() -> FlaskClient:
     app.config["TESTING"] = True
     with app.test_client() as c:
         yield c
@@ -49,32 +50,32 @@ class TestAdminRoutesRegistration:
         admin_routes = [r for r in rules if "/admin" in r]
         assert len(admin_routes) >= 5, f"Expected >=5 admin routes, got {len(admin_routes)}"
 
-    def test_admin_stats_requires_auth(self, client: object) -> None:
-        resp = client.get("/admin/stats")  # type: ignore[union-attr]
+    def test_admin_stats_requires_auth(self, client: FlaskClient) -> None:
+        resp = client.get("/admin/stats")
         assert resp.status_code in (302, 401, 403)
 
-    def test_admin_users_requires_auth(self, client: object) -> None:
-        resp = client.get("/admin/users")  # type: ignore[union-attr]
+    def test_admin_users_requires_auth(self, client: FlaskClient) -> None:
+        resp = client.get("/admin/users")
         assert resp.status_code in (302, 401, 403)
 
-    def test_admin_settings_requires_auth(self, client: object) -> None:
-        resp = client.get("/admin/settings")  # type: ignore[union-attr]
+    def test_admin_settings_requires_auth(self, client: FlaskClient) -> None:
+        resp = client.get("/admin/settings")
         assert resp.status_code in (302, 401, 403)
 
 
 class TestSettingsPages:
     """Test settings and security page rendering."""
 
-    def test_settings_page(self, client: object) -> None:
-        resp = client.get("/settings")  # type: ignore[union-attr]
+    def test_settings_page(self, client: FlaskClient) -> None:
+        resp = client.get("/settings")
         assert resp.status_code in (200, 302, 401, 403)
 
-    def test_security_page(self, client: object) -> None:
-        resp = client.get("/security")  # type: ignore[union-attr]
+    def test_security_page(self, client: FlaskClient) -> None:
+        resp = client.get("/security")
         assert resp.status_code in (200, 302, 401, 403)
 
-    def test_help_page(self, client: object) -> None:
-        resp = client.get("/help")  # type: ignore[union-attr]
+    def test_help_page(self, client: FlaskClient) -> None:
+        resp = client.get("/help")
         assert resp.status_code in (200, 302, 401, 403)
 
 

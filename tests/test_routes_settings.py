@@ -52,14 +52,12 @@ class TestSecurityPage:
 class TestSettingsPages:
     """Test settings page rendering."""
 
-    def test_settings_page_returns_response(self, app_client: object) -> None:
+    def test_settings_page_returns_response(self, app_client) -> None:
         """Settings page should return a valid response."""
-        client = app_client  # type: ignore[assignment]
-        resp = client.get("/settings")
+        resp = app_client.get("/settings")
         assert resp.status_code in (200, 302, 401, 403)
 
-    def test_help_page_returns_response(self, app_client: object) -> None:
+    def test_help_page_returns_response(self, app_client) -> None:
         """Help page should return a valid response."""
-        client = app_client  # type: ignore[assignment]
-        resp = client.get("/help")
+        resp = app_client.get("/help")
         assert resp.status_code in (200, 302, 401, 403)

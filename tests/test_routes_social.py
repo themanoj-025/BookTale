@@ -30,11 +30,12 @@ Config.RESERVATIONS_FILE = os.path.join(Config.DATA_DIR, "reservations.json")
 for _d in (Config.DATA_DIR, Config.LOGS_DIR, Config.BACKUPS_DIR):
     os.makedirs(_d, exist_ok=True)
 
+from flask.testing import FlaskClient
 from web_app import app
 
 
 @pytest.fixture()
-def client():  # type: ignore[no-untyped-def]
+def client() -> FlaskClient:
     app.config["TESTING"] = True
     with app.test_client() as c:
         yield c
@@ -43,35 +44,35 @@ def client():  # type: ignore[no-untyped-def]
 class TestSocialRoutes:
     """Test social page and API routes."""
 
-    def test_social_requires_auth(self, client: object) -> None:
-        resp = client.get("/social")  # type: ignore[union-attr]
+    def test_social_requires_auth(self, client: FlaskClient) -> None:
+        resp = client.get("/social")
         assert resp.status_code in (200, 302, 401, 403)
 
-    def test_community_requires_auth(self, client: object) -> None:
-        resp = client.get("/community")  # type: ignore[union-attr]
+    def test_community_requires_auth(self, client: FlaskClient) -> None:
+        resp = client.get("/community")
         assert resp.status_code in (200, 302, 401, 403)
 
-    def test_social_feed_requires_auth(self, client: object) -> None:
-        resp = client.get("/api/social/feed")  # type: ignore[union-attr]
+    def test_social_feed_requires_auth(self, client: FlaskClient) -> None:
+        resp = client.get("/api/social/feed")
         assert resp.status_code in (302, 401, 403)
 
-    def test_social_post_requires_auth(self, client: object) -> None:
-        resp = client.post("/api/social/post", json={"text": "Hello!"})  # type: ignore[union-attr]
+    def test_social_post_requires_auth(self, client: FlaskClient) -> None:
+        resp = client.post("/api/social/post", json={"text": "Hello!"})
         assert resp.status_code in (302, 401, 403)
 
-    def test_social_like_requires_auth(self, client: object) -> None:
-        resp = client.post("/api/social/like", json={"post_id": "test"})  # type: ignore[union-attr]
+    def test_social_like_requires_auth(self, client: FlaskClient) -> None:
+        resp = client.post("/api/social/like", json={"post_id": "test"})
         assert resp.status_code in (302, 401, 403)
 
-    def test_social_comment_requires_auth(self, client: object) -> None:
-        resp = client.post("/api/social/comment", json={  # type: ignore[union-attr]
+    def test_social_comment_requires_auth(self, client: FlaskClient) -> None:
+        resp = client.post("/api/social/comment", json={
             "post_id": "test",
             "text": "Nice!"
         })
         assert resp.status_code in (302, 401, 403)
 
-    def test_follow_requires_auth(self, client: object) -> None:
-        resp = client.post("/api/social/follow", json={"user_id": "test"})  # type: ignore[union-attr]
+    def test_follow_requires_auth(self, client: FlaskClient) -> None:
+        resp = client.post("/api/social/follow", json={"user_id": "test"})
         assert resp.status_code in (302, 401, 403)
 
     def test_social_route_registered(self) -> None:

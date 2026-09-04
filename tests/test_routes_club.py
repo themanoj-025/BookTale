@@ -30,11 +30,12 @@ Config.RESERVATIONS_FILE = os.path.join(Config.DATA_DIR, "reservations.json")
 for _d in (Config.DATA_DIR, Config.LOGS_DIR, Config.BACKUPS_DIR):
     os.makedirs(_d, exist_ok=True)
 
+from flask.testing import FlaskClient
 from web_app import app
 
 
 @pytest.fixture()
-def client():  # type: ignore[no-untyped-def]
+def client() -> FlaskClient:
     app.config["TESTING"] = True
     with app.test_client() as c:
         yield c
@@ -43,24 +44,24 @@ def client():  # type: ignore[no-untyped-def]
 class TestClubRoutes:
     """Test book club page and API routes."""
 
-    def test_clubs_requires_auth(self, client: object) -> None:
-        resp = client.get("/clubs")  # type: ignore[union-attr]
+    def test_clubs_requires_auth(self, client: FlaskClient) -> None:
+        resp = client.get("/clubs")
         assert resp.status_code in (200, 302, 401, 403)
 
-    def test_club_detail_requires_auth(self, client: object) -> None:
-        resp = client.get("/clubs/test-club-id")  # type: ignore[union-attr]
+    def test_club_detail_requires_auth(self, client: FlaskClient) -> None:
+        resp = client.get("/clubs/test-club-id")
         assert resp.status_code in (200, 302, 401, 403)
 
-    def test_club_create_requires_auth(self, client: object) -> None:
-        resp = client.post("/api/clubs/create", json={"name": "Test Club"})  # type: ignore[union-attr]
+    def test_club_create_requires_auth(self, client: FlaskClient) -> None:
+        resp = client.post("/api/clubs/create", json={"name": "Test Club"})
         assert resp.status_code in (302, 401, 403)
 
-    def test_club_join_requires_auth(self, client: object) -> None:
-        resp = client.post("/api/clubs/test-club-id/join")  # type: ignore[union-attr]
+    def test_club_join_requires_auth(self, client: FlaskClient) -> None:
+        resp = client.post("/api/clubs/test-club-id/join")
         assert resp.status_code in (302, 401, 403)
 
-    def test_club_leave_requires_auth(self, client: object) -> None:
-        resp = client.post("/api/clubs/test-club-id/leave")  # type: ignore[union-attr]
+    def test_club_leave_requires_auth(self, client: FlaskClient) -> None:
+        resp = client.post("/api/clubs/test-club-id/leave")
         assert resp.status_code in (302, 401, 403)
 
     def test_clubs_route_registered(self) -> None:
