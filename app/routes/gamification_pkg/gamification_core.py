@@ -58,12 +58,3 @@ def register_gamification_routes(app, _rate_limit) -> None:
         from app.routes.gamification_pkg.author_page import render_author_page
 
         return render_author_page(author_name)
-
-    # ═══ PROFILE PAGE (Phase 4 Showcase) ═══
-
-    @app.route("/profile/<user_id>")
-    @login_required
-    def profile_page(user_id) -> str:
-        from app.routes.gamification_pkg.profile_page import render_profile_page
-
-        return render_profile_page(user_id)
