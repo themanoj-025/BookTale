@@ -2,7 +2,7 @@
 
 ## Where to get help
 
-- **🐛 Bug reports & feature requests** — Open an issue on [GitHub Issues](https://github.com/themanoj-025/Book-Tale/issues)
+- **🐛 Bug reports & feature requests** — Open an issue on [GitHub Issues](https://github.com/themanoj-025/BookTale/issues)
 - **🔒 Security vulnerabilities** — See [SECURITY.md](SECURITY.md) for responsible disclosure
 - **📧 Email** — manojjana.0025@gmail.com (for private/urgent matters)
 
