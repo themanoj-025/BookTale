@@ -8,6 +8,8 @@ the bounded pool when Redis is unreachable, and the cron next-run helper.
 
 import os
 import sys
+from concurrent.futures import ThreadPoolExecutor
+from datetime import datetime
 import pytest
 
 pytestmark = pytest.mark.integration
@@ -285,7 +287,7 @@ class TestJobsFacade:
         pool = jobs._get_pool()
         assert isinstance(
             pool,
-            __import__("concurrent.futures", fromlist=["ThreadPoolExecutor"]).ThreadPoolExecutor,
+            ThreadPoolExecutor,
         )
         assert pool._max_workers == Config.COVER_FETCH_WORKERS
 
@@ -327,7 +329,7 @@ class TestCronNextRun:
         pytest.importorskip("croniter")
         from app.jobs import worker
 
-        base = __import__("datetime", fromlist=["datetime"]).datetime.now()
+        base = datetime.now()
         nxt = worker._next_run_after("0 9 * * *", after=base)
         assert nxt > base
 
