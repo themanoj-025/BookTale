@@ -11,7 +11,6 @@ import sys
 from typing import Any
 from functools import wraps
 
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 if sys.platform == "win32":
     for _stream in (sys.stdout, sys.stderr):
         with contextlib.suppress(AttributeError, OSError, ValueError):

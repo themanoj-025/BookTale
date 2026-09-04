@@ -16,7 +16,6 @@ pytestmark = pytest.mark.integration
 
 pytestmark = pytest.mark.slow
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-sys.path.insert(0, PROJECT_ROOT)
 
 # Set the boot env vars BEFORE importing config (mirrors test_web_security.py):
 # config's class body reads SECRET_KEY at import time, so if this module is

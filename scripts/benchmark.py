@@ -36,7 +36,6 @@ os.environ["STORAGE_BACKEND"] = "db"
 # root — add the root explicitly so `config`, `db.*` resolve (same pattern
 # as scripts/smoke_checklist.py).
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.insert(0, PROJECT_ROOT)
 
 from app.config.settings import Config
 

@@ -48,7 +48,6 @@ import threading
 import time
 
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.insert(0, PROJECT_ROOT)
 
 # ── Secure, rate-limited boot (the production defaults) BEFORE importing ──
 os.environ["SECRET_KEY"] = "smoke-live-secret-key-for-ci-only"
