@@ -30,11 +30,12 @@ Config.RESERVATIONS_FILE = os.path.join(Config.DATA_DIR, "reservations.json")
 for _d in (Config.DATA_DIR, Config.LOGS_DIR, Config.BACKUPS_DIR):
     os.makedirs(_d, exist_ok=True)
 
+from flask.testing import FlaskClient
 from web_app import app
 
 
 @pytest.fixture()
-def client():  # type: ignore[no-untyped-def]
+def client() -> FlaskClient:
     app.config["TESTING"] = True
     with app.test_client() as c:
         yield c
@@ -43,12 +44,12 @@ def client():  # type: ignore[no-untyped-def]
 class TestDashboardRoutes:
     """Test dashboard page and API routes."""
 
-    def test_dashboard_requires_auth(self, client: object) -> None:
-        resp = client.get("/dashboard")  # type: ignore[union-attr]
+    def test_dashboard_requires_auth(self, client: FlaskClient) -> None:
+        resp = client.get("/dashboard")
         assert resp.status_code in (200, 302, 401, 403)
 
-    def test_dashboard_api_requires_auth(self, client: object) -> None:
-        resp = client.get("/api/dashboard")  # type: ignore[union-attr]
+    def test_dashboard_api_requires_auth(self, client: FlaskClient) -> None:
+        resp = client.get("/api/dashboard")
         assert resp.status_code in (302, 401, 403)
 
     def test_dashboard_route_registered(self) -> None:

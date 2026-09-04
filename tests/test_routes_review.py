@@ -30,11 +30,12 @@ Config.RESERVATIONS_FILE = os.path.join(Config.DATA_DIR, "reservations.json")
 for _d in (Config.DATA_DIR, Config.LOGS_DIR, Config.BACKUPS_DIR):
     os.makedirs(_d, exist_ok=True)
 
+from flask.testing import FlaskClient
 from web_app import app
 
 
 @pytest.fixture()
-def client():  # type: ignore[no-untyped-def]
+def client() -> FlaskClient:
     app.config["TESTING"] = True
     with app.test_client() as c:
         yield c
@@ -43,16 +44,16 @@ def client():  # type: ignore[no-untyped-def]
 class TestReviewRoutes:
     """Test review page and API routes."""
 
-    def test_reviews_requires_auth(self, client: object) -> None:
-        resp = client.get("/reviews")  # type: ignore[union-attr]
+    def test_reviews_requires_auth(self, client: FlaskClient) -> None:
+        resp = client.get("/reviews")
         assert resp.status_code in (200, 302, 401, 403)
 
-    def test_review_api_requires_auth(self, client: object) -> None:
-        resp = client.get("/api/reviews")  # type: ignore[union-attr]
+    def test_review_api_requires_auth(self, client: FlaskClient) -> None:
+        resp = client.get("/api/reviews")
         assert resp.status_code in (302, 401, 403)
 
-    def test_review_submit_requires_auth(self, client: object) -> None:
-        resp = client.post("/api/reviews", json={  # type: ignore[union-attr]
+    def test_review_submit_requires_auth(self, client: FlaskClient) -> None:
+        resp = client.post("/api/reviews", json={
             "book_id": "test",
             "rating": 5,
             "text": "Great book!"

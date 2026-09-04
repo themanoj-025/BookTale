@@ -30,11 +30,12 @@ Config.RESERVATIONS_FILE = os.path.join(Config.DATA_DIR, "reservations.json")
 for _d in (Config.DATA_DIR, Config.LOGS_DIR, Config.BACKUPS_DIR):
     os.makedirs(_d, exist_ok=True)
 
+from flask.testing import FlaskClient
 from web_app import app
 
 
 @pytest.fixture()
-def client():  # type: ignore[no-untyped-def]
+def client() -> FlaskClient:
     app.config["TESTING"] = True
     with app.test_client() as c:
         yield c
@@ -43,23 +44,23 @@ def client():  # type: ignore[no-untyped-def]
 class TestProgressRoutes:
     """Test reading progress page and API routes."""
 
-    def test_progress_requires_auth(self, client: object) -> None:
-        resp = client.get("/progress")  # type: ignore[union-attr]
+    def test_progress_requires_auth(self, client: FlaskClient) -> None:
+        resp = client.get("/progress")
         assert resp.status_code in (200, 302, 401, 403)
 
-    def test_progress_api_requires_auth(self, client: object) -> None:
-        resp = client.get("/api/progress")  # type: ignore[union-attr]
+    def test_progress_api_requires_auth(self, client: FlaskClient) -> None:
+        resp = client.get("/api/progress")
         assert resp.status_code in (302, 401, 403)
 
-    def test_progress_update_requires_auth(self, client: object) -> None:
-        resp = client.post("/api/progress", json={  # type: ignore[union-attr]
+    def test_progress_update_requires_auth(self, client: FlaskClient) -> None:
+        resp = client.post("/api/progress", json={
             "book_id": "test",
             "page": 50
         })
         assert resp.status_code in (302, 401, 403)
 
-    def test_bookmarks_requires_auth(self, client: object) -> None:
-        resp = client.get("/api/bookmarks")  # type: ignore[union-attr]
+    def test_bookmarks_requires_auth(self, client: FlaskClient) -> None:
+        resp = client.get("/api/bookmarks")
         assert resp.status_code in (302, 401, 403)
 
     def test_progress_route_registered(self) -> None:
