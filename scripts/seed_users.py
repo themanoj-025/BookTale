@@ -18,7 +18,6 @@ from datetime import datetime, timedelta
 
 # Ensure we can import project modules
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.insert(0, BASE_DIR)
 
 from app.config.settings import Config
 from app.db.storage_adapter import create_storage

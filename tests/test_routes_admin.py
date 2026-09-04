@@ -11,7 +11,6 @@ import pytest
 pytestmark = pytest.mark.integration
 
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-sys.path.insert(0, PROJECT_ROOT)
 
 # Must be set before importing web_app
 os.environ.setdefault("SECRET_KEY", "test-secret-key-for-admin-routes")

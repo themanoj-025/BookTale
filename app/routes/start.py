@@ -20,7 +20,6 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__fil
 os.chdir(BASE_DIR)
 
 # -- Import config -- respects .env settings ----------------------
-sys.path.insert(0, BASE_DIR)
 try:
     from app.config.settings import Config
 
