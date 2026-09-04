@@ -19,7 +19,6 @@ import sys
 
 logger = logging.getLogger(__name__)
 
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # ── Validate URL before importing the app ──────────────────────────────
 database_url = os.environ.get("DATABASE_URL", "")

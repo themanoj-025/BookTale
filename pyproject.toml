@@ -1,3 +1,15 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "book-tale"
+version = "0.1.0"
+requires-python = ">=3.10"
+
+[tool.setuptools.packages.find]
+include = ["app*"]
+
 [tool.black]
 line-length = 100
 target-version = ["py310"]
@@ -43,6 +55,7 @@ ignore = [
 addopts = "-m 'not slow' --cov --cov-fail-under=70"
 minversion = "7.0"
 testpaths = ["tests"]
+pythonpath = ["."]
 
 markers = [
     "unit: marks pure unit tests (deselect with '-m \"not unit\"')",

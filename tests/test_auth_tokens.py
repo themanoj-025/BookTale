@@ -18,7 +18,6 @@ pytestmark = pytest.mark.integration
 
 # This file lives at tests/test_auth_tokens.py — one level below the root.
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-sys.path.insert(0, PROJECT_ROOT)
 
 # NOTE: this module deliberately does NOT mutate Config.DATA_DIR at import
 # time. Other test modules (e.g. test_web_security) also redirect that path,
@@ -153,7 +152,6 @@ class TestPersistenceAndCleanup:
         tok = authmod.generate_reset_token("MEM-RESTART")
         code = (
             "import sys\n"
-            f"sys.path.insert(0, {PROJECT_ROOT!r})\n"
             "from app.config.settings import Config\n"
             f"Config.DATA_DIR = {_isolated_db!r}\n"
             "import app.services.auth.auth as auth\n"

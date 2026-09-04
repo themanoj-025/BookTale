@@ -11,7 +11,6 @@ import pytest
 pytestmark = pytest.mark.integration
 
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-sys.path.insert(0, PROJECT_ROOT)
 
 os.environ.setdefault("SECRET_KEY", "test-secret-key-for-club-routes")
 os.environ.setdefault("DEFAULT_ADMIN_PASSWORD", "TestAdmin123")

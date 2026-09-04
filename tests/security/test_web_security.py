@@ -24,7 +24,6 @@ pytestmark = pytest.mark.integration
 
 pytestmark = pytest.mark.slow
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
-sys.path.insert(0, PROJECT_ROOT)
 
 # Must be set before importing web_app (module-level fail-fast boot validation).
 os.environ["SECRET_KEY"] = "test-secret-key-for-tests-only"
