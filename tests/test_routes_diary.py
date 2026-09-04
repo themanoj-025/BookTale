@@ -30,11 +30,12 @@ Config.RESERVATIONS_FILE = os.path.join(Config.DATA_DIR, "reservations.json")
 for _d in (Config.DATA_DIR, Config.LOGS_DIR, Config.BACKUPS_DIR):
     os.makedirs(_d, exist_ok=True)
 
+from flask.testing import FlaskClient
 from web_app import app
 
 
 @pytest.fixture()
-def client():  # type: ignore[no-untyped-def]
+def client() -> FlaskClient:
     app.config["TESTING"] = True
     with app.test_client() as c:
         yield c
@@ -43,16 +44,16 @@ def client():  # type: ignore[no-untyped-def]
 class TestDiaryRoutes:
     """Test diary page and API routes."""
 
-    def test_diary_requires_auth(self, client: object) -> None:
-        resp = client.get("/diary")  # type: ignore[union-attr]
+    def test_diary_requires_auth(self, client: FlaskClient) -> None:
+        resp = client.get("/diary")
         assert resp.status_code in (200, 302, 401, 403)
 
-    def test_diary_with_pagination(self, client: object) -> None:
-        resp = client.get("/diary?page=1")  # type: ignore[union-attr]
+    def test_diary_with_pagination(self, client: FlaskClient) -> None:
+        resp = client.get("/diary?page=1")
         assert resp.status_code in (200, 302, 401, 403)
 
-    def test_diary_api_requires_auth(self, client: object) -> None:
-        resp = client.get("/api/diary")  # type: ignore[union-attr]
+    def test_diary_api_requires_auth(self, client: FlaskClient) -> None:
+        resp = client.get("/api/diary")
         assert resp.status_code in (302, 401, 403)
 
     def test_diary_route_registered(self) -> None:

@@ -78,7 +78,7 @@ class TestFormatDate:
         assert format_date("not-a-date") == "not-a-date"
 
     def test_none(self) -> None:
-        assert format_date(None) is None  # type: ignore[arg-type]
+        assert format_date(None) is None  # intentionally passes wrong type
 
 
 class TestColored:
