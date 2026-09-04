@@ -505,8 +505,6 @@ def help_page() -> str:
 
 @app.route("/settings")
 @login_required
-@app.route("/settings")
-@login_required
 def settings_page() -> str:
     """User settings page with Profile, Notifications, Privacy, Appearance, and Reading tabs."""
     return _settings_page(render_page, storage, notif_mgr)
