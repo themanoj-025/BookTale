@@ -60,7 +60,7 @@ def launch_web() -> None:
     Output goes directly to the terminal.
     """
     logger.info(f"  [NET] Starting web server at http://0.0.0.0:{FLASK_PORT}...")
-    logger.info("  [LOCK] Admin login: ADMIN001 (password printed once on first boot)")
+    logger.info("  [LOCK] Admin login: ADMIN001 (password generated on first boot)")
     logger.info("  [HINT] Press Ctrl+K to search books anywhere")
     print()
 
@@ -170,7 +170,7 @@ def main() -> None:
             if web_proc.poll() is None:
                 logger.info(f"  [!] Server is running but port {FLASK_PORT} is not responding yet.")
             logger.info(f"  [WEB] Open {FLASK_URL} manually in your browser.")
-            logger.info("  [AUTH] Admin login: ADMIN001 (password printed once on first boot)")
+            logger.info("  [AUTH] Admin login: ADMIN001 (password generated on first boot)")
 
     if choice in ("2", "3"):
         cli_proc = launch_cli()
