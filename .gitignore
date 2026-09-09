@@ -65,3 +65,10 @@ CLAUDE.md
 
 # Runtime balance log
 radar_balance.txt
+
+# ── Portfolio-standard ignores (sweep 2026-09) ──────────────
+*.db
+*.db-shm
+*.db-wal
+.coverage.*
+coverage.xml
