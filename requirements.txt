@@ -23,4 +23,4 @@ rq>=2.11.0,<3.0  # <2.0: app/jobs/worker.py uses rq.Connection, removed in rq 2.
 croniter>=6.2.4,<7.0.0
 sqlalchemy>=2.0.52,<3.0.0
 alembic>=1.19.1,<2.0.0
-psycopg2-binary>=2.9.12,<3.0.0
+psycopg2-binary>=2.9.13,<3.0.0
