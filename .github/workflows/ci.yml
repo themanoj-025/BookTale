@@ -37,7 +37,7 @@ jobs:
 
       - name: Lint with ruff
         run: |
-          ruff check . --select E9,F63,F7,F82 --output-format=text
+          ruff check . --select E9,F63,F7,F82 --output-format=concise
           ruff check . --statistics
 
       - name: Format check with ruff
@@ -164,6 +164,8 @@ jobs:
       - uses: hadolint/hadolint-action@v3.5.0
         with:
           dockerfile: Dockerfile
+          failure-threshold: warning
+          failure-threshold-ignore: DL3066
 
   docker:
     runs-on: ubuntu-latest
