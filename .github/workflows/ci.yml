@@ -165,7 +165,7 @@ jobs:
         with:
           dockerfile: Dockerfile
           failure-threshold: warning
-          failure-threshold-ignore: DL3066
+          ignore: DL3066
 
   docker:
     runs-on: ubuntu-latest
