@@ -19,12 +19,12 @@ from datetime import datetime, timedelta
 # Ensure we can import project modules
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+import logging
+
 from app.config.settings import Config
 from app.db.storage_adapter import create_storage
 from app.models.user import User
 from app.services.auth.auth import hash_password
-import logging
-
 from scripts.seed_data import (
     BIOS,
     CITIES,

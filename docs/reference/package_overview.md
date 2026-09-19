@@ -9,20 +9,20 @@ recommendation engine with a Goodreads seed-data cold-start fallback.
 
 ## The `app` package — one home for everything
 
-| Subpackage | Responsibility | Key modules |
-| ----------- | ---------------- | ------------- |
-| `app/config` | Env-driven settings, fail-fast secret validation | `settings.py` |
-| `app/core` | Cross-cutting infrastructure | `logger.py`, `exceptions.py`, `utils.py` |
-| `app/models` | Domain dataclasses | `book.py`, `user.py` |
-| `app/storage` | Legacy JSON persistence | `storage.py` |
-| `app/db` | Relational layer (default backend) | `database.py`, `models.py`, `repositories.py`, `service.py`, `storage_adapter.py` |
-| `app/routes` | HTTP routes + CLI + launcher | `web_app.py`, `page_routes.py`, `social_routes.py`, `feature_routes.py`, `site_pages.py`, `main.py`, `start.py` |
-| `app/services` | Domain services | `auth/`, `books/`, `email/`, `notifications/`, `reading/`, `recommendations/`, `social/` |
-| `app/jobs` | Background jobs | `tasks.py`, `jobs.py`, `worker.py` |
-| `app/realtime` | Socket.IO wiring | `realtime.py` |
-| `app/api` | OpenAPI spec generation | `api_spec.py` |
-| `app/templates` | Jinja2 templates | `base.html`, `auth/`, `errors/`, ... |
-| `app/static` | Frontend assets + esbuild output | `css/`, `js/`, `fonts/`, `dist/` |
+| Subpackage      | Responsibility                                   | Key modules                                                                                                     |
+| --------------- | ------------------------------------------------ | --------------------------------------------------------------------------------------------------------------- |
+| `app/config`    | Env-driven settings, fail-fast secret validation | `settings.py`                                                                                                   |
+| `app/core`      | Cross-cutting infrastructure                     | `logger.py`, `exceptions.py`, `utils.py`                                                                        |
+| `app/models`    | Domain dataclasses                               | `book.py`, `user.py`                                                                                            |
+| `app/storage`   | Legacy JSON persistence                          | `storage.py`                                                                                                    |
+| `app/db`        | Relational layer (default backend)               | `database.py`, `models.py`, `repositories.py`, `service.py`, `storage_adapter.py`                               |
+| `app/routes`    | HTTP routes + CLI + launcher                     | `web_app.py`, `page_routes.py`, `social_routes.py`, `feature_routes.py`, `site_pages.py`, `main.py`, `start.py` |
+| `app/services`  | Domain services                                  | `auth/`, `books/`, `email/`, `notifications/`, `reading/`, `recommendations/`, `social/`                        |
+| `app/jobs`      | Background jobs                                  | `tasks.py`, `jobs.py`, `worker.py`                                                                              |
+| `app/realtime`  | Socket.IO wiring                                 | `realtime.py`                                                                                                   |
+| `app/api`       | OpenAPI spec generation                          | `api_spec.py`                                                                                                   |
+| `app/templates` | Jinja2 templates                                 | `base.html`, `auth/`, `errors/`, ...                                                                            |
+| `app/static`    | Frontend assets + esbuild output                 | `css/`, `js/`, `fonts/`, `dist/`                                                                                |
 
 ## Root directory — entry points and tooling only
 
@@ -36,7 +36,7 @@ recommendation engine with a Goodreads seed-data cold-start fallback.
 
 1. **Entry points are thin.** All logic lives in `app/`; root files are 10–20
    line wrappers so `python web_app.py` / `gunicorn web_app:app` / `python
-   worker.py` all work unchanged.
+worker.py` all work unchanged.
 2. **No bare top-level imports.** Every intra-app import uses the `app.`
    prefix — no reliance on `sys.path` hacks inside `app/`.
 3. **Dependencies flow downward.** routes → services → storage/db →

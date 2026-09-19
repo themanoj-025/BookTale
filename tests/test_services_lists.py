@@ -11,7 +11,6 @@ from app.services.books.lists import BookLists
 pytestmark = pytest.mark.unit
 
 
-
 @pytest.fixture()
 def mgr(tmp_path: object) -> BookLists:
     storage = MagicMock()
@@ -42,8 +41,9 @@ class TestBookListOperations:
     def test_add_book_to_list(self, mgr: BookLists) -> None:
         list_id = "LIST-123"
         mock_list = {"list_id": list_id, "books": ["existing"], "owner_id": "u1"}
-        with patch.object(mgr, "_load_lists", return_value=[mock_list]), patch.object(
-            mgr, "_save_lists"
+        with (
+            patch.object(mgr, "_load_lists", return_value=[mock_list]),
+            patch.object(mgr, "_save_lists"),
         ):
             ok, _msg = mgr.add_book_to_list(list_id, "new-book")
             assert ok is True
@@ -58,8 +58,9 @@ class TestBookListOperations:
     def test_remove_book_from_list(self, mgr: BookLists) -> None:
         list_id = "LIST-123"
         mock_list = {"list_id": list_id, "books": ["b1", "b2"], "owner_id": "u1"}
-        with patch.object(mgr, "_load_lists", return_value=[mock_list]), patch.object(
-            mgr, "_save_lists"
+        with (
+            patch.object(mgr, "_load_lists", return_value=[mock_list]),
+            patch.object(mgr, "_save_lists"),
         ):
             ok, _msg = mgr.remove_book_from_list(list_id, "b1")
             assert ok is True
@@ -76,8 +77,9 @@ class TestBookListOperations:
 
     def test_delete_list(self, mgr: BookLists) -> None:
         mock_list = {"list_id": "L1", "owner_id": "u1"}
-        with patch.object(mgr, "_load_lists", return_value=[mock_list]), patch.object(
-            mgr, "_save_lists"
+        with (
+            patch.object(mgr, "_load_lists", return_value=[mock_list]),
+            patch.object(mgr, "_save_lists"),
         ):
             ok, _msg = mgr.delete_list("L1", "u1")
             assert ok is True

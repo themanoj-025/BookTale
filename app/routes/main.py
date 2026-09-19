@@ -12,10 +12,9 @@ All domain logic lives in focused modules:
   - backup_cli.py            (backup, restore, logs)
 """
 
+import logging
 import os
-import sys
 from datetime import datetime
-
 
 from app.config.settings import Config
 from app.core.logger import log
@@ -30,6 +29,42 @@ from app.core.utils import (
     print_warning,
 )
 from app.db.storage_adapter import create_storage
+from app.routes.backup_cli import (
+    backup_restore_menu,
+    logs_menu,
+)
+
+# ── CLI module imports ──
+from app.routes.book_management_cli import (
+    book_management_menu,
+    search_books_menu,
+)
+from app.routes.notifications_cli import (
+    email_overdue_alerts,
+    notifications_menu,
+    show_notification_badge,
+)
+from app.routes.operations_cli import (
+    fine_management_menu,
+    issue_book_flow,
+    issue_return_menu,
+    overdue_menu,
+    reservations_menu,
+    return_book_flow,
+)
+from app.routes.recommendations_cli import (
+    recommendations_menu,
+    seed_import_menu,
+    seed_recommendations_menu,
+    user_recommendations_menu,
+)
+from app.routes.reports_cli import (
+    export_reports_menu,
+    reports_menu,
+)
+from app.routes.user_management_cli import (
+    user_management_menu,
+)
 from app.services.auth.auth import AuthManager, hash_password
 from app.services.books.backup import create_backup
 from app.services.books.library import Library
@@ -37,45 +72,7 @@ from app.services.notifications.notifications import NotificationManager
 from app.services.recommendations.recommender import Recommender
 from app.storage.storage import Storage
 
-# ── CLI module imports ──
-from app.routes.book_management_cli import (
-    book_management_menu,
-    search_books_menu,
-)
-from app.routes.user_management_cli import (
-    user_management_menu,
-)
-from app.routes.operations_cli import (
-    issue_return_menu,
-    issue_book_flow,
-    return_book_flow,
-    overdue_menu,
-    fine_management_menu,
-    reservations_menu,
-)
-from app.routes.reports_cli import (
-    reports_menu,
-    export_reports_menu,
-)
-from app.routes.recommendations_cli import (
-    recommendations_menu,
-    user_recommendations_menu,
-    seed_recommendations_menu,
-    seed_import_menu,
-)
-from app.routes.notifications_cli import (
-    show_notification_badge,
-    notifications_menu,
-    email_overdue_alerts,
-)
-from app.routes.backup_cli import (
-    backup_restore_menu,
-    logs_menu,
-)
-import logging
-
 logger = logging.getLogger(__name__)
-
 
 
 # ─
@@ -326,7 +323,8 @@ def main() -> None:
 
     bootstrap(storage, auth)
 
-    logger.info("""
+    logger.info(
+        """
 [cyan]
   ╔══════════════════════════════════════════╗
   ║   📚 Library Management System v2.0     ║
@@ -334,7 +332,8 @@ def main() -> None:
   ║   + Recommendations Engine              ║
   ╚══════════════════════════════════════════╝
 [/cyan]
-    """)
+    """
+    )
 
     try:
         while True:

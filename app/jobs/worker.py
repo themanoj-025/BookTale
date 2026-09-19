@@ -23,10 +23,8 @@ Run:
 """
 
 import os
-import sys
 import threading
 from datetime import datetime
-
 
 from app.config.settings import Config
 from app.core.logger import log

@@ -4,7 +4,6 @@ from __future__ import annotations
 
 from unittest.mock import MagicMock, patch
 
-
 from app.services.email.email_notifier import is_smtp_configured, send_email
 
 
@@ -31,8 +30,10 @@ class TestSendEmail:
             assert result is False
 
     def test_send_email_success(self) -> None:
-        with patch("app.services.email.email_notifier.is_smtp_configured", return_value=True), \
-             patch("app.services.email.email_notifier.smtplib.SMTP") as mock_smtp:
+        with (
+            patch("app.services.email.email_notifier.is_smtp_configured", return_value=True),
+            patch("app.services.email.email_notifier.smtplib.SMTP") as mock_smtp,
+        ):
             mock_server = MagicMock()
             mock_smtp.return_value.__enter__ = MagicMock(return_value=mock_server)
             mock_smtp.return_value.__exit__ = MagicMock(return_value=False)
@@ -40,7 +41,12 @@ class TestSendEmail:
             assert result is True
 
     def test_send_email_failure(self) -> None:
-        with patch("app.services.email.email_notifier.is_smtp_configured", return_value=True), \
-             patch("app.services.email.email_notifier.smtplib.SMTP", side_effect=OSError("Connection failed")):
+        with (
+            patch("app.services.email.email_notifier.is_smtp_configured", return_value=True),
+            patch(
+                "app.services.email.email_notifier.smtplib.SMTP",
+                side_effect=OSError("Connection failed"),
+            ),
+        ):
             result = send_email("test@example.com", "Subject", "<b>Hello</b>")
             assert result is False

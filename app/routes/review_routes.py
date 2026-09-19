@@ -3,9 +3,7 @@ review_routes.py - Reviews, Shelves, Bookshelves, and Profile API.
 Extracted from social_routes.py for focused maintenance.
 """
 
-from flask import g, jsonify, request, session
-
-from flask import Response
+from flask import Response, g, jsonify, request, session
 
 from app.routes.social_shared import (
     login_required,

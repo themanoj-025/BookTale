@@ -53,23 +53,28 @@ services → db/models → config/core.
 ## 3. Runtime flows
 
 ### 3.1 Web request
+
 `web_app.py` → `app.routes.web_app` Flask app (re-export shim keeps
 `from web_app import app` working) → route handlers → domain services →
 SQLAlchemy repositories → PostgreSQL. Real-time features (e.g. notifications)
 publish via Socket.IO (`app/realtime/`).
 
 ### 3.2 Background jobs (RQ)
+
 `worker.py` → `app.jobs.worker` (RQ worker + cron). Tasks in `app/jobs/tasks.py`:
+
 - `job_fetch_book_cover` — async cover/metadata fetch,
 - `job_send_overdue_emails` — scheduled batch,
 - `job_purge_expired_tokens` — hourly reap.
-Each builds its own storage handle and never raises (enhancement, not
-critical path).
+  Each builds its own storage handle and never raises (enhancement, not
+  critical path).
 
 ### 3.3 CLI
+
 `main.py` → `app.routes.main` CLI (rich-rendered management commands).
 
 ### 3.4 Recommendations (offline ML)
+
 `services/recommendations/ml/Model/recommendation_ml_comparison.py` benchmarks
 candidate models against `ml/Dataset/books.csv` and writes evidence to
 `data/generated/comparison_output/` (charts, radar, report — gitignored,
@@ -78,21 +83,21 @@ approach against the live catalog.
 
 ## 4. Configuration surface
 
-| Setting / file | Purpose |
-|---|---|
-| `app/config/settings.py` | `Config` — FLASK_HOST/PORT/DEBUG + env wiring |
-| `.env.example` | Required env template |
+| Setting / file                | Purpose                                                          |
+| ----------------------------- | ---------------------------------------------------------------- |
+| `app/config/settings.py`      | `Config` — FLASK_HOST/PORT/DEBUG + env wiring                    |
+| `.env.example`                | Required env template                                            |
 | `alembic.ini` + `migrations/` | Schema migrations (3 revisions: initial, audit log, auth tokens) |
-| `package.json` | Frontend build (`build_frontend.mjs`) → `static/dist` |
+| `package.json`                | Frontend build (`build_frontend.mjs`) → `static/dist`            |
 
 ## 5. Persistence
 
-| Artifact | Location | Note |
-|---|---|---|
-| PostgreSQL | external service | primary store (SQLAlchemy 2) |
-| Alembic versions | `migrations/versions/` | 3 revisions tracked |
-| ML dataset | `services/recommendations/ml/Dataset/books.csv` | tracked benchmark input |
-| ML outputs | `data/generated/comparison_output/` | generated on demand by `recommendation_ml_comparison.py` (gitignored) |
+| Artifact         | Location                                        | Note                                                                  |
+| ---------------- | ----------------------------------------------- | --------------------------------------------------------------------- |
+| PostgreSQL       | external service                                | primary store (SQLAlchemy 2)                                          |
+| Alembic versions | `migrations/versions/`                          | 3 revisions tracked                                                   |
+| ML dataset       | `services/recommendations/ml/Dataset/books.csv` | tracked benchmark input                                               |
+| ML outputs       | `data/generated/comparison_output/`             | generated on demand by `recommendation_ml_comparison.py` (gitignored) |
 
 ## 6. Deployment
 

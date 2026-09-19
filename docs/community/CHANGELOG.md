@@ -202,6 +202,7 @@ app-wide `200/min` default, with explicit per-route ceilings:
 ### Added
 
 #### Core Application
+
 - Flask web application with Jinja2 templating
 - Book CRUD with metadata, genres, tags, and cover images
 - User registration, login, and profile management
@@ -209,6 +210,7 @@ app-wide `200/min` default, with explicit per-route ceilings:
 - Session-based authentication with Flask sessions
 
 #### Social Features
+
 - Book reviews, ratings, and comments
 - User communities and groups
 - Reading lists (custom shelves)
@@ -216,6 +218,7 @@ app-wide `200/min` default, with explicit per-route ceilings:
 - 25+ social API endpoints for community interactions
 
 #### Reading Experience
+
 - Reading progress tracking with page/percentage updates
 - Reading challenges with goals and achievements
 - Reading calendar and streak tracking
@@ -223,27 +226,32 @@ app-wide `200/min` default, with explicit per-route ceilings:
 - Wishlist management
 
 #### Discovery & Recommendations
+
 - Book recommendation engine
 - Series management and tracking
 - Search and browse by genre, author, tags
 - Trending and popular books
 
 #### Real-Time Features
+
 - Flask-SocketIO integration for real-time updates
 - Live notifications for social interactions
 - PWA support for mobile-friendly experience
 
 #### AI Integration
+
 - AI Reading Companion for book recommendations and discussions
 - Personalized book suggestions based on reading history
 
 #### Administration
+
 - Admin dashboard with analytics
 - User management and moderation tools
 - Content management for books and reviews
 - System settings configuration
 
 #### Infrastructure
+
 - JSON file-based storage with backup and recovery
 - Email notifications via SMTP
 - QR code generation for sharing
@@ -255,6 +263,7 @@ app-wide `200/min` default, with explicit per-route ceilings:
 ## [0.1.0] — Initial Development
 
 ### Added
+
 - Project scaffolding and Flask application setup
 - Basic book and user models
 - Initial template structure

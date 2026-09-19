@@ -2,22 +2,22 @@
 backup_cli.py - Backup, Restore, and Activity Logs CLI.
 """
 
+import logging
+
 from app.core.logger import get_logs, log
 from app.core.utils import (
+    confirm,
     header,
     menu,
     pause,
     print_error,
     print_success,
     print_warning,
-    confirm,
 )
 from app.services.auth.auth import AuthManager
 from app.services.books.backup import create_backup, list_backups, restore_backup
-import logging
 
 logger = logging.getLogger(__name__)
-
 
 
 def backup_restore_menu(auth: AuthManager) -> None:

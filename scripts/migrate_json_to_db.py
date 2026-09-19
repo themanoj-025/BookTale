@@ -20,9 +20,9 @@ from __future__ import annotations
 
 import argparse
 import json
+import logging
 import os
 import sys
-
 
 from sqlalchemy import func, select
 
@@ -47,10 +47,8 @@ from app.db.models import (
     User,
     WishlistSuggestion,
 )
-import logging
 
 logger = logging.getLogger(__name__)
-
 
 
 def _load(path: str) -> list[object]:
@@ -306,7 +304,9 @@ def main() -> int:
         match = c["source"] == c["loaded"]
         ok = ok and match
         status = "✓" if match else "✗ MISMATCH"
-        logger.info(f"  {name:<24} {c['source']:>8} {c['loaded']:>8} " f"{c['skipped']:>8}   {status}")
+        logger.info(
+            f"  {name:<24} {c['source']:>8} {c['loaded']:>8} " f"{c['skipped']:>8}   {status}"
+        )
 
     if not ok:
         logger.error("\nMIGRATION FAILED: row counts disagree (see MISMATCH rows).")

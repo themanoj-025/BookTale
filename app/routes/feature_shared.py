@@ -7,8 +7,6 @@ import html
 import zlib
 from datetime import datetime
 
-
-
 # ── Module-level shared state (populated by init_feature_routes) ──
 
 _series = None
@@ -54,8 +52,14 @@ def init_shared_state(
 
     def _avatar_color(name) -> str:
         colors = [
-            "#4f46e5", "#059669", "#d97706", "#dc2626",
-            "#0891b2", "#7c3aed", "#db2777", "#ca8a04",
+            "#4f46e5",
+            "#059669",
+            "#d97706",
+            "#dc2626",
+            "#0891b2",
+            "#7c3aed",
+            "#db2777",
+            "#ca8a04",
         ]
         return colors[zlib.crc32(str(name).encode("utf-8")) % len(colors)]
 
@@ -86,13 +90,27 @@ def _js_str(value) -> str:
 def cat_color(c) -> str:
     """Category color lookup."""
     colors = {
-        "Fiction": "#4f46e5", "Non-Fiction": "#059669", "Science": "#0891b2",
-        "Technology": "#7c3aed", "History": "#d97706", "Philosophy": "#be185d",
-        "Art": "#db2777", "Biography": "#ca8a04", "Children": "#16a34a",
-        "Comics": "#e11d48", "Poetry": "#9333ea", "Drama": "#ea580c",
-        "Education": "#2563eb", "Reference": "#64748b", "Religion": "#78716c",
-        "Self-Help": "#0d9488", "Cooking": "#f97316", "Travel": "#0ea5e9",
-        "Music": "#8b5cf6", "Sports": "#22c55e", "Other": "#6b7280",
+        "Fiction": "#4f46e5",
+        "Non-Fiction": "#059669",
+        "Science": "#0891b2",
+        "Technology": "#7c3aed",
+        "History": "#d97706",
+        "Philosophy": "#be185d",
+        "Art": "#db2777",
+        "Biography": "#ca8a04",
+        "Children": "#16a34a",
+        "Comics": "#e11d48",
+        "Poetry": "#9333ea",
+        "Drama": "#ea580c",
+        "Education": "#2563eb",
+        "Reference": "#64748b",
+        "Religion": "#78716c",
+        "Self-Help": "#0d9488",
+        "Cooking": "#f97316",
+        "Travel": "#0ea5e9",
+        "Music": "#8b5cf6",
+        "Sports": "#22c55e",
+        "Other": "#6b7280",
     }
     return colors.get(c, colors["Other"])
 

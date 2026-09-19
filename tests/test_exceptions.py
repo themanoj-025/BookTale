@@ -4,7 +4,6 @@ Tests all exception classes for correct message formatting, attribute access,
 and inheritance chain.
 """
 
-
 from app.core.exceptions import (
     AuthenticationError,
     BookAlreadyDeletedError,

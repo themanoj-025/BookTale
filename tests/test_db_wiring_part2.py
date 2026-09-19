@@ -18,8 +18,10 @@ Proves the app actually runs on the relational layer:
    sandboxed DATA_DIR — the DB lands in that temp dir). — Part 2."""
 
 from __future__ import annotations
+
 import json
 import threading
+
 import app.db.database as dbmod
 from app.config.settings import Config
 from app.db.database import create_all
@@ -31,6 +33,7 @@ from app.storage.storage import Storage
 def _seed_users(store, *user_ids: str) -> None:
     """Seed users so FK-referencing rows can be inserted."""
     from app.models.user import User
+
     users = {}
     for uid in user_ids:
         users[uid] = User(
@@ -46,6 +49,7 @@ def _seed_users(store, *user_ids: str) -> None:
 
 def _seed_books(store, *book_ids: str) -> None:
     from app.models.book import Book
+
     books = {}
     for bid in book_ids:
         books[bid] = Book(
@@ -354,7 +358,6 @@ def test_audit_log_roundtrip_and_search(db_env) -> None:
 def test_audit_log_pagination(db_env) -> None:
     """Audit search paginates (newest first) and count is total, not page size."""
     from app.db.repositories import AuditLogRepository
-
 
     with dbmod.session_scope() as db:
         repo = AuditLogRepository(db)

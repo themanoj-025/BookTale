@@ -4,26 +4,24 @@ admin_page_routes.py - Admin page routes.
 Routes: /admin/users, /admin/audit, /admin/overdue, /reports
 """
 
+import logging
 from collections import Counter
 from datetime import datetime, timedelta
 
-import logging
-
-from flask import request, session
+from flask import render_template, request, session
 
 from app.routes.helpers import avatar_html
-from flask import render_template
 
 logger = logging.getLogger(__name__)
 
 from app.routes.page_state import (
     admin_required,
     h,
+    library_stats,
     login_required,
     notif_mgr,
     render_page,
     storage,
-    library_stats,
 )
 
 
@@ -224,9 +222,10 @@ def init_admin_page_routes(app) -> None:
     @login_required
     @admin_required
     def admin_audit_page() -> str:
+        from urllib.parse import urlencode
+
         import app.db.database as _dbmod
         from app.db.repositories import AuditLogRepository
-        from urllib.parse import urlencode
 
         q = request.args.get("q", "").strip()
         admin_filter = request.args.get("admin_id", "").strip()

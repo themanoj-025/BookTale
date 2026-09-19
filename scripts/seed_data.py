@@ -482,5 +482,3 @@ HOBBIES = [
     "blogging",
     "chess",
 ]
-
-

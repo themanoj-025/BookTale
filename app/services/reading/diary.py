@@ -127,20 +127,24 @@ class DiaryManager:
         # Check for duplicate entry (user + book on same date or without date)
         entries = _load_diary(self.storage)
         for e in entries:
-            if (e["user_id"] == user_id and e["book_id"] == book_id and (not date_read or e.get("date_read", "") == date_read)):
+            if (
+                e["user_id"] == user_id
+                and e["book_id"] == book_id
+                and (not date_read or e.get("date_read", "") == date_read)
+            ):
                 # Update existing entry
-                    e["rating_label"] = rating_label
-                    if star_rating is not None:
-                        e["star_rating"] = star_rating
-                    if diary_text:
-                        e["diary_text"] = diary_text
-                    e["is_reread"] = is_reread
-                    e["spoiler"] = spoiler
-                    e["vibe_tags"] = vibe_tags or []
-                    e["updated_at"] = datetime.now().isoformat()
-                    _save_diary(self.storage, entries)
-                    log(f"Updated diary entry for {book_id}", user_id, rating_label)
-                    return True, "Diary entry updated", e
+                e["rating_label"] = rating_label
+                if star_rating is not None:
+                    e["star_rating"] = star_rating
+                if diary_text:
+                    e["diary_text"] = diary_text
+                e["is_reread"] = is_reread
+                e["spoiler"] = spoiler
+                e["vibe_tags"] = vibe_tags or []
+                e["updated_at"] = datetime.now().isoformat()
+                _save_diary(self.storage, entries)
+                log(f"Updated diary entry for {book_id}", user_id, rating_label)
+                return True, "Diary entry updated", e
 
         if not date_read:
             date_read = date.today().isoformat()

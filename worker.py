@@ -6,9 +6,6 @@ Thin entry point for the RQ worker + cron scheduler. docker-compose's
 app/jobs/worker.py.
 """
 
-import os
-import sys
-
 # Add the project root to sys.path so app package imports work
 
 from app.jobs.worker import main

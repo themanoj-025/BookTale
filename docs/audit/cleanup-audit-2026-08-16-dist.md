@@ -1,6 +1,7 @@
 # Book-Tale — Session Audit (2026-08-16): Committed Build Sync
 
 ## What was done
+
 The repo deliberately commits `app/static/dist/` (hashed build output +
 manifest) so a fresh clone serves hashed URLs without running npm first.
 That committed build had gone **stale** — sources changed since the last
@@ -16,10 +17,12 @@ build output.
   convention while making the artifact auditable/reproducible.
 
 ## Validation
+
 - Rebuild is reproducible; diff against committed dist is now empty.
 - Commit: `3653045`.
 
 ## Note
+
 The repo's `.gitignore` deliberately un-ignores dist (the project serves
 it directly in production without a build step). No gitignore change made —
 the convention is respected, the sync guarantee is now enforced by CI.

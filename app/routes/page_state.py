@@ -8,12 +8,11 @@ dashboard_page_routes. Initialized once by init_page_routes in page_routes.py.
 
 import html as _html
 import logging
-from functools import wraps
-
-from flask import redirect, render_template, session, url_for
-from typing import Any
 from collections.abc import Callable
-from flask import Flask
+from functools import wraps
+from typing import Any
+
+from flask import Flask, redirect, render_template, session, url_for
 
 logger = logging.getLogger(__name__)
 

@@ -7,13 +7,12 @@ the bounded pool when Redis is unreachable, and the cron next-run helper.
 """
 
 import os
-import sys
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
+
 import pytest
 
 pytestmark = pytest.mark.integration
-
 
 
 pytestmark = pytest.mark.slow
@@ -389,7 +388,6 @@ class TestWorkerSchemaEnsure:
         monkeypatch.setattr("app.db.database.create_all", lambda: called.append(True))
         monkeypatch.setenv("STORAGE_BACKEND", "json")
         from app.jobs import worker
-
 
         worker._ensure_schema()
         assert not called

@@ -10,8 +10,8 @@ Delegates to focused modules:
 
 import logging
 
-from app.routes.dashboard import register_dashboard_routes
 from app.routes.books import register_book_routes
+from app.routes.dashboard import register_dashboard_routes
 from app.routes.gamification import register_gamification_routes
 from app.routes.profile import register_profile_routes
 

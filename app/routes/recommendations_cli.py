@@ -93,8 +93,10 @@ def _show_trending(recommender: Recommender) -> None:
     trending = recommender.recommend_trending(top_n=10)
     for i, r in enumerate(trending, 1):
         avail = "✅" if r["available"] > 0 else "❌"
-        logger.info(f"  {i:2}. [{r['book_id']}] {r['title']} — {r['author']} "
-            f"({r['category']}) {avail} Issued: {r['issue_count']}×")
+        logger.info(
+            f"  {i:2}. [{r['book_id']}] {r['title']} — {r['author']} "
+            f"({r['category']}) {avail} Issued: {r['issue_count']}×"
+        )
     pause()
 
 
@@ -104,8 +106,10 @@ def _show_bestsellers(recommender: Recommender) -> None:
     best = recommender.recommend_all_time_best(top_n=10)
     for i, r in enumerate(best, 1):
         avail = "✅" if r["available"] > 0 else "❌"
-        logger.info(f"  {i:2}. [{r['book_id']}] {r['title']} — {r['author']} "
-            f"({r['category']}) {avail} Issued: {r['issue_count']}×")
+        logger.info(
+            f"  {i:2}. [{r['book_id']}] {r['title']} — {r['author']} "
+            f"({r['category']}) {avail} Issued: {r['issue_count']}×"
+        )
     pause()
 
 
@@ -120,8 +124,10 @@ def _show_similar_books(recommender: Recommender) -> None:
         logger.info(f"\n  Similar books to [bold]{recs[0]['title']}[/bold] (score based):\n")
         for r in recs:
             avail = "✅ Available" if r["available"] > 0 else "❌ Unavailable"
-            logger.info(f"  📖 {r['title']} — {r['author']} ({r['category']}) "
-                f"Score: {r['score']} | {avail}")
+            logger.info(
+                f"  📖 {r['title']} — {r['author']} ({r['category']}) "
+                f"Score: {r['score']} | {avail}"
+            )
     pause()
 
 
@@ -136,8 +142,10 @@ def _show_frequently_bought(recommender: Recommender) -> None:
         logger.info(f"\n  Users who borrowed [bold]{recs[0]['title']}[/bold] also borrowed:\n")
         for r in recs:
             avail = "✅" if r["available"] > 0 else "❌"
-            logger.info(f"  📖 {r['title']} — {r['author']} "
-                f"(borrowed together {r['co_borrow_count']}×) {avail}")
+            logger.info(
+                f"  📖 {r['title']} — {r['author']} "
+                f"(borrowed together {r['co_borrow_count']}×) {avail}"
+            )
     pause()
 
 
@@ -157,8 +165,10 @@ def _browse_by_category(recommender: Recommender, lib: Library) -> None:
         books = recommender.recommend_by_category(cat)
         for j, b in enumerate(books, 1):
             avail = "✅" if b["available"] > 0 else "❌"
-            logger.info(f"  {j}. [{b['book_id']}] {b['title']} — {b['author']} "
-                f"({b['issue_count']} issues) {avail}")
+            logger.info(
+                f"  {j}. [{b['book_id']}] {b['title']} — {b['author']} "
+                f"({b['issue_count']} issues) {avail}"
+            )
     except (ValueError, IndexError):
         pass
     pause()
@@ -244,10 +254,12 @@ def _show_seed_trending(recommender: Recommender) -> None:
         print_warning("No seed data available.")
     else:
         for i, r in enumerate(recs, 1):
-            logger.info(f"  {i:2}. 📖 {r['title']} — {r['author']} "
+            logger.info(
+                f"  {i:2}. 📖 {r['title']} — {r['author']} "
                 f"({r['category']}) "
                 f"⭐ {r.get('average_rating', '?')} "
-                f"({r.get('ratings_count', 0):,} ratings)")
+                f"({r.get('ratings_count', 0):,} ratings)"
+            )
     pause()
 
 
@@ -271,8 +283,10 @@ def _show_seed_category(recommender: Recommender) -> None:
         if recs:
             logger.info(f"\n  📚 Top books in [bold]{cat}[/bold] (from Goodreads):\n")
             for i, r in enumerate(recs, 1):
-                logger.info(f"  {i:2}. {r['title']} — {r['author']} "
-                    f"(⭐ {r.get('average_rating', '?')}, {r.get('ratings_count', 0):,} ratings)")
+                logger.info(
+                    f"  {i:2}. {r['title']} — {r['author']} "
+                    f"(⭐ {r.get('average_rating', '?')}, {r.get('ratings_count', 0):,} ratings)"
+                )
     except (ValueError, IndexError):
         pass
     pause()
@@ -291,9 +305,11 @@ def _show_seed_search(recommender: Recommender) -> None:
         logger.info(f"\n  Found {len(recs)} result(s):\n")
         for i, r in enumerate(recs, 1):
             logger.info(f"  {i:2}. 📖 {r['title']}")
-            logger.info(f"      by {r['author']} | {r['category']} | "
+            logger.info(
+                f"      by {r['author']} | {r['category']} | "
                 f"⭐ {r.get('average_rating', '?')} "
-                f"({r.get('ratings_count', 0):,} ratings)")
+                f"({r.get('ratings_count', 0):,} ratings)"
+            )
     pause()
 
 
@@ -309,9 +325,11 @@ def _show_seed_author_books(recommender: Recommender) -> None:
     else:
         logger.info(f"\n  Books by [bold]{author}[/bold] in Goodreads dataset:")
         for i, r in enumerate(recs, 1):
-            logger.info(f"  {i:2}. {r['title']} ({r['category']}) "
+            logger.info(
+                f"  {i:2}. {r['title']} ({r['category']}) "
                 f"⭐ {r.get('average_rating', '?')} "
-                f"({r.get('ratings_count', 0):,} ratings)")
+                f"({r.get('ratings_count', 0):,} ratings)"
+            )
     pause()
 
 
@@ -365,7 +383,9 @@ def seed_import_menu(lib: Library, auth: AuthManager) -> None:
         pause()
         return
 
-    logger.info(f"  [cyan]Seed dataset: {stats['total']:,} books across {stats['categories_count']} categories[/cyan]")
+    logger.info(
+        f"  [cyan]Seed dataset: {stats['total']:,} books across {stats['categories_count']} categories[/cyan]"
+    )
 
     logger.info("\n  Options:")
     logger.info("    1. Import by Category (pick a category)")
@@ -422,8 +442,10 @@ def seed_import_menu(lib: Library, auth: AuthManager) -> None:
 
     logger.info(f"\n  Found {len(books_to_import)} seed book(s):")
     for i, b in enumerate(books_to_import[:10], 1):
-        logger.info(f"  {i:2}. {b['title']} — {b['author']} ({b['category']}) "
-            f"⭐ {b.get('average_rating', '?')}")
+        logger.info(
+            f"  {i:2}. {b['title']} — {b['author']} ({b['category']}) "
+            f"⭐ {b.get('average_rating', '?')}"
+        )
     if len(books_to_import) > 10:
         logger.info(f"      ... and {len(books_to_import) - 10} more")
 
@@ -460,8 +482,8 @@ def seed_import_menu(lib: Library, auth: AuthManager) -> None:
 
 
 # Needed by seed_import_menu
-from app.core.utils import confirm
 import logging
 
-logger = logging.getLogger(__name__)
+from app.core.utils import confirm
 
+logger = logging.getLogger(__name__)

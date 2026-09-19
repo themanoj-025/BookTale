@@ -336,8 +336,9 @@ check(39, "Notification created + unread badge", nm.get_unread_count("MEM-SMOKE1
 # ═══════════════════════════════════════════════════════════════════
 logger.info("== E. Stability & Security ==")
 
-from app.db.storage_adapter import DbStorage
 import logging
+
+from app.db.storage_adapter import DbStorage
 
 logger = logging.getLogger(__name__)
 

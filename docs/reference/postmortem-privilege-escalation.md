@@ -11,13 +11,13 @@ enough to obtain a fully privileged session.
 
 ## Timeline
 
-| Time | Event |
-| ------ | ------- |
-| Audit | `POST /register` reads `request.form.get("role", "user")` and passes it straight to `lib.register_user(...)` |
-| Audit | Confirmed: no server-side validation of `role` anywhere in the registration path |
-| Fix | Registration now only ever accepts `"user"`; any other value (admin, librarian, `""`, crafted payloads) is silently downgraded (CWE-269) |
-| Fix | Added `tests/security/test_web_security.py::TestPrivilegeEscalation` — posts `role=admin` / `role=librarian` and asserts the created account is `role == "user"` |
-| Fix | Fail-fast boot: a default/empty `SECRET_KEY` now refuses to boot (`validate_secure_config`), closing the session-forgery route that could mint `role=admin` cookies on an unconfigured deploy |
+| Time  | Event                                                                                                                                                                                         |
+| ----- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Audit | `POST /register` reads `request.form.get("role", "user")` and passes it straight to `lib.register_user(...)`                                                                                  |
+| Audit | Confirmed: no server-side validation of `role` anywhere in the registration path                                                                                                              |
+| Fix   | Registration now only ever accepts `"user"`; any other value (admin, librarian, `""`, crafted payloads) is silently downgraded (CWE-269)                                                      |
+| Fix   | Added `tests/security/test_web_security.py::TestPrivilegeEscalation` — posts `role=admin` / `role=librarian` and asserts the created account is `role == "user"`                              |
+| Fix   | Fail-fast boot: a default/empty `SECRET_KEY` now refuses to boot (`validate_secure_config`), closing the session-forgery route that could mint `role=admin` cookies on an unconfigured deploy |
 
 ## Root Cause
 

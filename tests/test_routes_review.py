@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import os
-import sys
 import tempfile
 
 import pytest
@@ -31,6 +30,7 @@ for _d in (Config.DATA_DIR, Config.LOGS_DIR, Config.BACKUPS_DIR):
     os.makedirs(_d, exist_ok=True)
 
 from flask.testing import FlaskClient
+
 from web_app import app
 
 
@@ -53,11 +53,9 @@ class TestReviewRoutes:
         assert resp.status_code in (302, 401, 403)
 
     def test_review_submit_requires_auth(self, client: FlaskClient) -> None:
-        resp = client.post("/api/reviews", json={
-            "book_id": "test",
-            "rating": 5,
-            "text": "Great book!"
-        })
+        resp = client.post(
+            "/api/reviews", json={"book_id": "test", "rating": 5, "text": "Great book!"}
+        )
         assert resp.status_code in (302, 401, 403)
 
     def test_review_route_registered(self) -> None:
@@ -70,11 +68,13 @@ class TestReviewHelpers:
 
     def test_h_escapes_html(self) -> None:
         from app.routes.feature_shared import h
+
         assert h("<script>") == "&lt;script&gt;"
         assert h("a & b") == "a &amp; b"
 
     def test_cat_color(self) -> None:
         from app.routes.feature_shared import cat_color
+
         color = cat_color("Mystery")
         assert isinstance(color, str)
         assert len(color) > 0

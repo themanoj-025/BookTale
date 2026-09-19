@@ -12,17 +12,17 @@ registration to the focused sub-modules:
 - diary_routes.py     – reading diary pages + API
 """
 
+from collections.abc import Callable
+
 from flask import Flask
 
 from app.db.models import User
-
-from app.routes.feature_shared import init_shared_state
-from app.routes.series_routes import register_series_routes
 from app.routes.challenge_routes import register_challenge_routes
-from app.routes.progress_routes import register_progress_routes
-from app.routes.wishlist_routes import register_wishlist_routes
 from app.routes.diary_routes import register_diary_routes
-from collections.abc import Callable
+from app.routes.feature_shared import init_shared_state
+from app.routes.progress_routes import register_progress_routes
+from app.routes.series_routes import register_series_routes
+from app.routes.wishlist_routes import register_wishlist_routes
 
 
 def init_feature_routes(
@@ -76,6 +76,7 @@ def init_feature_routes(
             if "user_id" not in session:
                 return redirect(url_for("login_page"))
             return f(*a, **k)
+
         return d
 
     def admin_required(f) -> Callable[[Callable], Callable]:
@@ -86,6 +87,7 @@ def init_feature_routes(
             if session.get("role") != "admin":
                 return jsonify({"error": "Admin access required"}), 403
             return f(*a, **k)
+
         return d
 
     def _rate_limit(limit_value, **kwargs) -> Callable:

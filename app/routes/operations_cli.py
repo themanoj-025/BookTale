@@ -2,6 +2,8 @@
 operations_cli.py - Issue/Return, Overdue, Fine Management, Reservations CLI.
 """
 
+import logging
+
 from app.core.utils import (
     create_table,
     header,
@@ -14,10 +16,8 @@ from app.core.utils import (
 from app.services.auth.auth import AuthManager
 from app.services.books.library import Library
 from app.storage.storage import Storage
-import logging
 
 logger = logging.getLogger(__name__)
-
 
 
 def issue_return_menu(lib: Library, auth: AuthManager) -> None:

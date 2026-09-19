@@ -3,6 +3,7 @@ book_management_cli.py - Book management CLI functions (add, search, update, del
 """
 
 import json
+import logging
 import os
 
 import requests
@@ -22,10 +23,8 @@ from app.core.utils import (
 from app.models.book import CATEGORIES
 from app.services.auth.auth import AuthManager
 from app.services.books.library import Library
-import logging
 
 logger = logging.getLogger(__name__)
-
 
 
 def book_management_menu(lib: Library, auth: AuthManager) -> None:

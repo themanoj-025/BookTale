@@ -8,13 +8,13 @@ db/database.py - Engine & session management.
 """
 
 import os
+from typing import Self
 
 from sqlalchemy import create_engine, event
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import DeclarativeBase, sessionmaker
 
 from app.config.settings import Config
-from typing import Self
 
 
 class Base(DeclarativeBase):

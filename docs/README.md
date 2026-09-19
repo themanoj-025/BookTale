@@ -75,13 +75,13 @@ docs/
 
 ## Guidance
 
-| You want... | Read |
-|---|---|
-| How the system works end-to-end | [architecture.md](architecture.md) |
-| Where everything lives | [folder_structure.md](folder_structure.md) |
-| Architecture decisions | [decisions/0001-fail-fast-secret-key-validation.md](decisions/0001-fail-fast-secret-key-validation.md) |
-| Runbooks (deploy/rollback/restore) | [assets/runbooks/deploy.md](assets/runbooks/deploy.md) |
-| API surface | [technical/API.md](technical/API.md) |
-| Deployment | [technical/Deployment.md](technical/Deployment.md) |
-| What's shipped / next | [project/Tracker.md](project/Tracker.md) |
-| Risks & follow-ups | [project/RiskRegister.md](project/RiskRegister.md) |
+| You want...                        | Read                                                                                                   |
+| ---------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| How the system works end-to-end    | [architecture.md](architecture.md)                                                                     |
+| Where everything lives             | [folder_structure.md](folder_structure.md)                                                             |
+| Architecture decisions             | [decisions/0001-fail-fast-secret-key-validation.md](decisions/0001-fail-fast-secret-key-validation.md) |
+| Runbooks (deploy/rollback/restore) | [assets/runbooks/deploy.md](assets/runbooks/deploy.md)                                                 |
+| API surface                        | [technical/API.md](technical/API.md)                                                                   |
+| Deployment                         | [technical/Deployment.md](technical/Deployment.md)                                                     |
+| What's shipped / next              | [project/Tracker.md](project/Tracker.md)                                                               |
+| Risks & follow-ups                 | [project/RiskRegister.md](project/RiskRegister.md)                                                     |

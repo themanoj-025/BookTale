@@ -2,6 +2,8 @@
 notifications_cli.py - In-app and Email Notification CLI.
 """
 
+import logging
+
 from app.config.settings import Config
 from app.core.logger import log
 from app.core.utils import (
@@ -17,10 +19,8 @@ from app.core.utils import (
 )
 from app.services.books.library import Library
 from app.services.notifications.notifications import NotificationManager
-import logging
 
 logger = logging.getLogger(__name__)
-
 
 
 def show_notification_badge(notif_mgr: NotificationManager, user_id: str) -> None:

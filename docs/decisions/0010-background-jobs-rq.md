@@ -59,7 +59,7 @@ also runs a small cron scheduler thread. Deliverables:
   Celery pulls in `kombu`, `billiard`, and a heavier config surface.
 - **Operational simplicity:** `rq worker` semantics are transparent; job
   state lives in the Redis the stack already runs. Debugging is a `redis-cli
-  LRANGE booktale` away.
+LRANGE booktale` away.
 - **Consistency:** Flask-Limiter and Socket.IO already use the same Redis;
   one infrastructure primitive (Redis) for rate limits, realtime, and jobs.
 

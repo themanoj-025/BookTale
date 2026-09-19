@@ -11,7 +11,6 @@ from app.services.books.series import SeriesManager
 pytestmark = pytest.mark.unit
 
 
-
 @pytest.fixture()
 def mgr() -> SeriesManager:
     storage = MagicMock()
@@ -52,8 +51,9 @@ class TestSeriesCRUD:
 
     def test_delete_series(self, mgr: SeriesManager) -> None:
         series = [{"series_id": "S1", "name": "A"}]
-        with patch.object(mgr, "_load_series", return_value=series), patch.object(
-            mgr, "_save_series"
+        with (
+            patch.object(mgr, "_load_series", return_value=series),
+            patch.object(mgr, "_save_series"),
         ):
             ok, _msg = mgr.delete_series("S1")
             assert ok is True

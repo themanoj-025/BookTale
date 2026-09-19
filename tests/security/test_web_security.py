@@ -16,10 +16,10 @@ import json
 import os
 import sys
 import tempfile
+
 import pytest
 
 pytestmark = pytest.mark.integration
-
 
 
 pytestmark = pytest.mark.slow
@@ -1323,4 +1323,3 @@ class TestRateLimiting:
             assert (
                 'exempt_when=lambda: request.method == "GET"' in block
             ), f"{marker} must exempt GET page loads"
-

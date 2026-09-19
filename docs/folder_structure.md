@@ -66,11 +66,11 @@ docs/
 
 ## 3. Change log (this pass)
 
-| Old path | New path | Reason | Mechanism |
-|---|---|---|---|
-| `docs/assets/agents/AGENTS_FIX.md` | *removed* | Leftover v7.0 prompt scaffolding (same file duplicated in 16 sibling repos); archived copy had zero consumers | `git rm` |
-| `docs/assets/agents/AGENTS.md` + `.cursorrules` | *removed* | Archived universal master-prompt template (generic, zero project content, zero consumers); the repo's real agent instructions live in `.github/copilot-instructions.md` | `git rm` (2026-08-15 docs audit) |
-| `requirements.txt` (dup block) | deduped | `pandas/numpy/Pillow` pinned twice identically; removed redundant block (resolved set unchanged) | edit |
+| Old path                                        | New path  | Reason                                                                                                                                                                  | Mechanism                        |
+| ----------------------------------------------- | --------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------- |
+| `docs/assets/agents/AGENTS_FIX.md`              | _removed_ | Leftover v7.0 prompt scaffolding (same file duplicated in 16 sibling repos); archived copy had zero consumers                                                           | `git rm`                         |
+| `docs/assets/agents/AGENTS.md` + `.cursorrules` | _removed_ | Archived universal master-prompt template (generic, zero project content, zero consumers); the repo's real agent instructions live in `.github/copilot-instructions.md` | `git rm` (2026-08-15 docs audit) |
+| `requirements.txt` (dup block)                  | deduped   | `pandas/numpy/Pillow` pinned twice identically; removed redundant block (resolved set unchanged)                                                                        | edit                             |
 
 Reference updates: `.dockerignore` (dropped `AGENTS_FIX.md` exclusion).
 The CHANGELOG's historical note about the earlier `docs/agents/` move is a
@@ -78,15 +78,15 @@ factual record and was left intact.
 
 ## 4. Root allowlist compliance
 
-| Root entry | Status |
-|---|---|
-| `main.py`, `start.py`, `web_app.py`, `worker.py` | ✔ entry points (thin wrappers) |
-| `Dockerfile`, `docker-compose.yml`, `docker/` | ✔ container tooling |
-| `Makefile`, `pyproject.toml`, `requirements.txt`, `package.json`, `alembic.ini` | ✔ standard metadata |
-| `README.md`, `PROJECT_OVERVIEW.md`, `PROJECT_ANALYSIS.md`, `SMOKE_TEST.md`, `LICENSE` | ✔ metadata / docs |
-| `app/`, `migrations/`, `tests/`, `docs/`, `scripts/`, `docker/`, `.github/` | ✔ top-level folders |
-| `apex_lib.bat`, `apex_lib_install.bat`, `start.bat` | ✔ platform helpers (flagged §6.3) |
-| `.env.example`, `.gitignore`, `.dockerignore`, `.editorconfig`, `.gitattributes`, `.vscode/`, `.gemini/` | ✔ config / metadata |
+| Root entry                                                                                               | Status                             |
+| -------------------------------------------------------------------------------------------------------- | ---------------------------------- |
+| `main.py`, `start.py`, `web_app.py`, `worker.py`                                                         | ✔ entry points (thin wrappers)    |
+| `Dockerfile`, `docker-compose.yml`, `docker/`                                                            | ✔ container tooling               |
+| `Makefile`, `pyproject.toml`, `requirements.txt`, `package.json`, `alembic.ini`                          | ✔ standard metadata               |
+| `README.md`, `PROJECT_OVERVIEW.md`, `PROJECT_ANALYSIS.md`, `SMOKE_TEST.md`, `LICENSE`                    | ✔ metadata / docs                 |
+| `app/`, `migrations/`, `tests/`, `docs/`, `scripts/`, `docker/`, `.github/`                              | ✔ top-level folders               |
+| `apex_lib.bat`, `apex_lib_install.bat`, `start.bat`                                                      | ✔ platform helpers (flagged §6.3) |
+| `.env.example`, `.gitignore`, `.dockerignore`, `.editorconfig`, `.gitattributes`, `.vscode/`, `.gemini/` | ✔ config / metadata               |
 
 Result: **no stray files remain at root**.
 

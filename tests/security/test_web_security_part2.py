@@ -11,7 +11,9 @@ SECRET_KEY BEFORE importing web_app (whose module-level code runs bootstrap and
 fail-fast boot validation). — Part 2."""
 
 import io
+
 import pytest
+
 from app.config.settings import Config
 from web_app import storage
 
@@ -421,7 +423,6 @@ class TestUploadValidation:
         """A genuine 1x1 PNG uploads (re-encoded) and is served back."""
         _login(client)
         import base64
-
 
         png = base64.b64decode(
             "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJ"

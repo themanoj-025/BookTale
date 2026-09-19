@@ -6,10 +6,10 @@ Extracted from feature_routes.py for focused maintenance.
 import json
 from datetime import datetime
 
-from flask import jsonify, request, session
+from flask import Response, jsonify, request, session
 
-from app.routes.feature_shared import _challenge, h, _avatar_html as avatar_html
-from flask import Response
+from app.routes.feature_shared import _avatar_html as avatar_html
+from app.routes.feature_shared import _challenge, h
 
 
 def register_challenge_routes(app, login_required, render_page, _rate_limit) -> None:
@@ -46,14 +46,24 @@ def register_challenge_routes(app, login_required, render_page, _rate_limit) -> 
             lb_bar_c = "var(--success)" if entry["percentage"] >= 100 else "var(--primary)"
             LB += (
                 '<div class="d-flex align-items-center gap-2 mb-2">'
-                '<span style="width:28px;text-align:center;font-weight:700;">' + medal + '</span>'
-                + lb_avatar +
-                '<div class="flex-grow-1" style="min-width:0;">'
-                '<div class="fw-bold small">' + h(entry["name"]) + '</div>'
-                '<div class="progress-thin"><div class="bar" style="width:' + str(lb_bar_w) + '%;background:' + lb_bar_c + ';"></div></div>'
-                '</div>'
-                '<small class="fw-bold">' + str(entry["count"]) + '/' + str(entry.get("goal") or "—") + '</small>'
-                '</div>'
+                '<span style="width:28px;text-align:center;font-weight:700;">'
+                + medal
+                + "</span>"
+                + lb_avatar
+                + '<div class="flex-grow-1" style="min-width:0;">'
+                '<div class="fw-bold small">' + h(entry["name"]) + "</div>"
+                '<div class="progress-thin"><div class="bar" style="width:'
+                + str(lb_bar_w)
+                + "%;background:"
+                + lb_bar_c
+                + ';"></div></div>'
+                "</div>"
+                '<small class="fw-bold">'
+                + str(entry["count"])
+                + "/"
+                + str(entry.get("goal") or "—")
+                + "</small>"
+                "</div>"
             )
         if not LB:
             LB = '<div class="text-center text-muted small py-3">No data yet. Start reading!</div>'
@@ -62,59 +72,89 @@ def register_challenge_routes(app, login_required, render_page, _rate_limit) -> 
         for y in range(year - 2, year + 1):
             cls = "btn-primary" if y == year else "btn-outline"
             yr_label = ("📅 " if y == datetime.now().year else "") + str(y)
-            YEAR_SELECTOR += '<a href="/reading-challenge?year=' + str(y) + '" class="btn ' + cls + ' btn-sm">' + yr_label + '</a>'
+            YEAR_SELECTOR += (
+                '<a href="/reading-challenge?year='
+                + str(y)
+                + '" class="btn '
+                + cls
+                + ' btn-sm">'
+                + yr_label
+                + "</a>"
+            )
 
         CONTENT = (
             '<div class="animate-in">'
             '<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">'
             '<h4 class="fw-bold mb-0"><i class="bi bi-trophy-fill me-2 text-warning"></i>Reading Challenge</h4>'
-            '<div class="d-flex gap-1">' + YEAR_SELECTOR + '</div>'
-            '</div>'
+            '<div class="d-flex gap-1">' + YEAR_SELECTOR + "</div>"
+            "</div>"
             '<div class="row mb-3">'
             '<div class="col-lg-8 mb-3">'
             '<div class="glass-card p-4">'
             '<div class="d-flex justify-content-between align-items-start mb-3">'
-            '<div>'
-            '<h5 class="fw-bold mb-1">' + str(year) + ' Reading Goal</h5>'
-            '<p class="text-muted small mb-0">' + str(len(chart.get("monthly", []))) + ' months of data</p>'
-            '</div>'
+            "<div>"
+            '<h5 class="fw-bold mb-1">' + str(year) + " Reading Goal</h5>"
+            '<p class="text-muted small mb-0">'
+            + str(len(chart.get("monthly", [])))
+            + " months of data</p>"
+            "</div>"
             '<div class="text-end">'
-            '<div style="font-size:2rem;font-weight:800;color:var(--primary);">' + str(goal.get("progress", 0)) + '<span style="font-size:1rem;color:var(--text-muted);">/' + str(goal.get("goal", 0)) + '</span></div>'
+            '<div style="font-size:2rem;font-weight:800;color:var(--primary);">'
+            + str(goal.get("progress", 0))
+            + '<span style="font-size:1rem;color:var(--text-muted);">/'
+            + str(goal.get("goal", 0))
+            + "</span></div>"
             '<div class="small text-muted">books read</div>'
-            '</div>'
-            '</div>'
+            "</div>"
+            "</div>"
             '<div class="progress-thin mb-3" style="height:12px;border-radius:6px;">'
-            '<div class="bar" style="width:' + str(progress_pct) + '%;background:' + progress_bar_color + ';height:12px;border-radius:6px;"></div>'
-            '</div>'
+            '<div class="bar" style="width:'
+            + str(progress_pct)
+            + "%;background:"
+            + progress_bar_color
+            + ';height:12px;border-radius:6px;"></div>'
+            "</div>"
             '<div class="d-flex justify-content-between align-items-center">'
             '<div class="d-flex gap-2 flex-wrap">'
-            '<span class="badge" style="background:var(--primary)20;color:var(--primary);">📈 Pace: ' + str(goal.get("pace", 0)) + '/mo</span>'
-            '<span class="badge" style="background:#10b98120;color:#10b981;">📊 Projected: ' + str(goal.get("projected_total", 0)) + '</span>'
-            + on_track_badge +
-            '</div>'
+            '<span class="badge" style="background:var(--primary)20;color:var(--primary);">📈 Pace: '
+            + str(goal.get("pace", 0))
+            + "/mo</span>"
+            '<span class="badge" style="background:#10b98120;color:#10b981;">📊 Projected: '
+            + str(goal.get("projected_total", 0))
+            + "</span>"
+            + on_track_badge
+            + "</div>"
             '<div class="d-flex gap-1">'
             '<button class="btn btn-primary btn-sm" onclick="setReadingGoal()"><i class="bi bi-pencil"></i> Set Goal</button>'
-            '</div>'
-            '</div>'
+            "</div>"
+            "</div>"
             '<hr style="border-color:var(--border);">'
             '<div class="row text-center">'
-            '<div class="col-4"><span class="fw-bold text-success">' + str(goal.get("progress", 0)) + '</span><br><small class="text-muted">Read</small></div>'
-            '<div class="col-4"><span class="fw-bold text-warning">' + str(goal.get("remaining", 0)) + '</span><br><small class="text-muted">Remaining</small></div>'
-            '<div class="col-4"><span class="fw-bold text-info">' + str(goal.get("days_remaining", 0)) + '</span><br><small class="text-muted">Days Left</small></div>'
-            '</div>'
-            '</div>'
-            '</div>'
+            '<div class="col-4"><span class="fw-bold text-success">'
+            + str(goal.get("progress", 0))
+            + '</span><br><small class="text-muted">Read</small></div>'
+            '<div class="col-4"><span class="fw-bold text-warning">'
+            + str(goal.get("remaining", 0))
+            + '</span><br><small class="text-muted">Remaining</small></div>'
+            '<div class="col-4"><span class="fw-bold text-info">'
+            + str(goal.get("days_remaining", 0))
+            + '</span><br><small class="text-muted">Days Left</small></div>'
+            "</div>"
+            "</div>"
+            "</div>"
             '<div class="col-lg-4 mb-3">'
             '<div class="glass-card p-3 h-100">'
-            '<div class="section-title"><i class="bi bi-trophy-fill text-warning"></i> Leaderboard ' + str(year) + '</div>'
-            '<div style="max-height:350px;overflow-y:auto;">' + LB + '</div>'
-            '</div>'
-            '</div>'
-            '</div>'
+            '<div class="section-title"><i class="bi bi-trophy-fill text-warning"></i> Leaderboard '
+            + str(year)
+            + "</div>"
+            '<div style="max-height:350px;overflow-y:auto;">' + LB + "</div>"
+            "</div>"
+            "</div>"
+            "</div>"
             '<div class="glass-card p-3 mb-3 animate-d1">'
             '<div class="section-title"><i class="bi bi-graph-up-arrow text-primary"></i> Monthly Progress</div>'
             '<div class="chart-container" style="height:250px;"><canvas id="challengeChart"></canvas></div>'
-            '</div>'
+            "</div>"
             '<div class="glass-card p-3 animate-d2">'
             '<div class="section-title"><i class="bi bi-calendar-check"></i> Past Challenges</div>'
             '<div class="row g-2">'
@@ -122,12 +162,18 @@ def register_challenge_routes(app, login_required, render_page, _rate_limit) -> 
         for y in summary.get("years", []):
             CONTENT += (
                 '<div class="col-md-4"><div class="glass-card p-3 text-center">'
-                '<div class="fw-bold">' + str(y["year"]) + '</div>'
-                '<div class="progress-thin mt-2"><div class="bar" style="width:' + str(y["percentage"]) + '%;background:var(--primary);"></div></div>'
-                '<div class="mt-1"><span class="fw-bold">' + str(y["progress"]) + '</span><small class="text-muted">/' + str(y["goal"]) + '</small></div>'
-                '</div></div>'
+                '<div class="fw-bold">' + str(y["year"]) + "</div>"
+                '<div class="progress-thin mt-2"><div class="bar" style="width:'
+                + str(y["percentage"])
+                + '%;background:var(--primary);"></div></div>'
+                '<div class="mt-1"><span class="fw-bold">'
+                + str(y["progress"])
+                + '</span><small class="text-muted">/'
+                + str(y["goal"])
+                + "</small></div>"
+                "</div></div>"
             )
-        CONTENT += '</div></div></div>'
+        CONTENT += "</div></div></div>"
 
         # Chart.js data
         chart_js = ""
@@ -153,9 +199,9 @@ def register_challenge_routes(app, login_required, render_page, _rate_limit) -> 
 
         goal_val = goal.get("goal", 0)
         CONTENT += (
-            '<script>'
-            'function setReadingGoal(){'
-            'var current=' + str(goal_val) + ';'
+            "<script>"
+            "function setReadingGoal(){"
+            "var current=" + str(goal_val) + ";"
             'var g=prompt("How many books do you want to read in ' + str(year) + '?",current||12);'
             "if(g&&parseInt(g)>0){"
             "fetch('/api/reading-challenge/goal',{"
@@ -165,8 +211,7 @@ def register_challenge_routes(app, login_required, render_page, _rate_limit) -> 
             "if(d.success){showToast(d.message,'success');setTimeout(function(){location.reload()},1200)}"
             "else{showToast(d.error,'error')}"
             "});}}"
-            '}' + chart_js +
-            '</script>'
+            "}" + chart_js + "</script>"
         )
         return render_page("Reading Challenge", CONTENT)
 

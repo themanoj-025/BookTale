@@ -1,11 +1,11 @@
 # Rules — Book-Tale: Coding Standards & AI-Agent Operating Rules
 
-| Field | Value |
-| --- | --- |
-| Version | v0.1 |
-| Last Updated | 2026-08-06 |
-| Owner | Engineering Lead |
-| Status | In Review |
+| Field        | Value            |
+| ------------ | ---------------- |
+| Version      | v0.1             |
+| Last Updated | 2026-08-06       |
+| Owner        | Engineering Lead |
+| Status       | In Review        |
 
 ---
 
@@ -87,14 +87,14 @@ tests/         # unit + security suites
 
 ## 8. Prohibited Patterns
 
-| Anti-pattern | Why |
-| --- | --- |
-| `except Exception: pass` | Silent failure (except audit path) |
-| Raw SQL with f-strings | SQL injection |
-| Trusting upload extension alone | Magic-byte bypass |
-| Hardcoding SECRET_KEY | Trivial compromise |
-| State changes without CSRF token | CSRF |
-| Per-process `hash()` randomness for avatars | Nondeterministic UI |
+| Anti-pattern                                | Why                                |
+| ------------------------------------------- | ---------------------------------- |
+| `except Exception: pass`                    | Silent failure (except audit path) |
+| Raw SQL with f-strings                      | SQL injection                      |
+| Trusting upload extension alone             | Magic-byte bypass                  |
+| Hardcoding SECRET_KEY                       | Trivial compromise                 |
+| State changes without CSRF token            | CSRF                               |
+| Per-process `hash()` randomness for avatars | Nondeterministic UI                |
 
 ## 9. Escalation Rules
 
@@ -120,18 +120,18 @@ flowchart TD
 
 ## 10. Related Documents
 
-| Document | Relationship |
-| --- | --- |
-| [Testing.md](../technical/Testing.md) | Test requirements |
+| Document                                                          | Relationship      |
+| ----------------------------------------------------------------- | ----------------- |
+| [Testing.md](../technical/Testing.md)                             | Test requirements |
 | [SecurityAndCompliance.md](../technical/SecurityAndCompliance.md) | Security baseline |
-| [PRD.md](../product/PRD.md) | Requirements |
-| [TechSpec.md](../technical/TechSpec.md) | Architecture |
-| [AppFlow.md](../design/AppFlow.md) | Flows |
-| [Design.md](../design/Design.md) | Design system |
-| [Schema.md](../technical/Schema.md) | Data model |
-| [ImplementationPlan.md](ImplementationPlan.md) | Tasks |
-| [Tracker.md](Tracker.md) | Status |
-| [API.md](../technical/API.md) | Contract |
-| [Deployment.md](../technical/Deployment.md) | Env vars |
-| [Glossary.md](../reference/Glossary.md) | Vocabulary |
-| [RiskRegister.md](RiskRegister.md) | Risks |
+| [PRD.md](../product/PRD.md)                                       | Requirements      |
+| [TechSpec.md](../technical/TechSpec.md)                           | Architecture      |
+| [AppFlow.md](../design/AppFlow.md)                                | Flows             |
+| [Design.md](../design/Design.md)                                  | Design system     |
+| [Schema.md](../technical/Schema.md)                               | Data model        |
+| [ImplementationPlan.md](ImplementationPlan.md)                    | Tasks             |
+| [Tracker.md](Tracker.md)                                          | Status            |
+| [API.md](../technical/API.md)                                     | Contract          |
+| [Deployment.md](../technical/Deployment.md)                       | Env vars          |
+| [Glossary.md](../reference/Glossary.md)                           | Vocabulary        |
+| [RiskRegister.md](RiskRegister.md)                                | Risks             |

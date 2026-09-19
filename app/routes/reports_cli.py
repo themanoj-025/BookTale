@@ -3,6 +3,7 @@ reports_cli.py - Reports, Analytics, and CSV Export CLI.
 """
 
 import csv
+import logging
 import os
 from datetime import datetime
 
@@ -14,10 +15,8 @@ from app.core.utils import (
     print_success,
 )
 from app.services.books.library import Library
-import logging
 
 logger = logging.getLogger(__name__)
-
 
 
 def reports_menu(lib: Library) -> None:
@@ -37,7 +36,9 @@ def reports_menu(lib: Library) -> None:
             data = lib.report_most_issued()
             header("📚 Most Issued Books")
             for i, r in enumerate(data, 1):
-                logger.info(f"  {i:2}. [{r['id']}] {r['title']} — {r['author']} " f"| Issued {r['count']}×")
+                logger.info(
+                    f"  {i:2}. [{r['id']}] {r['title']} — {r['author']} " f"| Issued {r['count']}×"
+                )
         elif choice == "2":
             data = lib.report_active_users()
             header("🏆 Most Active Users")

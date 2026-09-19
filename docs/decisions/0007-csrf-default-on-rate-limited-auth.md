@@ -79,16 +79,16 @@ an in-memory per-user lockout (a per-user DoS primitive, not IP throttling).
   → `user:<user_id>` from the session) so a distributed attacker cannot evade
   the budget by spreading requests across many source IPs:
 
-| Route | Key | Limit | What counts |
-| --- | --- | --- | --- |
-| `/login` (POST only) | IP | 10/min | `deduct_when` — only **failed** credential attempts; GET page loads exempt |
-| `/register`, `/forgot-password`, `/reset-password` (POST only) | IP | 5/min | `methods=["POST"]` + `exempt_when` GET — POST submissions only; GET page loads exempt |
-| `/api/settings/save` | **account** | 10/min | `deduct_when` — only **failed password changes** |
-| `/api/admin/settings/save` | **account** | 10/min | `deduct_when` — only **failed admin-password verifications** |
-| `/api/profile/update` | IP | 10/min | `deduct_when` — only requests that **submit an `email` field** (account-takeover vector; email is a reset identity) |
-| `/api/upload` | IP | 10/min | every request (file-write / storage-abuse vector) |
-| `/api/series/<series_id>/delete` | IP | 20/min | every request (admin destructive) |
-| `/api/wishlist/<suggestion_id>/moderate` | IP | 20/min | every request (admin moderation) |
+| Route                                                          | Key         | Limit  | What counts                                                                                                         |
+| -------------------------------------------------------------- | ----------- | ------ | ------------------------------------------------------------------------------------------------------------------- |
+| `/login` (POST only)                                           | IP          | 10/min | `deduct_when` — only **failed** credential attempts; GET page loads exempt                                          |
+| `/register`, `/forgot-password`, `/reset-password` (POST only) | IP          | 5/min  | `methods=["POST"]` + `exempt_when` GET — POST submissions only; GET page loads exempt                               |
+| `/api/settings/save`                                           | **account** | 10/min | `deduct_when` — only **failed password changes**                                                                    |
+| `/api/admin/settings/save`                                     | **account** | 10/min | `deduct_when` — only **failed admin-password verifications**                                                        |
+| `/api/profile/update`                                          | IP          | 10/min | `deduct_when` — only requests that **submit an `email` field** (account-takeover vector; email is a reset identity) |
+| `/api/upload`                                                  | IP          | 10/min | every request (file-write / storage-abuse vector)                                                                   |
+| `/api/series/<series_id>/delete`                               | IP          | 20/min | every request (admin destructive)                                                                                   |
+| `/api/wishlist/<suggestion_id>/moderate`                       | IP          | 20/min | every request (admin moderation)                                                                                    |
 
 - **Shared-surface & engagement endpoints** (audit pass over the remaining
   non-sensitive POSTs): every POST that writes shared-surface content (feed
@@ -96,35 +96,35 @@ an in-memory per-user lockout (a per-user DoS primitive, not IP throttling).
   compromised session can't flood the feed or stuff votes under the 200/min
   default. Three tiers, all keyed per IP:
 
-| Route | Limit | Why |
-| --- | --- | --- |
-| `/api/posts` (create), `/api/posts/<id>/repost` | 30/min | content spam / amplification |
-| `/api/posts/<id>/comments`, `/api/comments/<id>/reply`, `/api/reviews/<id>/comments` | 30/min (POST only) | comment spam — GET fetches exempt |
-| `/api/reviews/<book_id>`, `/api/books/<id>/review` | 30/min | review spam |
-| `/api/lists` (create), `/api/shelves/create` | 30/min | public list / shelf spam |
-| `/api/wishlist/<id>/comment` | 30/min | suggestion comment spam |
-| `/api/clubs/create`, `/api/wishlist/suggest` | 10/min | create-heavy: club spam / moderation-queue flood |
-| `/api/ai/chat` | 30/min | companion spam / load |
+| Route                                                                                | Limit              | Why                                              |
+| ------------------------------------------------------------------------------------ | ------------------ | ------------------------------------------------ |
+| `/api/posts` (create), `/api/posts/<id>/repost`                                      | 30/min             | content spam / amplification                     |
+| `/api/posts/<id>/comments`, `/api/comments/<id>/reply`, `/api/reviews/<id>/comments` | 30/min (POST only) | comment spam — GET fetches exempt                |
+| `/api/reviews/<book_id>`, `/api/books/<id>/review`                                   | 30/min             | review spam                                      |
+| `/api/lists` (create), `/api/shelves/create`                                         | 30/min             | public list / shelf spam                         |
+| `/api/wishlist/<id>/comment`                                                         | 30/min             | suggestion comment spam                          |
+| `/api/clubs/create`, `/api/wishlist/suggest`                                         | 10/min             | create-heavy: club spam / moderation-queue flood |
+| `/api/ai/chat`                                                                       | 30/min             | companion spam / load                            |
 
-  The three auth **form** routes were initially scoped as plain `5/min`
-  (`@_rate_limit("5 per minute")` with no method restriction), which made GET
-  page loads consume the budget — the 6th page load in a minute returned 429
-  (a real journey breaker). `scripts/smoke_live.py` (real-HTTP run with
-  rate limiting ON) exposed this; all three now mirror the login route's
-  GET-exempt split (`methods=["POST"]` + `exempt_when`), and the fix is locked
-  by `TestRateLimiting::test_auth_form_*` probes + a decorator-scoping
-  assertion.
+The three auth **form** routes were initially scoped as plain `5/min`
+(`@_rate_limit("5 per minute")` with no method restriction), which made GET
+page loads consume the budget — the 6th page load in a minute returned 429
+(a real journey breaker). `scripts/smoke_live.py` (real-HTTP run with
+rate limiting ON) exposed this; all three now mirror the login route's
+GET-exempt split (`methods=["POST"]` + `exempt_when`), and the fix is locked
+by `TestRateLimiting::test_auth_form_*` probes + a decorator-scoping
+assertion.
 | `/api/posts/<id>/like`, `/api/posts/<id>/vote`, `/api/reviews/<id>/helpful`, `/api/follow/<user_id>`, `/api/lists/<id>/follow`, `/api/lists/<id>/upvote`, `/api/wishlist/<id>/vote`, `/api/clubs/<id>/join` | 60/min | engagement manipulation (like/vote/helpful farming, follow churn) |
 
-  **Deliberately left at the 200/min default** (self-scoped actions that only
-  mutate the caller's own data and have no shared-surface or cross-user side
-  effects): notifications read/read-all, bookshelves add/remove,
-  `/api/profile/favorites/{add,remove,reorder}`, post/shelf delete + shelf
-  rename, club leave, reading-goal/progress updates, bookmarks, diary log.
+**Deliberately left at the 200/min default** (self-scoped actions that only
+mutate the caller's own data and have no shared-surface or cross-user side
+effects): notifications read/read-all, bookshelves add/remove,
+`/api/profile/favorites/{add,remove,reorder}`, post/shelf delete + shelf
+rename, club leave, reading-goal/progress updates, bookmarks, diary log.
 
-  `_user_key()` falls back to `ip:<remote_addr>` when no session exists
-  (defensive; both password-change endpoints are login/admin-required, so a
-  session is always present by the time the limiter runs).
+`_user_key()` falls back to `ip:<remote_addr>` when no session exists
+(defensive; both password-change endpoints are login/admin-required, so a
+session is always present by the time the limiter runs).
 
 **Session-cookie hardening (same phase):** `SESSION_COOKIE_HTTPONLY=True` and
 `SESSION_COOKIE_SAMESITE=Lax` are always set; `SESSION_COOKIE_SECURE` is set in
@@ -149,7 +149,7 @@ session cookie out of JS; SameSite=Lax blocks cross-site POSTs from carrying it
 - One fetch interceptor covers the whole XHR surface; one decorator pattern
   covers auth throttling.
 - Per-IP throttling replaces the per-user lockout as the first line of defense
-  (the lockout remains, but the *attempt* is throttled, not the victim's
+  (the lockout remains, but the _attempt_ is throttled, not the victim's
   account).
 - Explicit env opt-outs make test-mode behavior visible and auditable.
 
@@ -195,7 +195,7 @@ session cookie out of JS; SameSite=Lax blocks cross-site POSTs from carrying it
   the auth form routes (`register`/`forgot-password`/`reset-password`),
   locked by `test_auth_form_get_page_loads_never_consume_budget`,
   `test_auth_form_post_budget_breaches_429`, and
-  `test_auth_form_decorators_scope_to_post`. Per-account  keying is covered by probes that exhaust User A's budget and prove User B on
+  `test_auth_form_decorators_scope_to_post`. Per-account keying is covered by probes that exhaust User A's budget and prove User B on
   the **same IP** gets a fresh one, plus a scoping test asserting `_user_key()`
   yields `user:<id>` distinct per account.
 - `TestRedisLimiterStorage`: the app limiter's `_storage_uri` resolves to

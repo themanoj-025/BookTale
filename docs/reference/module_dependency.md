@@ -49,21 +49,21 @@ config — never on routes. Routes depend on services, realtime, and api.
 
 ## Key cross-cutting dependencies
 
-| Consumer | Depends on |
-| ---------- | ------------ |
-| `routes/web_app.py` | all services, `db.storage_adapter`, `realtime`, `routes.main` (bootstrap) |
-| `routes/page_routes.py` | services, `models.book` (CATEGORIES), `db.database` |
-| `services/books/library.py` | `models.book`, `models.user`, `storage`, `jobs.jobs` (enqueue cover fetch) |
-| `services/recommendations/recommender.py` | `models.book`, `storage`, `recommendations.seed_data` |
-| `jobs/tasks.py` | `core.logger`, `services.books.cover_service`, `db.storage_adapter` |
-| `jobs/jobs.py` | `config`, `core.logger` |
-| `db/database.py` | `config`, imports `db.models` for metadata |
-| `scripts/seed_users.py` | `services.auth.auth`, `models.user`, `config`, `db.storage_adapter` |
+| Consumer                                  | Depends on                                                                 |
+| ----------------------------------------- | -------------------------------------------------------------------------- |
+| `routes/web_app.py`                       | all services, `db.storage_adapter`, `realtime`, `routes.main` (bootstrap)  |
+| `routes/page_routes.py`                   | services, `models.book` (CATEGORIES), `db.database`                        |
+| `services/books/library.py`               | `models.book`, `models.user`, `storage`, `jobs.jobs` (enqueue cover fetch) |
+| `services/recommendations/recommender.py` | `models.book`, `storage`, `recommendations.seed_data`                      |
+| `jobs/tasks.py`                           | `core.logger`, `services.books.cover_service`, `db.storage_adapter`        |
+| `jobs/jobs.py`                            | `config`, `core.logger`                                                    |
+| `db/database.py`                          | `config`, imports `db.models` for metadata                                 |
+| `scripts/seed_users.py`                   | `services.auth.auth`, `models.user`, `config`, `db.storage_adapter`        |
 
 ## Import conventions
 
 - All intra-app imports use the `app.` package prefix (`from app.config.settings
-  import Config`), never bare top-level modules and never `sys.path` games
+import Config`), never bare top-level modules and never `sys.path` games
   inside `app/`.
 - Route modules receive their dependencies as parameters from the app factory
   (`init_*_routes(app, storage, lib, ...)`) instead of importing `web_app`
