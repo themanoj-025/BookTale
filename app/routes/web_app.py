@@ -136,7 +136,7 @@ def _audit_log(
             )
     except (OSError, ValueError) as e:
         log(
-            f"audit write failed (admin={admin_id}, action={action}, " f"target={target}): {e}",
+            f"audit write failed (admin={admin_id}, action={action}, target={target}): {e}",
             "audit",
         )
 

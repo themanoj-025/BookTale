@@ -135,7 +135,7 @@ def _ensure_schema() -> None:
         log("Worker: relational schema verified (create_all)", "worker")
     except (OSError, RuntimeError) as e:
         log(
-            f"Worker: schema ensure failed (DB jobs will fail until the " f"schema exists): {e}",
+            f"Worker: schema ensure failed (DB jobs will fail until the schema exists): {e}",
             "worker",
         )
 

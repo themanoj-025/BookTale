@@ -125,8 +125,7 @@ def _show_similar_books(recommender: Recommender) -> None:
         for r in recs:
             avail = "✅ Available" if r["available"] > 0 else "❌ Unavailable"
             logger.info(
-                f"  📖 {r['title']} — {r['author']} ({r['category']}) "
-                f"Score: {r['score']} | {avail}"
+                f"  📖 {r['title']} — {r['author']} ({r['category']}) Score: {r['score']} | {avail}"
             )
     pause()
 

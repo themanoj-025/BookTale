@@ -277,7 +277,7 @@ class BookLists:
         lists = self._load_lists()
         public = [lst for lst in lists if lst["is_public"]]
         public.sort(
-            key=lambda l: (l.get("upvotes", 0) * 3 + len(l["followers"]) * 2 + len(l["books"])),
+            key=lambda l: l.get("upvotes", 0) * 3 + len(l["followers"]) * 2 + len(l["books"]),
             reverse=True,
         )
         return public[:limit]
