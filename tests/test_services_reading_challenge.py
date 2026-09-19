@@ -17,12 +17,11 @@ def mgr() -> ReadingChallenge:
 
 class TestReadingChallenge:
     def test_create_challenge(self, mgr: ReadingChallenge) -> None:
-        with patch.object(mgr, "_load_challenges", return_value=[]), patch.object(
-            mgr, "_save_challenges"
+        with (
+            patch.object(mgr, "_load_challenges", return_value=[]),
+            patch.object(mgr, "_save_challenges"),
         ):
-            ok, _msg, ch = mgr.create_challenge(
-                "u1", "Read 20 books in 2026", target=20
-            )
+            ok, _msg, ch = mgr.create_challenge("u1", "Read 20 books in 2026", target=20)
             assert ok is True
             assert ch["target"] == 20
 
@@ -32,8 +31,9 @@ class TestReadingChallenge:
 
     def test_join_challenge(self, mgr: ReadingChallenge) -> None:
         ch = {"challenge_id": "CH1", "participants": {}}
-        with patch.object(mgr, "_load_challenges", return_value=[ch]), patch.object(
-            mgr, "_save_challenges"
+        with (
+            patch.object(mgr, "_load_challenges", return_value=[ch]),
+            patch.object(mgr, "_save_challenges"),
         ):
             ok, _msg = mgr.join_challenge("CH1", "u2")
             assert ok is True
@@ -46,8 +46,9 @@ class TestReadingChallenge:
 
     def test_update_progress(self, mgr: ReadingChallenge) -> None:
         ch = {"challenge_id": "CH1", "participants": {"u1": {"progress": 3}}, "target": 20}
-        with patch.object(mgr, "_load_challenges", return_value=[ch]), patch.object(
-            mgr, "_save_challenges"
+        with (
+            patch.object(mgr, "_load_challenges", return_value=[ch]),
+            patch.object(mgr, "_save_challenges"),
         ):
             ok, _msg = mgr.update_progress("CH1", "u1", books_read=5)
             assert ok is True

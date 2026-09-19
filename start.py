@@ -6,7 +6,6 @@ The actual launcher logic lives in app/routes/start.py.
 """
 
 import os
-import sys
 
 # Ensure we're in the project directory
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))

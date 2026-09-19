@@ -24,7 +24,9 @@ logger = logging.getLogger(__name__)
 database_url = os.environ.get("DATABASE_URL", "")
 if not database_url:
     logger.error("ERROR: DATABASE_URL env var is not set.")
-    logger.info("Example: DATABASE_URL=postgresql+psycopg2://booktale:booktale@localhost:5432/booktale")
+    logger.info(
+        "Example: DATABASE_URL=postgresql+psycopg2://booktale:booktale@localhost:5432/booktale"
+    )
     sys.exit(1)
 if "sqlite" in database_url.lower():
     logger.warning("WARNING: DATABASE_URL appears to be SQLite, not PostgreSQL.")
@@ -37,11 +39,12 @@ from app.config.settings import Config
 
 Config.DATABASE_URL = database_url
 
+import logging
+
+import psycopg2
 from alembic import command
 from alembic.config import Config as AlembicConfig
 from sqlalchemy import create_engine, inspect
-import psycopg2
-import logging
 
 logger = logging.getLogger(__name__)
 

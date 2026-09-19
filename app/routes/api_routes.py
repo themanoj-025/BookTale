@@ -8,12 +8,12 @@ Extracted from web_app.py to reduce file size and improve maintainability.
 import contextlib
 import os
 import random as _random
+from collections.abc import Callable
 from datetime import datetime
 from functools import wraps
+from typing import Any
 
 from flask import g, jsonify, redirect, request, session, url_for
-from typing import Any
-from collections.abc import Callable
 
 
 def init_api_routes(app, storage, lib, auth, notif_mgr, recommender, social, diary_mgr) -> None:
@@ -38,6 +38,7 @@ def init_api_routes(app, storage, lib, auth, notif_mgr, recommender, social, dia
             if "user_id" not in session:
                 return redirect(url_for("login_page"))
             return f(*a, **k)
+
         return d
 
     def api_key_required(f: Callable[..., Any]) -> Callable[..., Any]:
@@ -56,6 +57,7 @@ def init_api_routes(app, storage, lib, auth, notif_mgr, recommender, social, dia
             if not _secrets.compare_digest(token, api_key):
                 return jsonify({"error": "Invalid API key"}), 403
             return f(*a, **k)
+
         return d
 
     # ── Settings Save API ───────────────────────────────────────────────────
@@ -122,9 +124,12 @@ def init_api_routes(app, storage, lib, auth, notif_mgr, recommender, social, dia
                 g._pw_change_failed = True
                 return jsonify({"success": False, "error": "Current password is incorrect"})
             if len(data["new_password"]) < 12:
-                return jsonify({"success": False, "error": "Password must be at least 12 characters"})
+                return jsonify(
+                    {"success": False, "error": "Password must be at least 12 characters"}
+                )
             user.password_hash = _hp(data["new_password"])
             from app.core.logger import log
+
             log("Password changed via settings", uid)
 
         storage.save_users(users)
@@ -269,20 +274,24 @@ def init_api_routes(app, storage, lib, auth, notif_mgr, recommender, social, dia
                     if trending:
                         titles = [r.get("title", "Unknown") for r in trending]
                         response = (
-                            "Here are some trending books you might enjoy: " + ", ".join(titles) + "."
+                            "Here are some trending books you might enjoy: "
+                            + ", ".join(titles)
+                            + "."
                         )
                     else:
                         response = "I'd recommend checking out our Explore page for trending books!"
             except (OSError, ValueError, KeyError, TypeError):
                 response = "I'm having trouble finding recommendations right now. Try browsing the Explore page!"
         elif "similar" in msg_lower or "like" in msg_lower:
-            response = (
-                "Try searching for a book and checking the 'Similar Books' section on its detail page!"
-            )
+            response = "Try searching for a book and checking the 'Similar Books' section on its detail page!"
         elif "summary" in msg_lower or "summarize" in msg_lower:
-            response = "To get a summary, go to a book's detail page and check the description section!"
+            response = (
+                "To get a summary, go to a book's detail page and check the description section!"
+            )
         elif "genre" in msg_lower or "category" in msg_lower:
-            response = "We have many genres! Browse by category on the Books or Recommendations page."
+            response = (
+                "We have many genres! Browse by category on the Books or Recommendations page."
+            )
         elif "hello" in msg_lower or "hi " in msg_lower or msg_lower == "hi":
             response = "Hello! I'm your AI Reading Companion. Ask me for book recommendations, or about specific books!"
         elif "thank" in msg_lower:
@@ -300,7 +309,9 @@ def init_api_routes(app, storage, lib, auth, notif_mgr, recommender, social, dia
         """Calculate reading streak based on diary entries."""
         uid = session["user_id"]
         try:
-            entries, _ = diary_mgr.get_user_diary(uid, page=1, per_page=500) if diary_mgr else ([], 0)
+            entries, _ = (
+                diary_mgr.get_user_diary(uid, page=1, per_page=500) if diary_mgr else ([], 0)
+            )
             dates = sorted(
                 {e.get("date_read", "")[:10] for e in entries if e.get("date_read")},
                 reverse=True,
@@ -334,8 +345,18 @@ def init_api_routes(app, storage, lib, auth, notif_mgr, recommender, social, dia
         books = storage.load_books()
         all_books = [b for b in books.values() if not b.is_deleted]
         months = [
-            "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-            "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+            "Jan",
+            "Feb",
+            "Mar",
+            "Apr",
+            "May",
+            "Jun",
+            "Jul",
+            "Aug",
+            "Sep",
+            "Oct",
+            "Nov",
+            "Dec",
         ]
         monthly = [0] * 12
         for b in all_books:

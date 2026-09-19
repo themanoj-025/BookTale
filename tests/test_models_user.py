@@ -15,8 +15,12 @@ class TestUserCreation:
 
     def test_minimal_user(self) -> None:
         u = User(
-            user_id="U001", name="John", email="j@x.com",
-            phone="1234567890", role="user", password_hash="hashed",
+            user_id="U001",
+            name="John",
+            email="j@x.com",
+            phone="1234567890",
+            role="user",
+            password_hash="hashed",
         )
         assert u.user_id == "U001"
         assert u.name == "John"
@@ -40,8 +44,12 @@ class TestUserSerialization:
 
     def test_to_dict(self) -> None:
         u = User(
-            user_id="U001", name="John", email="j@x.com",
-            phone="123", role="user", password_hash="h",
+            user_id="U001",
+            name="John",
+            email="j@x.com",
+            phone="123",
+            role="user",
+            password_hash="h",
         )
         d = u.to_dict()
         assert d["user_id"] == "U001"
@@ -49,8 +57,12 @@ class TestUserSerialization:
 
     def test_from_dict_minimal(self) -> None:
         data = {
-            "user_id": "U001", "name": "John", "email": "j@x.com",
-            "phone": "123", "role": "user", "password_hash": "h",
+            "user_id": "U001",
+            "name": "John",
+            "email": "j@x.com",
+            "phone": "123",
+            "role": "user",
+            "password_hash": "h",
         }
         u = User.from_dict(data)
         assert u.bio == ""
@@ -61,10 +73,17 @@ class TestUserSerialization:
 
     def test_from_dict_full(self) -> None:
         data = {
-            "user_id": "U001", "name": "John", "email": "j@x.com",
-            "phone": "123", "role": "admin", "password_hash": "h",
-            "bio": "Reader", "theme": "dark", "font_size": "large",
-            "favorite_genres": ["fiction"], "favorite_books": ["B001"],
+            "user_id": "U001",
+            "name": "John",
+            "email": "j@x.com",
+            "phone": "123",
+            "role": "admin",
+            "password_hash": "h",
+            "bio": "Reader",
+            "theme": "dark",
+            "font_size": "large",
+            "favorite_genres": ["fiction"],
+            "favorite_books": ["B001"],
         }
         u = User.from_dict(data)
         assert u.bio == "Reader"
@@ -74,8 +93,12 @@ class TestUserSerialization:
 
     def test_roundtrip(self) -> None:
         u1 = User(
-            user_id="U001", name="John", email="j@x.com",
-            phone="123", role="user", password_hash="h",
+            user_id="U001",
+            name="John",
+            email="j@x.com",
+            phone="123",
+            role="user",
+            password_hash="h",
         )
         u2 = User.from_dict(u1.to_dict())
         assert u1.user_id == u2.user_id
@@ -87,16 +110,24 @@ class TestUserActivity:
 
     def test_active_user(self) -> None:
         u = User(
-            user_id="U001", name="J", email="j@x.com",
-            phone="123", role="user", password_hash="h",
+            user_id="U001",
+            name="J",
+            email="j@x.com",
+            phone="123",
+            role="user",
+            password_hash="h",
             membership_expiry=(datetime.now() + timedelta(days=30)).isoformat(),
         )
         assert u.is_active() is True
 
     def test_blocked_user(self) -> None:
         u = User(
-            user_id="U001", name="J", email="j@x.com",
-            phone="123", role="user", password_hash="h",
+            user_id="U001",
+            name="J",
+            email="j@x.com",
+            phone="123",
+            role="user",
+            password_hash="h",
             membership_status="Blocked",
             membership_expiry=(datetime.now() + timedelta(days=30)).isoformat(),
         )
@@ -104,8 +135,12 @@ class TestUserActivity:
 
     def test_expired_user(self) -> None:
         u = User(
-            user_id="U001", name="J", email="j@x.com",
-            phone="123", role="user", password_hash="h",
+            user_id="U001",
+            name="J",
+            email="j@x.com",
+            phone="123",
+            role="user",
+            password_hash="h",
             membership_expiry=(datetime.now() - timedelta(days=1)).isoformat(),
         )
         assert u.is_active() is False
@@ -113,16 +148,24 @@ class TestUserActivity:
 
     def test_can_borrow_active(self) -> None:
         u = User(
-            user_id="U001", name="J", email="j@x.com",
-            phone="123", role="user", password_hash="h",
+            user_id="U001",
+            name="J",
+            email="j@x.com",
+            phone="123",
+            role="user",
+            password_hash="h",
             membership_expiry=(datetime.now() + timedelta(days=30)).isoformat(),
         )
         assert u.can_borrow() is True
 
     def test_cannot_borrow_at_limit(self) -> None:
         u = User(
-            user_id="U001", name="J", email="j@x.com",
-            phone="123", role="user", password_hash="h",
+            user_id="U001",
+            name="J",
+            email="j@x.com",
+            phone="123",
+            role="user",
+            password_hash="h",
             membership_expiry=(datetime.now() + timedelta(days=30)).isoformat(),
             books_issued=["B001", "B002", "B003"],
         )
@@ -134,8 +177,12 @@ class TestUserDisplay:
 
     def test_display(self) -> None:
         u = User(
-            user_id="U001", name="John", email="j@x.com",
-            phone="123", role="user", password_hash="h",
+            user_id="U001",
+            name="John",
+            email="j@x.com",
+            phone="123",
+            role="user",
+            password_hash="h",
         )
         d = u.display()
         assert "U001" in d

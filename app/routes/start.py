@@ -3,14 +3,14 @@ start.py -- Library Management System Launcher
 Start the web server, CLI, or both with one click.
 """
 
+import contextlib
+import logging
 import os
 import socket
 import subprocess  # nosec B404 (launcher uses list-form Popen with constant args)
 import sys
 import time
 import webbrowser
-import contextlib
-import logging
 
 logger = logging.getLogger(__name__)
 
@@ -44,12 +44,14 @@ def safe_print(text) -> None:
 
 def print_banner() -> dict:
     """Display a clean launch banner."""
-    logger.info("""
+    logger.info(
+        """
   +=============================================+
   |     Library Management System v3.0          |
   |     Python + Flask + Bootstrap 5            |
   +=============================================+
-""")
+"""
+    )
 
 
 def launch_web() -> None:

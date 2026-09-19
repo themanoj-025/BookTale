@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import os
-import sys
 import tempfile
 
 import pytest
@@ -31,6 +30,7 @@ for _d in (Config.DATA_DIR, Config.LOGS_DIR, Config.BACKUPS_DIR):
     os.makedirs(_d, exist_ok=True)
 
 from flask.testing import FlaskClient
+
 from web_app import app
 
 
@@ -70,23 +70,27 @@ class TestExploreHelpers:
 
     def test_avatar_html_with_url(self) -> None:
         from app.routes.helpers import avatar_html
+
         result = avatar_html("https://example.com/avatar.jpg")
         assert isinstance(result, str)
         assert "img" in result or "src" in result
 
     def test_avatar_html_without_url(self) -> None:
         from app.routes.helpers import avatar_html
+
         result = avatar_html("")
         assert isinstance(result, str)
 
     def test_cat_color(self) -> None:
         from app.routes.helpers import cat_color
+
         color = cat_color("Fiction")
         assert isinstance(color, str)
         assert len(color) > 0
 
     def test_cat_color_multiple_categories(self) -> None:
         from app.routes.helpers import cat_color
+
         for cat in ["Fiction", "Science", "History", "Mystery", "Romance", ""]:
             color = cat_color(cat)
             assert isinstance(color, str)

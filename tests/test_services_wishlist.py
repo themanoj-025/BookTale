@@ -11,7 +11,6 @@ from app.services.reading.wishlist import Wishlist
 pytestmark = pytest.mark.unit
 
 
-
 @pytest.fixture()
 def mgr() -> Wishlist:
     storage = MagicMock()
@@ -20,8 +19,9 @@ def mgr() -> Wishlist:
 
 class TestWishlist:
     def test_add_suggestion(self, mgr: Wishlist) -> None:
-        with patch.object(mgr, "_load_suggestions", return_value=[]), patch.object(
-            mgr, "_save_suggestions"
+        with (
+            patch.object(mgr, "_load_suggestions", return_value=[]),
+            patch.object(mgr, "_save_suggestions"),
         ):
             ok, _msg, s = mgr.add_suggestion("u1", "The Hobbit", "Tolkien")
             assert ok is True
@@ -48,8 +48,9 @@ class TestWishlist:
             "downvotes": 0,
             "downvoters": [],
         }
-        with patch.object(mgr, "_load_suggestions", return_value=[sugg]), patch.object(
-            mgr, "_save_suggestions"
+        with (
+            patch.object(mgr, "_load_suggestions", return_value=[sugg]),
+            patch.object(mgr, "_save_suggestions"),
         ):
             ok, _msg = mgr.vote("W1", "u1", direction="up")
             assert ok is True
@@ -68,8 +69,9 @@ class TestWishlist:
 
     def test_approve_suggestion(self, mgr: Wishlist) -> None:
         sugg = {"suggestion_id": "W1", "status": "pending"}
-        with patch.object(mgr, "_load_suggestions", return_value=[sugg]), patch.object(
-            mgr, "_save_suggestions"
+        with (
+            patch.object(mgr, "_load_suggestions", return_value=[sugg]),
+            patch.object(mgr, "_save_suggestions"),
         ):
             ok, _msg = mgr.approve("W1")
             assert ok is True
@@ -77,8 +79,9 @@ class TestWishlist:
 
     def test_reject_suggestion(self, mgr: Wishlist) -> None:
         sugg = {"suggestion_id": "W1", "status": "pending"}
-        with patch.object(mgr, "_load_suggestions", return_value=[sugg]), patch.object(
-            mgr, "_save_suggestions"
+        with (
+            patch.object(mgr, "_load_suggestions", return_value=[sugg]),
+            patch.object(mgr, "_save_suggestions"),
         ):
             ok, _msg = mgr.reject("W1")
             assert ok is True

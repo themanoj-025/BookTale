@@ -3,16 +3,14 @@ diary_routes.py - Reading Diary pages and API endpoints.
 Extracted from feature_routes.py for focused maintenance.
 """
 
-from flask import jsonify, request, session
+from flask import Response, jsonify, request, session
 
 from app.routes.feature_shared import (
     _diary,
     _storage,
-    h,
     cat_color,
+    h,
 )
-from flask import Response
-
 from app.services.reading.diary import (
     RATING_LABELS,
     RATING_SCORES,

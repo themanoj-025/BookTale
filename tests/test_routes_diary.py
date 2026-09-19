@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import os
-import sys
 import tempfile
 
 import pytest
@@ -31,6 +30,7 @@ for _d in (Config.DATA_DIR, Config.LOGS_DIR, Config.BACKUPS_DIR):
     os.makedirs(_d, exist_ok=True)
 
 from flask.testing import FlaskClient
+
 from web_app import app
 
 
@@ -66,24 +66,28 @@ class TestDiaryHelpers:
 
     def test_rating_labels_exist(self) -> None:
         from app.services.reading.diary import RATING_LABELS
+
         assert "timepass" in RATING_LABELS
         assert "masterpiece" in RATING_LABELS
         assert len(RATING_LABELS) == 6
 
     def test_rating_scores_exist(self) -> None:
         from app.services.reading.diary import RATING_SCORES
+
         assert len(RATING_SCORES) == 6
         scores = list(RATING_SCORES.values())
         assert scores == sorted(scores)
 
     def test_rating_badge_html(self) -> None:
         from app.services.reading.diary import rating_badge_html
+
         badge = rating_badge_html("masterpiece")
         assert isinstance(badge, str)
         assert len(badge) > 0
 
     def test_star_rating_html(self) -> None:
         from app.services.reading.diary import star_rating_html
+
         stars = star_rating_html(4.5)
         assert isinstance(stars, str)
         assert len(stars) > 0

@@ -45,12 +45,13 @@ Config.BACKUPS_DIR = os.path.join(_BENCH_DIR, "backups")
 for _d in (Config.DATA_DIR, Config.LOGS_DIR, Config.BACKUPS_DIR):
     os.makedirs(_d, exist_ok=True)
 
+import logging
+
 from sqlalchemy import insert
 
 from app.db.database import create_all, get_engine
 from app.db.models import Book, Transaction, User
 from app.db.service import LibraryService
-import logging
 
 logger = logging.getLogger(__name__)
 
@@ -332,7 +333,9 @@ def main() -> int:
     # the warmup from the cap.
     n_checkout = max(0, min(200, len(user_ids) - 20, len(book_ids) - 20))
     if n_checkout == 0:
-        logger.info("  pool too small for the checkout benchmark " "(need at least 21 users and 21 books)")
+        logger.info(
+            "  pool too small for the checkout benchmark " "(need at least 21 users and 21 books)"
+        )
         return 1
     checkout_i = 0
 
@@ -376,16 +379,20 @@ def main() -> int:
     logger.info(f"{'operation':<26} {'n':>5} {'mean':>9} {'p50':>9} {'p95':>9} {'p99':>9}")
     logger.info("-" * 67)
     for name, r in results.items():
-        logger.info(f"{name:<26} {r['n']:>5} {r['mean']:>8.2f}ms {r['p50']:>8.2f}ms "
-            f"{r['p95']:>8.2f}ms {r['p99']:>8.2f}ms")
+        logger.info(
+            f"{name:<26} {r['n']:>5} {r['mean']:>8.2f}ms {r['p50']:>8.2f}ms "
+            f"{r['p95']:>8.2f}ms {r['p99']:>8.2f}ms"
+        )
 
     # DoD gate: checkout p95 < 50ms
     checkout_p95 = results["checkout (issue_book)"]["p95"]
     gate = checkout_p95 < 50.0
     # ASCII markers only: the Windows cp1252 console cannot encode the
     # check/cross emoji and would raise UnicodeEncodeError on the gate line.
-    logger.error(f"\n  Phase 2 DoD gate: checkout p95 < 50ms -> "
-        f"{checkout_p95:.2f}ms {'PASS' if gate else 'FAIL'}")
+    logger.error(
+        f"\n  Phase 2 DoD gate: checkout p95 < 50ms -> "
+        f"{checkout_p95:.2f}ms {'PASS' if gate else 'FAIL'}"
+    )
 
     if args.write_doc:
         _append_doc(args, results)

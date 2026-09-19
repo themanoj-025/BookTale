@@ -1,8 +1,6 @@
 """Tests for Book-Tale settings pages and helpers."""
 
 
-
-
 class TestSettingsHelpers:
     """Test settings page helper functions."""
 

@@ -2,8 +2,8 @@
 
 from flask import session
 
-from app.routes.social_shared import avatar_html, render_page, storage
 from app.routes.helpers import h
+from app.routes.social_shared import avatar_html, render_page, storage
 
 
 def render_profile_edit_page() -> str:
@@ -95,9 +95,7 @@ def render_profile_edit_page() -> str:
         </div>
     </div>
 </div>"""
-    CONTENT = CONTENT.replace("AVATAR_PLACEHOLDER", avatar).replace(
-        "AVATAR2_PLACEHOLDER", avatar
-    )
+    CONTENT = CONTENT.replace("AVATAR_PLACEHOLDER", avatar).replace("AVATAR2_PLACEHOLDER", avatar)
     CONTENT = CONTENT.replace("USER_ID_PLACEHOLDER", h(uid))
     CONTENT = CONTENT.replace("ROLE_PLACEHOLDER", h(user.role.upper()))
     CONTENT = CONTENT.replace("NAME_PLACEHOLDER", name_val)
@@ -107,7 +105,8 @@ def render_profile_edit_page() -> str:
     CONTENT = CONTENT.replace("LOCATION_PLACEHOLDER", location_val)
     CONTENT = CONTENT.replace("BIO_PLACEHOLDER", bio_val)
     CONTENT = CONTENT.replace("PP_PLACEHOLDER", pp_val)
-    CONTENT += """
+    CONTENT += (
+        """
 <script>
 function saveProfile() {
     var btn = document.getElementById("saveProfileBtn");
@@ -130,7 +129,9 @@ function saveProfile() {
     }).then(function(r){ return r.json() }).then(function(d){
         if (d.success) {
             showToast("Profile updated!", "success");
-            setTimeout(function(){ window.location.href = '/profile/""" + h(uid) + """'; }, 1000);
+            setTimeout(function(){ window.location.href = '/profile/"""
+        + h(uid)
+        + """'; }, 1000);
         } else {
             showToast(d.error || "Failed to update", "error");
             btn.disabled = false;
@@ -199,4 +200,5 @@ document.addEventListener("DOMContentLoaded", function(){
     }
 });
 </script>"""
+    )
     return render_page("Edit Profile", CONTENT)

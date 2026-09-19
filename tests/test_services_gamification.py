@@ -6,7 +6,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from app.services.social.gamification import Gamification, LEVELS, ACHIEVEMENTS
+from app.services.social.gamification import ACHIEVEMENTS, LEVELS, Gamification
 
 
 @pytest.fixture()
@@ -33,8 +33,9 @@ class TestLevels:
 
 class TestPoints:
     def test_add_points(self, mgr: Gamification) -> None:
-        with patch.object(mgr, "_load_user_points", return_value=0), patch.object(
-            mgr, "_save_user_points"
+        with (
+            patch.object(mgr, "_load_user_points", return_value=0),
+            patch.object(mgr, "_save_user_points"),
         ):
             mgr.add_points("u1", 10, "review")
             mgr._save_user_points.assert_called_once()
@@ -47,15 +48,18 @@ class TestPoints:
 
 class TestAchievements:
     def test_check_achievements_first_review(self, mgr: Gamification) -> None:
-        with patch.object(mgr, "_load_user_points", return_value=10), patch.object(
-            mgr, "_load_user_achievements", return_value=[]
-        ), patch.object(mgr, "_save_user_achievements"):
+        with (
+            patch.object(mgr, "_load_user_points", return_value=10),
+            patch.object(mgr, "_load_user_achievements", return_value=[]),
+            patch.object(mgr, "_save_user_achievements"),
+        ):
             new = mgr.check_achievements("u1", {"reviews": 1})
             assert isinstance(new, list)
 
     def test_no_new_achievements(self, mgr: Gamification) -> None:
-        with patch.object(mgr, "_load_user_points", return_value=0), patch.object(
-            mgr, "_load_user_achievements", return_value=["first_review"]
+        with (
+            patch.object(mgr, "_load_user_points", return_value=0),
+            patch.object(mgr, "_load_user_achievements", return_value=["first_review"]),
         ):
             new = mgr.check_achievements("u1", {"reviews": 0})
             assert len(new) == 0
@@ -63,11 +67,15 @@ class TestAchievements:
 
 class TestLeaderboard:
     def test_get_leaderboard(self, mgr: Gamification) -> None:
-        with patch.object(mgr, "_load_all_points", return_value=[
-            {"user_id": "u1", "points": 100},
-            {"user_id": "u2", "points": 50},
-            {"user_id": "u3", "points": 200},
-        ]):
+        with patch.object(
+            mgr,
+            "_load_all_points",
+            return_value=[
+                {"user_id": "u1", "points": 100},
+                {"user_id": "u2", "points": 50},
+                {"user_id": "u3", "points": 200},
+            ],
+        ):
             result = mgr.get_leaderboard()
             assert len(result) == 3
             assert result[0]["user_id"] == "u3"  # Highest first

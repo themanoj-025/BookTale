@@ -4,18 +4,16 @@ club_routes.py - Book club page routes.
 Routes: /clubs, /clubs/<club_id>, /api/clubs/create, /api/clubs/<id>/join, /api/clubs/<id>/leave
 """
 
-from flask import jsonify, request, session
+from flask import Response, jsonify, request, session
 
 from app.routes.helpers import avatar_html, cat_color
-from flask import Response
-
 from app.routes.page_state import (
     communities,
     h,
     login_required,
+    make_rate_limit,
     render_page,
     storage,
-    make_rate_limit,
 )
 
 
@@ -38,12 +36,12 @@ def init_club_routes(app) -> None:
         for c in clubs_data:
             member_count = len(c.get("members", []))
             is_member = uid in c.get("members", [])
-            btn = '<a href="/clubs/{}" class="btn btn-primary btn-sm w-100">View Club</a>'.format(h(
-                c["club_id"]
-            ))
+            btn = '<a href="/clubs/{}" class="btn btn-primary btn-sm w-100">View Club</a>'.format(
+                h(c["club_id"])
+            )
             if is_member:
-                btn = (
-                    '<div class="d-flex gap-1"><a href="/clubs/{}" class="btn btn-primary btn-sm flex-grow-1">View</a><span class="badge bg-success" style="display:flex;align-items:center;padding:.3rem .6rem;">Member</span></div>'.format(h(c["club_id"]))
+                btn = '<div class="d-flex gap-1"><a href="/clubs/{}" class="btn btn-primary btn-sm flex-grow-1">View</a><span class="badge bg-success" style="display:flex;align-items:center;padding:.3rem .6rem;">Member</span></div>'.format(
+                    h(c["club_id"])
                 )
             clubs_html += """<div class="col-md-6 col-lg-4 mb-3">
                 <div class="glass-card p-3 h-100">
@@ -332,9 +330,7 @@ function leaveClub(cid) {
             if communities
             else (False, "Clubs module not available", None)
         )
-        return jsonify(
-            {"success": ok, "message": msg, "club": club}
-        )
+        return jsonify({"success": ok, "message": msg, "club": club})
 
     @app.route("/api/clubs/<club_id>/join", methods=["POST"])
     @login_required

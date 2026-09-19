@@ -5,10 +5,12 @@ Thank you for your interest in contributing to Book-Tale, the community-driven l
 ## Getting Started
 
 ### Prerequisites
+
 - Python 3.x
 - pip
 
 ### Setup
+
 1. Fork and clone the repository.
 2. Create a virtual environment:
    ```bash
@@ -30,15 +32,16 @@ Thank you for your interest in contributing to Book-Tale, the community-driven l
    The app will be available at `http://localhost:5000`.
 
 ### Environment Variables
-| Variable | Description |
-| --- | --- |
-| `SECRET_KEY` | Flask session secret key (required) |
-| `SMTP_SERVER` | SMTP host for email notifications |
-| `SMTP_PORT` | SMTP port (default: 587) |
-| `SMTP_USERNAME` | SMTP login username |
-| `SMTP_PASSWORD` | SMTP login password |
-| `SMTP_FROM_EMAIL` | Sender email address |
-| `DATA_DIR` | Directory for JSON data files (optional) |
+
+| Variable          | Description                              |
+| ----------------- | ---------------------------------------- |
+| `SECRET_KEY`      | Flask session secret key (required)      |
+| `SMTP_SERVER`     | SMTP host for email notifications        |
+| `SMTP_PORT`       | SMTP port (default: 587)                 |
+| `SMTP_USERNAME`   | SMTP login username                      |
+| `SMTP_PASSWORD`   | SMTP login password                      |
+| `SMTP_FROM_EMAIL` | Sender email address                     |
+| `DATA_DIR`        | Directory for JSON data files (optional) |
 
 ## Code Style
 
@@ -58,6 +61,7 @@ Thank you for your interest in contributing to Book-Tale, the community-driven l
 - **`realtime.py`** — Socket.IO event handlers
 
 ### Key Principles
+
 - Keep business logic in service modules, not in route handlers.
 - Route handlers should call service functions and render templates or return JSON.
 - New API endpoints should be added to the appropriate route module.
@@ -90,6 +94,7 @@ Test files are located in the `tests/` directory. When adding new features, plea
 ## Reporting Issues
 
 Include in your report:
+
 - Steps to reproduce the issue
 - Expected vs actual behavior
 - Browser/OS information
@@ -98,16 +103,19 @@ Include in your report:
 ## Adding Features
 
 ### Adding a new API endpoint
+
 1. Add the route to the appropriate route file (e.g., `social_routes.py` for social features).
 2. Use `@login_required` for authenticated endpoints.
 3. Return JSON responses with appropriate status codes.
 
 ### Adding a new page
+
 1. Add the route in `page_routes.py` or `web_app.py`.
 2. Use `render_page()` to render the base template.
 3. Add JavaScript/CSS inline or in the static directory.
 
 ### Adding a new storage entity
+
 1. Define the data structure.
 2. Add load/save methods to `storage.py` if needed.
 3. Reference the data directory via `Config.DATA_DIR`.
@@ -115,6 +123,7 @@ Include in your report:
 ## Database
 
 Book-Tale uses JSON file-based storage (no SQL database). When modifying data structures:
+
 - Ensure backward compatibility with existing JSON files.
 - Provide migration logic if the schema changes.
 - Test with both empty and populated data directories.

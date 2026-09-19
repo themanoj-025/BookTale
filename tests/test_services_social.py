@@ -11,7 +11,6 @@ from app.services.social.social import SocialFeed
 pytestmark = pytest.mark.unit
 
 
-
 @pytest.fixture()
 def feed() -> SocialFeed:
     storage = MagicMock()

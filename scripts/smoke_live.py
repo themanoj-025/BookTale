@@ -105,8 +105,9 @@ def _csrf_meta(html: str) -> str:
 # ── Boot the real server on a free port ──────────────────────────────────
 PORT = _free_port()
 BASE = f"http://127.0.0.1:{PORT}"
-from werkzeug.serving import make_server
 import logging
+
+from werkzeug.serving import make_server
 
 logger = logging.getLogger(__name__)
 

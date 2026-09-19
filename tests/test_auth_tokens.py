@@ -9,7 +9,6 @@ and stale rows are reaped by purge_expired_tokens().
 """
 
 import os
-import sys
 from datetime import datetime, timedelta
 
 import pytest

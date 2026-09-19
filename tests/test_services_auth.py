@@ -10,7 +10,6 @@ from app.core.exceptions import AuthenticationError
 
 pytestmark = pytest.mark.unit
 from app.services.auth.auth import (
-
     AuthManager,
     hash_password,
     verify_password,

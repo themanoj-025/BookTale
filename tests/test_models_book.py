@@ -12,9 +12,13 @@ class TestBookCreation:
 
     def test_minimal_book(self) -> None:
         b = Book(
-            book_id="B001", title="Test", author="Author",
-            isbn="1234567890", category="Fiction",
-            total_copies=5, available_copies=5,
+            book_id="B001",
+            title="Test",
+            author="Author",
+            isbn="1234567890",
+            category="Fiction",
+            total_copies=5,
+            available_copies=5,
         )
         assert b.book_id == "B001"
         assert b.title == "Test"
@@ -25,12 +29,20 @@ class TestBookCreation:
 
     def test_full_book(self) -> None:
         b = Book(
-            book_id="B002", title="Full", author="Writer",
-            isbn="9781234567890", category="Science",
-            total_copies=10, available_copies=8,
-            publisher="Pub", pages=300, language="Hindi",
-            release_date="2024-01-01", description="A book",
-            series_name="Series", series_order=1,
+            book_id="B002",
+            title="Full",
+            author="Writer",
+            isbn="9781234567890",
+            category="Science",
+            total_copies=10,
+            available_copies=8,
+            publisher="Pub",
+            pages=300,
+            language="Hindi",
+            release_date="2024-01-01",
+            description="A book",
+            series_name="Series",
+            series_order=1,
             genres=["sci-fi", "thriller"],
         )
         assert b.publisher == "Pub"
@@ -49,9 +61,13 @@ class TestBookSerialization:
 
     def test_to_dict(self) -> None:
         b = Book(
-            book_id="B001", title="T", author="A",
-            isbn="111", category="Fiction",
-            total_copies=1, available_copies=1,
+            book_id="B001",
+            title="T",
+            author="A",
+            isbn="111",
+            category="Fiction",
+            total_copies=1,
+            available_copies=1,
         )
         d = b.to_dict()
         assert d["book_id"] == "B001"
@@ -60,9 +76,13 @@ class TestBookSerialization:
 
     def test_from_dict_minimal(self) -> None:
         data = {
-            "book_id": "B001", "title": "T", "author": "A",
-            "isbn": "111", "category": "Fiction",
-            "total_copies": 1, "available_copies": 1,
+            "book_id": "B001",
+            "title": "T",
+            "author": "A",
+            "isbn": "111",
+            "category": "Fiction",
+            "total_copies": 1,
+            "available_copies": 1,
         }
         b = Book.from_dict(data)
         assert b.book_id == "B001"
@@ -73,10 +93,16 @@ class TestBookSerialization:
 
     def test_from_dict_full(self) -> None:
         data = {
-            "book_id": "B002", "title": "Full", "author": "W",
-            "isbn": "222", "category": "Science",
-            "total_copies": 5, "available_copies": 3,
-            "publisher": "Pub", "pages": 200, "genres": ["a", "b"],
+            "book_id": "B002",
+            "title": "Full",
+            "author": "W",
+            "isbn": "222",
+            "category": "Science",
+            "total_copies": 5,
+            "available_copies": 3,
+            "publisher": "Pub",
+            "pages": 200,
+            "genres": ["a", "b"],
         }
         b = Book.from_dict(data)
         assert b.genres == ["a", "b"]
@@ -84,9 +110,13 @@ class TestBookSerialization:
 
     def test_from_dict_null_genres(self) -> None:
         data = {
-            "book_id": "B003", "title": "X", "author": "Y",
-            "isbn": "333", "category": "CS",
-            "total_copies": 1, "available_copies": 1,
+            "book_id": "B003",
+            "title": "X",
+            "author": "Y",
+            "isbn": "333",
+            "category": "CS",
+            "total_copies": 1,
+            "available_copies": 1,
             "genres": None,
         }
         b = Book.from_dict(data)
@@ -94,9 +124,13 @@ class TestBookSerialization:
 
     def test_from_dict_string_genres(self) -> None:
         data = {
-            "book_id": "B004", "title": "X", "author": "Y",
-            "isbn": "444", "category": "CS",
-            "total_copies": 1, "available_copies": 1,
+            "book_id": "B004",
+            "title": "X",
+            "author": "Y",
+            "isbn": "444",
+            "category": "CS",
+            "total_copies": 1,
+            "available_copies": 1,
             "genres": "fiction",
         }
         b = Book.from_dict(data)
@@ -104,9 +138,13 @@ class TestBookSerialization:
 
     def test_roundtrip(self) -> None:
         b1 = Book(
-            book_id="B005", title="RT", author="A",
-            isbn="555", category="History",
-            total_copies=2, available_copies=1,
+            book_id="B005",
+            title="RT",
+            author="A",
+            isbn="555",
+            category="History",
+            total_copies=2,
+            available_copies=1,
             genres=["history"],
         )
         b2 = Book.from_dict(b1.to_dict())

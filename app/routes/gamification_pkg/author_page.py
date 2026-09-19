@@ -3,8 +3,8 @@
 from collections import Counter
 from urllib.parse import unquote
 
-from app.routes.social_shared import render_page, storage
 from app.routes.helpers import cat_color, h
+from app.routes.social_shared import render_page, storage
 
 
 def render_author_page(author_name: str) -> str:
@@ -34,7 +34,7 @@ def render_author_page(author_name: str) -> str:
             f'<div class="fw-bold small">{h(b.title)[:40]}</div>'
             f'<small class="text-muted">{h(b.category)}</small>'
             f'<div class="mt-1">{avail}</div>'
-            '</div></a>'
+            "</div></a>"
         )
     if not BOOKS_GRID:
         BOOKS_GRID = '<div class="col-12"><div class="empty-state empty-state-variant"><div class="empty-icon"><i class="bi bi-book"></i></div><div class="empty-title">No books found</div><div class="empty-desc">This author has no books in the library yet.</div></div></div>'

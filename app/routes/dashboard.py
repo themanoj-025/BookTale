@@ -11,9 +11,9 @@ from app.routes.page_state import (
     diary_mgr,
     gamification,
     h,
+    library_stats,
     login_required,
     render_page,
-    library_stats,
 )
 
 logger = logging.getLogger(__name__)
@@ -149,9 +149,7 @@ def register_dashboard_routes(app) -> None:
             '<span class="stat-label">Points</span>'
             '<span class="stat-sub">' + h(level) + "</span></div>"
             '<div class="stat-card">'
-            '<span class="stat-number" style="color:var(--success);">'
-            + str(books_read)
-            + "</span>"
+            '<span class="stat-number" style="color:var(--success);">' + str(books_read) + "</span>"
             '<span class="stat-label">Books Read</span>'
             '<span class="stat-sub">' + str(pages_read) + " pages</span></div>"
             '<div class="stat-card">'

@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import os
-import sys
 import tempfile
 
 import pytest
@@ -32,6 +31,7 @@ for _d in (Config.DATA_DIR, Config.LOGS_DIR, Config.BACKUPS_DIR):
     os.makedirs(_d, exist_ok=True)
 
 from flask.testing import FlaskClient
+
 from web_app import app
 
 
@@ -84,6 +84,7 @@ class TestAdminHelpers:
 
     def test_h_escapes_html(self) -> None:
         import html
+
         assert html.escape("<script>") == "&lt;script&gt;"
         assert html.escape("a&b") == "a&amp;b"
         assert html.escape('"quoted"') == "&quot;quoted&quot;"
@@ -97,6 +98,8 @@ class TestAdminHelpers:
         mock_db.session_scope.return_value.__exit__ = MagicMock(return_value=False)
         mock_repo = MagicMock()
 
-        with patch("app.db.database", mock_db), \
-             patch("app.db.repositories.AuditLogRepository", return_value=mock_repo):
+        with (
+            patch("app.db.database", mock_db),
+            patch("app.db.repositories.AuditLogRepository", return_value=mock_repo),
+        ):
             assert mock_db.session_scope is not None

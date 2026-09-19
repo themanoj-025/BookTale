@@ -1,30 +1,36 @@
 """ML model implementations."""
 
 from __future__ import annotations
-from app.services.recommendations.ml.Model.ml_pkg.data_loading import N_CLUSTERS, N_NEIGHBORS, RANDOM_STATE, TEST_SIZE, XGB_AVAILABLE
-from app.services.recommendations.ml.Model.ml_pkg.models import ALGORITHM_COLORS
-from sklearn.cluster import AgglomerativeClustering
-from sklearn.cluster import DBSCAN
-from sklearn.cluster import KMeans
-from sklearn.neural_network import MLPRegressor
-from app.services.recommendations.ml.Model.ml_pkg.models import ModelResult
-from sklearn.neighbors import NearestNeighbors
-from sklearn.decomposition import PCA
-from sklearn.manifold import TSNE
-from sklearn.decomposition import TruncatedSVD
-from sklearn.metrics.pairwise import cosine_similarity
-from app.services.recommendations.ml.Model.ml_pkg.models import evaluate_clustering
-from app.services.recommendations.ml.Model.ml_pkg.models import evaluate_recommendation
+
+import logging
 import math
-from sklearn.metrics import mean_absolute_error
-from sklearn.metrics import mean_squared_error
+import time
+
 import numpy as np
 import pandas as pd
-from sklearn.metrics import r2_score
-import time
-from sklearn.model_selection import train_test_split
 import xgboost as xgb
-import logging
+from sklearn.cluster import DBSCAN, AgglomerativeClustering, KMeans
+from sklearn.decomposition import PCA, TruncatedSVD
+from sklearn.manifold import TSNE
+from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
+from sklearn.metrics.pairwise import cosine_similarity
+from sklearn.model_selection import train_test_split
+from sklearn.neighbors import NearestNeighbors
+from sklearn.neural_network import MLPRegressor
+
+from app.services.recommendations.ml.Model.ml_pkg.data_loading import (
+    N_CLUSTERS,
+    N_NEIGHBORS,
+    RANDOM_STATE,
+    TEST_SIZE,
+    XGB_AVAILABLE,
+)
+from app.services.recommendations.ml.Model.ml_pkg.models import (
+    ALGORITHM_COLORS,
+    ModelResult,
+    evaluate_clustering,
+    evaluate_recommendation,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -423,5 +429,3 @@ def agglomerative_model(X: np.ndarray, df: pd.DataFrame) -> ModelResult:
 
 
 # 3. VISUALIZATION FUNCTIONS
-
-

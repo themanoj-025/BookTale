@@ -9,7 +9,6 @@ import html as _html
 from flask import session
 
 
-
 def _h(text: object) -> str:
     """HTML-escape helper (local copy to avoid circular import)."""
     return _html.escape(str(text))
@@ -23,16 +22,56 @@ def _h(text: object) -> str:
 def security_page(render_page_func) -> str:
     """Render the security & trust information page."""
     items = [
-        ("🔑", "Password hashing", "Passwords are stored as bcrypt hashes; the policy requires 12+ characters, enforced server-side on every password surface (registration, reset, settings)."),
-        ("🛡️", "Role-safe registration", 'Self-service registration can only ever create "user" accounts — client-supplied admin/librarian roles are silently downgraded.'),
-        ("🎫", "CSRF protection", "CSRFProtect is enabled by default; every state-changing POST without a valid session token is rejected (400)."),
-        ("⏱️", "Rate limiting", "Auth endpoints and all shared-surface writes are rate-limited (per-IP and per-account), so brute-force and spam attempts are throttled without locking real users out."),
-        ("🔒", "Fail-fast boot", "The app refuses to boot with a default/empty SECRET_KEY or debug mode outside development."),
-        ("📄", "Secure sessions", "Session cookies are HttpOnly + SameSite=Lax (Secure when deployed over HTTPS); HSTS headers are applied on the edge."),
-        ("🎨", "Upload verification", "Image uploads are magic-byte verified with Pillow and re-encoded server-side — a renamed HTML/JS file is rejected, and embedded payloads are stripped."),
-        ("⏳", "One-time tokens", "Password-reset (15 min) and email-verify (24 h) tokens are stored in the database with explicit expiry; they survive restarts and are consumed once."),
-        ("📋", "Audit trail", "Every admin-settings change is recorded (who/what/when/from-where) in an append-only audit log; secrets are redacted."),
-        ("🧪", "Security regression tests", "Privilege escalation, CSRF, rate limiting, XSS round-trips, upload forgery, and token expiry all have automated regression tests (tests/security/)."),
+        (
+            "🔑",
+            "Password hashing",
+            "Passwords are stored as bcrypt hashes; the policy requires 12+ characters, enforced server-side on every password surface (registration, reset, settings).",
+        ),
+        (
+            "🛡️",
+            "Role-safe registration",
+            'Self-service registration can only ever create "user" accounts — client-supplied admin/librarian roles are silently downgraded.',
+        ),
+        (
+            "🎫",
+            "CSRF protection",
+            "CSRFProtect is enabled by default; every state-changing POST without a valid session token is rejected (400).",
+        ),
+        (
+            "⏱️",
+            "Rate limiting",
+            "Auth endpoints and all shared-surface writes are rate-limited (per-IP and per-account), so brute-force and spam attempts are throttled without locking real users out.",
+        ),
+        (
+            "🔒",
+            "Fail-fast boot",
+            "The app refuses to boot with a default/empty SECRET_KEY or debug mode outside development.",
+        ),
+        (
+            "📄",
+            "Secure sessions",
+            "Session cookies are HttpOnly + SameSite=Lax (Secure when deployed over HTTPS); HSTS headers are applied on the edge.",
+        ),
+        (
+            "🎨",
+            "Upload verification",
+            "Image uploads are magic-byte verified with Pillow and re-encoded server-side — a renamed HTML/JS file is rejected, and embedded payloads are stripped.",
+        ),
+        (
+            "⏳",
+            "One-time tokens",
+            "Password-reset (15 min) and email-verify (24 h) tokens are stored in the database with explicit expiry; they survive restarts and are consumed once.",
+        ),
+        (
+            "📋",
+            "Audit trail",
+            "Every admin-settings change is recorded (who/what/when/from-where) in an append-only audit log; secrets are redacted.",
+        ),
+        (
+            "🧪",
+            "Security regression tests",
+            "Privilege escalation, CSRF, rate limiting, XSS round-trips, upload forgery, and token expiry all have automated regression tests (tests/security/).",
+        ),
     ]
     cards = "".join(
         f'<div class="col-md-6"><div class="glass-card p-4 h-100"><div style="font-size:1.8rem;margin-bottom:.5rem;">{icon}</div>'
@@ -174,9 +213,24 @@ def settings_page(render_page_func, storage, notif_mgr) -> str:
         )
 
     p_checks = [
-        ("privacy_show_activity", "Show reading activity on profile", "graph-up-arrow", user.privacy_show_activity),
-        ("privacy_show_wishlist", "Show wishlist on profile", "star-fill", user.privacy_show_wishlist),
-        ("privacy_show_bookmarks", "Show bookmarks on profile", "bookmark-fill", user.privacy_show_bookmarks),
+        (
+            "privacy_show_activity",
+            "Show reading activity on profile",
+            "graph-up-arrow",
+            user.privacy_show_activity,
+        ),
+        (
+            "privacy_show_wishlist",
+            "Show wishlist on profile",
+            "star-fill",
+            user.privacy_show_wishlist,
+        ),
+        (
+            "privacy_show_bookmarks",
+            "Show bookmarks on profile",
+            "bookmark-fill",
+            user.privacy_show_bookmarks,
+        ),
         ("privacy_show_email", "Show email on profile", "envelope-fill", user.privacy_show_email),
     ]
     p_html = ""
@@ -203,7 +257,12 @@ def settings_page(render_page_func, storage, notif_mgr) -> str:
     rating_opts = ""
     for v in ["perfection", "worth_it", "timepass", "skip"]:
         sel = "selected" if user.reading_default_rating == v else ""
-        label = {"perfection": "Perfection", "worth_it": "Worth It", "timepass": "Timepass", "skip": "Skip"}[v]
+        label = {
+            "perfection": "Perfection",
+            "worth_it": "Worth It",
+            "timepass": "Timepass",
+            "skip": "Skip",
+        }[v]
         rating_opts += f'<option value="{v}" {sel}>{label}</option>'
 
     goal_opts = ""
@@ -326,8 +385,13 @@ def settings_page(render_page_func, storage, notif_mgr) -> str:
     elif font_v == "large":
         font_classes[2] = "btn btn-primary"
     CONTENT = CONTENT % (
-        light_sel, light_chk, dark_sel, dark_chk,
-        font_classes[0], font_classes[1], font_classes[2],
+        light_sel,
+        light_chk,
+        dark_sel,
+        dark_chk,
+        font_classes[0],
+        font_classes[1],
+        font_classes[2],
     )
 
     return render_page_func(

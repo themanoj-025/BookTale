@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import os
-import sys
 import tempfile
 
 import pytest
@@ -31,6 +30,7 @@ for _d in (Config.DATA_DIR, Config.LOGS_DIR, Config.BACKUPS_DIR):
     os.makedirs(_d, exist_ok=True)
 
 from flask.testing import FlaskClient
+
 from web_app import app
 
 
@@ -62,10 +62,12 @@ class TestDashboardHelpers:
 
     def test_avatar_html(self) -> None:
         from app.routes.helpers import avatar_html
+
         result = avatar_html("https://example.com/avatar.jpg")
         assert isinstance(result, str)
 
     def test_avatar_html_empty(self) -> None:
         from app.routes.helpers import avatar_html
+
         result = avatar_html("")
         assert isinstance(result, str)

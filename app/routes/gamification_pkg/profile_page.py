@@ -8,6 +8,7 @@ from datetime import datetime, timedelta
 from flask import session
 
 from app.config.settings import Config
+from app.routes.helpers import h
 from app.routes.social_shared import (
     _render_badges_grid,
     _render_diary_entries,
@@ -20,7 +21,6 @@ from app.routes.social_shared import (
     social,
     storage,
 )
-from app.routes.helpers import h
 
 
 def render_profile_page(user_id: str) -> str:
@@ -85,8 +85,8 @@ def render_profile_page(user_id: str) -> str:
             '<div class="glass-card p-3 mb-2" style="animation:cardEnter .3s ease both;">'
             '<div style="font-size:.9rem;">%s</div>'
             '<div class="d-flex gap-2 mt-2" style="font-size:.75rem;color:var(--text-muted);">'
-            '<span>\u2764\ufe0f %d</span><span>\U0001f4ac %d</span><span>%s</span>'
-            '</div></div>'
+            "<span>\u2764\ufe0f %d</span><span>\U0001f4ac %d</span><span>%s</span>"
+            "</div></div>"
             % (
                 h(p.get("content", "")),
                 p.get("likes_count", 0),
@@ -146,13 +146,23 @@ def render_profile_page(user_id: str) -> str:
     FB = ""
     if not is_own:
         if is_following:
-            FB = '<button class="btn btn-outline btn-sm" onclick="toggleFollow(\'%s\',this)"><i class="bi bi-person-check"></i> Following</button>' % h(user_id)
+            FB = (
+                '<button class="btn btn-outline btn-sm" onclick="toggleFollow(\'%s\',this)"><i class="bi bi-person-check"></i> Following</button>'
+                % h(user_id)
+            )
         else:
-            FB = '<button class="btn btn-primary btn-sm" onclick="toggleFollow(\'%s\',this)"><i class="bi bi-person-plus"></i> Follow</button>' % h(user_id)
+            FB = (
+                '<button class="btn btn-primary btn-sm" onclick="toggleFollow(\'%s\',this)"><i class="bi bi-person-plus"></i> Follow</button>'
+                % h(user_id)
+            )
 
     if pu.profile_picture:
-        PA = '<div class="avatar" style="width:72px;height:72px;background-size:cover;background-image:url(%s);border-radius:50%;border:3px solid var(--bg);box-shadow:0 4px 12px rgba(0,0,0,.1);" title="%s"></div>' % (  # noqa: F509
-            h(pu.profile_picture), h(pu.name),
+        PA = (
+            '<div class="avatar" style="width:72px;height:72px;background-size:cover;background-image:url(%s);border-radius:50%;border:3px solid var(--bg);box-shadow:0 4px 12px rgba(0,0,0,.1);" title="%s"></div>'
+            % (  # noqa: F509
+                h(pu.profile_picture),
+                h(pu.name),
+            )
         )
     else:
         PA = avatar_html(pu.name, 72)
@@ -227,12 +237,14 @@ def render_profile_page(user_id: str) -> str:
         if not sh_section:
             sh_section = '<div class="text-center text-muted small py-3">Empty shelf.</div>'
         db = (
-            '<button class="btn btn-sm" style="background:none;border:none;color:var(--text-dim);font-size:.65rem;padding:0;" onclick="deleteShelf(\'%s\')" title="Delete shelf"><i class="bi bi-trash"></i></button>' % h(name)
+            '<button class="btn btn-sm" style="background:none;border:none;color:var(--text-dim);font-size:.65rem;padding:0;" onclick="deleteShelf(\'%s\')" title="Delete shelf"><i class="bi bi-trash"></i></button>'
+            % h(name)
             if is_own
             else ""
         )
         eb = (
-            '<button class="btn btn-sm" style="background:none;border:none;color:var(--text-dim);font-size:.65rem;padding:0;" onclick="renameShelf(\'%s\')" title="Rename shelf"><i class="bi bi-pencil"></i></button>' % h(name)
+            '<button class="btn btn-sm" style="background:none;border:none;color:var(--text-dim);font-size:.65rem;padding:0;" onclick="renameShelf(\'%s\')" title="Rename shelf"><i class="bi bi-pencil"></i></button>'
+            % h(name)
             if is_own
             else ""
         )
@@ -559,4 +571,3 @@ else { showToast(d.error || "Failed", "error"); }
 </div></div></div>
 """,
     )
-

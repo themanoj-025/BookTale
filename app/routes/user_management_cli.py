@@ -2,6 +2,8 @@
 user_management_cli.py - User management CLI functions (register, view, block, renew, list).
 """
 
+import logging
+
 from app.core.utils import (
     colored,
     header,
@@ -16,10 +18,8 @@ from app.models.user import ROLES
 from app.services.auth.auth import AuthManager, hash_password
 from app.services.books.library import Library
 from app.storage.storage import Storage
-import logging
 
 logger = logging.getLogger(__name__)
-
 
 
 def user_management_menu(lib: Library, auth: AuthManager, storage: Storage) -> None:
@@ -139,7 +139,9 @@ def list_users(storage: Storage) -> None:
     users = storage.load_users()
     for u in users.values():
         status_color = "green" if u.membership_status == "Active" else "red"
-        logger.info(f"  [{u.user_id}] {u.name} | {u.role.upper()} | "
+        logger.info(
+            f"  [{u.user_id}] {u.name} | {u.role.upper()} | "
             f"{colored(u.membership_status, status_color)} | "
-            f"Books: {len(u.books_issued)} | Fine: ₹{u.unpaid_fine:.2f}")
+            f"Books: {len(u.books_issued)} | Fine: ₹{u.unpaid_fine:.2f}"
+        )
     pause()

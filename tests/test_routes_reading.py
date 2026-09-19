@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import os
-import sys
 import tempfile
 
 import pytest
@@ -31,6 +30,7 @@ for _d in (Config.DATA_DIR, Config.LOGS_DIR, Config.BACKUPS_DIR):
     os.makedirs(_d, exist_ok=True)
 
 from flask.testing import FlaskClient
+
 from web_app import app
 
 
@@ -66,10 +66,12 @@ class TestReadingHelpers:
 
     def test_h_function(self) -> None:
         from app.routes.feature_shared import h
+
         assert h("<b>bold</b>") == "&lt;b&gt;bold&lt;/b&gt;"
         assert h("normal") == "normal"
 
     def test_cat_color(self) -> None:
         from app.routes.feature_shared import cat_color
+
         color = cat_color("Romance")
         assert isinstance(color, str)

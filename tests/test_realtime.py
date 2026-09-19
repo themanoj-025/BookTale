@@ -9,7 +9,6 @@ from app.realtime.realtime import RealtimeManager
 pytestmark = pytest.mark.unit
 
 
-
 @pytest.fixture
 def mock_storage() -> MagicMock:
     storage = MagicMock()

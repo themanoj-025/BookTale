@@ -24,7 +24,7 @@ high-risk, low-reviewability change touching every file in the repo.
 
 Introduce `db/storage_adapter.py` with:
 
-1. **`DbStorage`** — a class implementing the *exact* `Storage` public interface
+1. **`DbStorage`** — a class implementing the _exact_ `Storage` public interface
    (load/save/append for every entity) on top of the SQLAlchemy models in
    `db/models.py`. Callers are unchanged: `library.py`'s `issue_book` still calls
    `self.storage.load_users()`, only the object behind it changed.
@@ -36,7 +36,7 @@ Introduce `db/storage_adapter.py` with:
 4. **Transactional core delegation** — `Library.__init__` detects a `DbStorage`
    and delegates `issue_book`/`return_book`/`pay_fine` to `db.service.LibraryService`,
    which performs each operation as a single DB transaction (SQLite `BEGIN
-   IMMEDIATE` via engine event) so concurrent checkouts cannot oversell the last
+IMMEDIATE` via engine event) so concurrent checkouts cannot oversell the last
    copy. Reservations (`reserve_book`, enqueue/pop queue) are inside the service too.
 
 ### Semantics deliberately preserved from the JSON layer

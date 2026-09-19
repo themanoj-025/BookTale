@@ -1,13 +1,5 @@
 """Tests for app.core.utils validation functions."""
 
-
-from app.core.utils import (
-    colored,
-    format_date,
-    validate_email,
-    validate_isbn,
-    validate_phone,
-)
 from app.core.exceptions import (
     AuthenticationError,
     BookAlreadyDeletedError,
@@ -25,6 +17,13 @@ from app.core.exceptions import (
     UserBlockedError,
     UserError,
     UserNotFoundError,
+)
+from app.core.utils import (
+    colored,
+    format_date,
+    validate_email,
+    validate_isbn,
+    validate_phone,
 )
 
 

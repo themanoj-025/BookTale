@@ -2,10 +2,10 @@
 config.py - Centralized configuration with .env support
 """
 
+import contextlib
 import os
 
 from dotenv import load_dotenv
-import contextlib
 
 load_dotenv()
 

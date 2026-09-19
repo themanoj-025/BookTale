@@ -38,12 +38,13 @@ import numpy as np
 import pandas as pd
 
 matplotlib.use("Agg")  # Non-interactive backend
+import logging
+
 import matplotlib.pyplot as plt
 from sklearn.feature_extraction.text import TfidfVectorizer
 
 # Scikit-learn
 from sklearn.preprocessing import LabelEncoder, StandardScaler
-import logging
 
 logger = logging.getLogger(__name__)
 
@@ -222,5 +223,3 @@ def get_tfidf_features(df: pd.DataFrame) -> np.ndarray:
 
 
 # 2. MODEL DEFINITIONS
-
-

@@ -6,11 +6,11 @@ Extracted from web_app.py to reduce file size and improve maintainability.
 """
 
 import html
+from collections.abc import Callable
 from functools import wraps
+from typing import Any
 
 from flask import g, redirect, render_template, request, session, url_for
-from typing import Any
-from collections.abc import Callable
 
 
 def init_auth_routes(app, storage, lib, auth, notif_mgr) -> None:
@@ -28,7 +28,9 @@ def init_auth_routes(app, storage, lib, auth, notif_mgr) -> None:
 
     def render_auth_page(title: str, content: str, **kw: Any) -> str:
         """Render an auth page using the split-screen auth_base.html template."""
-        return render_template("auth_base.html", title=title, auth_content=content, session={}, **kw)
+        return render_template(
+            "auth_base.html", title=title, auth_content=content, session={}, **kw
+        )
 
     def get_current_user() -> Any:
         if "user_id" not in session:
@@ -51,6 +53,7 @@ def init_auth_routes(app, storage, lib, auth, notif_mgr) -> None:
             if "user_id" not in session:
                 return redirect(url_for("login_page"))
             return f(*a, **k)
+
         return d
 
     # ── Logout ──────────────────────────────────────────────────────────────
@@ -81,6 +84,7 @@ def init_auth_routes(app, storage, lib, auth, notif_mgr) -> None:
             session["user_name"] = user.name
             session["role"] = user.role
             from app.core.logger import log
+
             log("Web login", user.user_id)
             return redirect(url_for("feed_page"))
         except AuthenticationError:
@@ -162,6 +166,7 @@ def init_auth_routes(app, storage, lib, auth, notif_mgr) -> None:
                 )
             except (ValueError, KeyError) as e:
                 from app.core.logger import log
+
                 log("Welcome email error", extra=str(e))
 
         return render_template(
@@ -213,6 +218,7 @@ def init_auth_routes(app, storage, lib, auth, notif_mgr) -> None:
                     )
             except (ValueError, KeyError) as e:
                 from app.core.logger import log
+
                 log("Reset email error", extra=str(e))
 
         return render_template(
@@ -408,6 +414,7 @@ def init_auth_routes(app, storage, lib, auth, notif_mgr) -> None:
         user.password_hash = _hp(password)
         storage.save_users(users)
         from app.core.logger import log
+
         log("Password reset", user_id)
 
         return render_auth_page(

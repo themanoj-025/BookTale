@@ -6,22 +6,20 @@ Routes: /explore, /recommendations, /api/notifications/<id>/read, /api/notificat
 
 from datetime import datetime
 
-from flask import jsonify, session
+from flask import Response, jsonify, session
 
 from app.models.book import CATEGORIES as BOOK_CATEGORIES
 from app.routes.helpers import avatar_html, cat_color
-from flask import Response
-
 from app.routes.page_state import (
     communities,
     h,
     login_required,
+    make_rate_limit,
     notif_mgr,
     recommender,
     render_page,
     social,
     storage,
-    make_rate_limit,
 )
 
 
@@ -101,8 +99,8 @@ def init_explore_routes(app) -> None:
                 for tag in tags:
                     if isinstance(tag, dict):
                         tag = tag.get("tag", "")
-                    hashtag_html += (
-                        '<a href="/search?tag={}" class="btn btn-outline btn-sm mb-1" style="border-radius:50px;">#{}</a> '.format(h(tag.strip("#")), h(tag.strip("#")))
+                    hashtag_html += '<a href="/search?tag={}" class="btn btn-outline btn-sm mb-1" style="border-radius:50px;">#{}</a> '.format(
+                        h(tag.strip("#")), h(tag.strip("#"))
                     )
             except (AttributeError, TypeError, KeyError):
                 pass
