@@ -158,8 +158,8 @@ def render_profile_page(user_id: str) -> str:
 
     if pu.profile_picture:
         PA = (
-            '<div class="avatar" style="width:72px;height:72px;background-size:cover;background-image:url(%s);border-radius:50%;border:3px solid var(--bg);box-shadow:0 4px 12px rgba(0,0,0,.1);" title="%s"></div>'
-            % (  # noqa: F509
+            '<div class="avatar" style="width:72px;height:72px;background-size:cover;background-image:url(%s);border-radius:50%%;border:3px solid var(--bg);box-shadow:0 4px 12px rgba(0,0,0,.1);" title="%s"></div>'
+            % (
                 h(pu.profile_picture),
                 h(pu.name),
             )
