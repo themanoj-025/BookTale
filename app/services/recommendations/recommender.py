@@ -273,7 +273,11 @@ class Recommender:
             if t["type"] == "issue" and t["user_id"] != user_id and t["book_id"] in user_books:
                 # This user borrowed the same book as our user
                 for t2 in txns:
-                    if t2["type"] == "issue" and t2["user_id"] == t["user_id"] and t2["book_id"] not in user_books:
+                    if (
+                        t2["type"] == "issue"
+                        and t2["user_id"] == t["user_id"]
+                        and t2["book_id"] not in user_books
+                    ):
                         similar_user_books[t2["book_id"]] += 2
 
         # Score candidate books

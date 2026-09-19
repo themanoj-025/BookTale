@@ -13,11 +13,11 @@ The seed data is indexed in memory on first access and provides:
 """
 
 import csv
+import logging
 import math
 import os
 import re
 from collections import defaultdict
-import logging
 
 logger = logging.getLogger(__name__)
 
@@ -372,7 +372,9 @@ def _load_seed_data(force: bool = False) -> None:
 
         _SEED_CATEGORIES = list(_SEED_BY_CATEGORY.keys())
         _SEED_LOADED = True
-        logger.info(f"  [SEED DATA] Loaded {len(_SEED_BOOKS)} books from Goodreads dataset ({len(_SEED_CATEGORIES)} categories)")
+        logger.info(
+            f"  [SEED DATA] Loaded {len(_SEED_BOOKS)} books from Goodreads dataset ({len(_SEED_CATEGORIES)} categories)"
+        )
     except (FileNotFoundError, csv.Error) as e:
         logger.error(f"  [SEED DATA ERROR] Could not load CSV: {e}")
         _SEED_LOADED = True

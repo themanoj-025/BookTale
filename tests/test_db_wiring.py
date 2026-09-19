@@ -36,9 +36,9 @@ from app.models.user import User
 pytestmark = pytest.mark.unit
 
 
-
-
 pytestmark = pytest.mark.slow
+
+
 @pytest.fixture()
 def db_env(monkeypatch) -> None:
     """Point the engine at a throwaway SQLite file; rebuild on teardown."""
@@ -321,4 +321,3 @@ def test_soft_delete_book_persists_through_adapter(store) -> None:
     reloaded = store.load_books()
     assert reloaded["BK-1"].is_deleted is True
     assert "BK-1" in reloaded  # row kept, mirroring JSON semantics
-

@@ -1,6 +1,7 @@
 """test_library.py - Comprehensive test suite for Library Management System — Part 2."""
 
 import os
+
 from app.core.logger import get_logs, log
 from app.models.book import Book
 from app.models.user import User
@@ -10,6 +11,7 @@ from app.services.books.library import Library
 from app.services.notifications.notifications import NotificationManager
 from app.services.recommendations.recommender import Recommender
 from app.storage.storage import Storage
+
 
 class TestRecommender:
     def test_recommend_similar_books(self, lib: Library, storage: Storage) -> None:

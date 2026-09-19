@@ -10,13 +10,14 @@ registration to the focused sub-modules:
 - gamification_routes.py – feed/search/profile/author pages + gamification renderers
 """
 
+from collections.abc import Callable
+
 from flask import Flask
 
-from app.routes.social_shared import init_shared_state
-from app.routes.social_api import register_social_api_routes
-from app.routes.review_routes import register_review_routes
 from app.routes.gamification_routes import register_gamification_routes
-from collections.abc import Callable
+from app.routes.review_routes import register_review_routes
+from app.routes.social_api import register_social_api_routes
+from app.routes.social_shared import init_shared_state
 
 
 def init_social_routes(

@@ -47,7 +47,7 @@ attacker's `role` claim trivially obtainable **and** forgeable.
 
 ### Negative
 
-- None functional. (Minor: a malicious client could still *send* `role=admin`;
+- None functional. (Minor: a malicious client could still _send_ `role=admin`;
   the server ignores it, so there is no residual risk.)
 
 ### Regression coverage

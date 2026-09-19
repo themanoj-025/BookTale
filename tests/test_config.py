@@ -5,10 +5,9 @@ from unittest.mock import patch
 
 import pytest
 
-from app.config.settings import Config, _INSECURE_SECRET_KEYS, validate_secure_config
+from app.config.settings import _INSECURE_SECRET_KEYS, Config, validate_secure_config
 
 pytestmark = pytest.mark.integration
-
 
 
 class TestConfigDefaults:

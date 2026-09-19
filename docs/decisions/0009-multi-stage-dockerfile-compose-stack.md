@@ -65,7 +65,7 @@ The project had no container story:
   the nginx service will fail to start until that file is added (or the service
   is removed). The app/db/redis services work without it.
 - **Compose `SECRET_KEY` default is `change-me-in-production`** — this literal
-  is *not* in `validate_secure_config()`'s denylist (which covers the empty
+  is _not_ in `validate_secure_config()`'s denylist (which covers the empty
   string and two historical placeholders), so the stack would boot with a weak
   key. Operators must export `SECRET_KEY` (documented in compose); adding the
   compose default to the denylist is a recommended follow-up.

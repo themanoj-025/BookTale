@@ -6,27 +6,27 @@ Extracted from social_routes.py for focused maintenance.
 import os
 import uuid
 
-from flask import jsonify, request, session
+from flask import Response, jsonify, request, session
 
 from app.config.settings import Config
 from app.core.logger import log
 from app.realtime.realtime import get_realtime
+
+# Re-export module-level refs that init_social_routes may mutate at startup.
 from app.routes.social_shared import (
     _verify_and_reencode_image,
     avatar_html,
+    book_lists,
     gamification,
+    lib,
     login_required,
     social,
     storage,
     time_ago,
 )
 
-# Re-export module-level refs that init_social_routes may mutate at startup.
-from app.routes.social_shared import lib, book_lists
-from flask import Response
-
 # referenced by init_social_routes at startup
-__all__ = ['book_lists', 'lib']
+__all__ = ["book_lists", "lib"]
 
 
 def register_social_api_routes(app, _rate_limit) -> None:

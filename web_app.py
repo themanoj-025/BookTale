@@ -9,9 +9,6 @@ Every public name from the real module is re-exported so existing imports
 keep working unchanged after the restructure.
 """
 
-import os
-import sys
-
 # Add the project root to sys.path so app package imports work
 
 from app.routes import web_app as _web_app

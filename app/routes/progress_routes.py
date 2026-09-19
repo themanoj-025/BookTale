@@ -5,19 +5,16 @@ Extracted from feature_routes.py for focused maintenance.
 
 import contextlib
 from datetime import datetime
-
-from flask import jsonify, request, session
-
 from typing import Any
 
-from flask import Response
+from flask import Response, jsonify, request, session
 
 from app.routes.feature_shared import (
-    _progress,
     _challenge,
+    _progress,
     _storage,
-    h,
     cat_color,
+    h,
 )
 
 
@@ -33,7 +30,7 @@ def register_progress_routes(app, login_required, render_page, _rate_limit) -> N
 
         def render_book_list(books, empty_msg):
             if not books:
-                return '<div class="text-center text-muted small py-3">' + empty_msg + '</div>'
+                return '<div class="text-center text-muted small py-3">' + empty_msg + "</div>"
             out = ""
             for b in books:
                 pct = b.get("percentage", 0)
@@ -41,15 +38,33 @@ def register_progress_routes(app, login_required, render_page, _rate_limit) -> N
                 bar_col = "var(--success)" if pct >= 100 else "var(--primary)"
                 out += (
                     '<div class="d-flex align-items-center gap-2 mb-2 p-2" style="border-radius:8px;border:1px solid var(--border);">'
-                    '<div style="width:36px;height:36px;border-radius:8px;background:' + cc + '20;display:flex;align-items:center;justify-content:center;flex-shrink:0;">'
+                    '<div style="width:36px;height:36px;border-radius:8px;background:'
+                    + cc
+                    + '20;display:flex;align-items:center;justify-content:center;flex-shrink:0;">'
                     '<i class="bi bi-book-fill" style="color:' + cc + ';"></i></div>'
                     '<div class="flex-grow-1" style="min-width:0;">'
-                    '<a href="/books/' + h(b["book_id"]) + '" class="fw-bold text-decoration-none" style="color:var(--text);font-size:.85rem;">' + h(b.get("book_title", ""))[:40] + '</a>'
-                    '<div class="progress-thin mt-1"><div class="bar" style="width:' + str(pct) + '%;background:' + bar_col + ';"></div></div>'
-                    '<small class="text-muted" style="font-size:.65rem;">' + str(pct) + '% · Page ' + str(b.get("current_page", 0)) + '/' + str(b.get("total_pages", 0)) + '</small>'
-                    '</div>'
-                    '<a href="/reading-progress/' + h(b["book_id"]) + '" class="btn btn-sm btn-outline" style="flex-shrink:0;"><i class="bi bi-arrow-right"></i></a>'
-                    '</div>'
+                    '<a href="/books/'
+                    + h(b["book_id"])
+                    + '" class="fw-bold text-decoration-none" style="color:var(--text);font-size:.85rem;">'
+                    + h(b.get("book_title", ""))[:40]
+                    + "</a>"
+                    '<div class="progress-thin mt-1"><div class="bar" style="width:'
+                    + str(pct)
+                    + "%;background:"
+                    + bar_col
+                    + ';"></div></div>'
+                    '<small class="text-muted" style="font-size:.65rem;">'
+                    + str(pct)
+                    + "% · Page "
+                    + str(b.get("current_page", 0))
+                    + "/"
+                    + str(b.get("total_pages", 0))
+                    + "</small>"
+                    "</div>"
+                    '<a href="/reading-progress/'
+                    + h(b["book_id"])
+                    + '" class="btn btn-sm btn-outline" style="flex-shrink:0;"><i class="bi bi-arrow-right"></i></a>'
+                    "</div>"
                 )
             return out
 
@@ -61,27 +76,48 @@ def register_progress_routes(app, login_required, render_page, _rate_limit) -> N
         time_h = stats.get("total_time_spent_minutes", 0) // 60
         time_m = stats.get("total_time_spent_minutes", 0) % 60
 
-        CONTENT = """
+        CONTENT = (
+            """
         <div class="animate-in">
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h4 class="fw-bold mb-0"><i class="bi bi-bookmark-check-fill me-2 text-primary"></i>Reading Progress</h4>
             </div>
             <div class="stats-bar mb-3 animate-in">
-                <div class="stat-item"><div class="num">""" + str(stats.get("books_started", 0)) + """</div><div class="desc">Started</div></div>
-                <div class="stat-item"><div class="num">""" + str(stats.get("books_finished", 0)) + """</div><div class="desc">Finished</div></div>
-                <div class="stat-item"><div class="num">""" + str(stats.get("completion_rate", 0)) + """%</div><div class="desc">Completion</div></div>
-                <div class="stat-item"><div class="num">""" + str(stats.get("total_pages_read", 0)) + """</div><div class="desc">Pages Read</div></div>
-                <div class="stat-item"><div class="num">""" + str(time_h) + """h """ + str(time_m) + """m</div><div class="desc">Time Spent</div></div>
+                <div class="stat-item"><div class="num">"""
+            + str(stats.get("books_started", 0))
+            + """</div><div class="desc">Started</div></div>
+                <div class="stat-item"><div class="num">"""
+            + str(stats.get("books_finished", 0))
+            + """</div><div class="desc">Finished</div></div>
+                <div class="stat-item"><div class="num">"""
+            + str(stats.get("completion_rate", 0))
+            + """%</div><div class="desc">Completion</div></div>
+                <div class="stat-item"><div class="num">"""
+            + str(stats.get("total_pages_read", 0))
+            + """</div><div class="desc">Pages Read</div></div>
+                <div class="stat-item"><div class="num">"""
+            + str(time_h)
+            + """h """
+            + str(time_m)
+            + """m</div><div class="desc">Time Spent</div></div>
             </div>
             <div class="row">
                 <div class="col-lg-7 mb-3">
                     <div class="glass-card p-3">
-                        <div class="section-title"><i class="bi bi-book-fill text-primary"></i> Currently Reading (""" + str(len(rl.get("currently_reading", []))) + """)</div>
-                        """ + READING + """
+                        <div class="section-title"><i class="bi bi-book-fill text-primary"></i> Currently Reading ("""
+            + str(len(rl.get("currently_reading", [])))
+            + """)</div>
+                        """
+            + READING
+            + """
                     </div>
                     <div class="glass-card p-3 mt-3">
-                        <div class="section-title"><i class="bi bi-check-circle-fill text-success"></i> Recently Finished (""" + str(len(rl.get("finished", []))) + """)</div>
-                        """ + FINISHED + """
+                        <div class="section-title"><i class="bi bi-check-circle-fill text-success"></i> Recently Finished ("""
+            + str(len(rl.get("finished", [])))
+            + """)</div>
+                        """
+            + FINISHED
+            + """
                     </div>
                 </div>
                 <div class="col-lg-5 mb-3">
@@ -110,6 +146,7 @@ def register_progress_routes(app, login_required, render_page, _rate_limit) -> N
             </div>
         </div>
         """
+        )
         CONTENT += """
         <script>
         var selectedProgressBookId = null;
@@ -171,34 +208,59 @@ def register_progress_routes(app, login_required, render_page, _rate_limit) -> N
             BM_HTML += (
                 '<div class="d-flex align-items-center gap-2 mb-2 p-2" style="border-radius:8px;border:1px solid var(--border);">'
                 '<i class="bi bi-bookmark-fill text-warning"></i>'
-                '<div class="flex-grow-1"><strong>Page ' + str(bm['page']) + '</strong> &middot; ' + h(bm.get('note', '')) + '</div>'
-                '<button class="btn btn-sm btn-outline" onclick="removeBookmark(\'' + bm["bookmark_id"] + '\')"><i class="bi bi-trash"></i></button>'
-                '</div>'
+                '<div class="flex-grow-1"><strong>Page '
+                + str(bm["page"])
+                + "</strong> &middot; "
+                + h(bm.get("note", ""))
+                + "</div>"
+                '<button class="btn btn-sm btn-outline" onclick="removeBookmark(\''
+                + bm["bookmark_id"]
+                + '\')"><i class="bi bi-trash"></i></button>'
+                "</div>"
             )
         if not BM_HTML:
-            BM_HTML = '<div class="text-center text-muted small py-3">No bookmarks. Add one below!</div>'
+            BM_HTML = (
+                '<div class="text-center text-muted small py-3">No bookmarks. Add one below!</div>'
+            )
 
         cc = cat_color(book.category)
-        CONTENT = """
+        CONTENT = (
+            """
         <div class="animate-in">
             <div class="row">
                 <div class="col-lg-8">
                     <div class="glass-card p-4 mb-3">
                         <div class="d-flex gap-3">
-                            <div style="width:56px;height:56px;border-radius:12px;background:linear-gradient(135deg,""" + cc + """,""" + cc + """dd);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                            <div style="width:56px;height:56px;border-radius:12px;background:linear-gradient(135deg,"""
+            + cc
+            + ""","""
+            + cc
+            + """dd);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
                                 <i class="bi bi-book-fill" style="color:white;font-size:1.3rem;"></i>
                             </div>
                             <div class="flex-grow-1">
-                                <h5 class="fw-bold mb-1">""" + h(book.title) + """</h5>
-                                <p class="text-muted mb-0">""" + h(book.author) + """</p>
+                                <h5 class="fw-bold mb-1">"""
+            + h(book.title)
+            + """</h5>
+                                <p class="text-muted mb-0">"""
+            + h(book.author)
+            + """</p>
                             </div>
                             <div class="text-end">
-                                <div class="fw-bold" style="font-size:1.5rem;color:var(--primary);">""" + str(progress.get("percentage", 0)) + """%</div>
-                                <small class="text-muted">""" + str(progress.get("current_page", 0)) + """/""" + str(progress.get("total_pages", 0) or "?") + """ pages</small>
+                                <div class="fw-bold" style="font-size:1.5rem;color:var(--primary);">"""
+            + str(progress.get("percentage", 0))
+            + """%</div>
+                                <small class="text-muted">"""
+            + str(progress.get("current_page", 0))
+            + """/"""
+            + str(progress.get("total_pages", 0) or "?")
+            + """ pages</small>
                             </div>
                         </div>
                         <div class="progress-thin mt-3" style="height:10px;border-radius:5px;">
-                            <div class="bar" style="width:""" + str(progress.get("percentage", 0)) + """%;background:var(--primary);height:10px;border-radius:5px;"></div>
+                            <div class="bar" style="width:"""
+            + str(progress.get("percentage", 0))
+            + """%;background:var(--primary);height:10px;border-radius:5px;"></div>
                         </div>
                     </div>
                     <div class="glass-card p-3 mb-3">
@@ -206,7 +268,11 @@ def register_progress_routes(app, login_required, render_page, _rate_limit) -> N
                         <div class="row g-2">
                             <div class="col-md-4">
                                 <label class="form-label">Current Page</label>
-                                <input type="number" id="updatePage" class="form-control" value=""" + str(progress.get("current_page", 0)) + """ min="0" max=""" + str(progress.get("total_pages", 9999) or 9999) + """>
+                                <input type="number" id="updatePage" class="form-control" value="""
+            + str(progress.get("current_page", 0))
+            + """ min="0" max="""
+            + str(progress.get("total_pages", 9999) or 9999)
+            + """>
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label">Minutes Read</label>
@@ -219,7 +285,9 @@ def register_progress_routes(app, login_required, render_page, _rate_limit) -> N
                         </div>
                         <div class="mt-2">
                             <label class="form-label">Notes</label>
-                            <textarea id="updateNotes" class="form-control" rows="2" placeholder="Your thoughts...">""" + h(progress.get("notes", "")) + """</textarea>
+                            <textarea id="updateNotes" class="form-control" rows="2" placeholder="Your thoughts...">"""
+            + h(progress.get("notes", ""))
+            + """</textarea>
                         </div>
                     </div>
                 </div>
@@ -227,15 +295,25 @@ def register_progress_routes(app, login_required, render_page, _rate_limit) -> N
                     <div class="glass-card p-3 mb-3">
                         <div class="section-title"><i class="bi bi-clock"></i> Reading Stats</div>
                         <div class="info-grid">
-                            <div class="info-card"><div class="value">""" + str(progress.get("percentage", 0)) + """%</div><div class="label">Complete</div></div>
-                            <div class="info-card"><div class="value">""" + str(progress.get("current_page", 0)) + """</div><div class="label">Current Page</div></div>
-                            <div class="info-card"><div class="value">""" + str(progress.get("estimated_minutes_remaining", 0)) + """m</div><div class="label">Left to Read</div></div>
-                            <div class="info-card"><div class="value">""" + str(progress.get("time_spent_minutes", 0)) + """m</div><div class="label">Time Spent</div></div>
+                            <div class="info-card"><div class="value">"""
+            + str(progress.get("percentage", 0))
+            + """%</div><div class="label">Complete</div></div>
+                            <div class="info-card"><div class="value">"""
+            + str(progress.get("current_page", 0))
+            + """</div><div class="label">Current Page</div></div>
+                            <div class="info-card"><div class="value">"""
+            + str(progress.get("estimated_minutes_remaining", 0))
+            + """m</div><div class="label">Left to Read</div></div>
+                            <div class="info-card"><div class="value">"""
+            + str(progress.get("time_spent_minutes", 0))
+            + """m</div><div class="label">Time Spent</div></div>
                         </div>
                     </div>
                     <div class="glass-card p-3">
                         <div class="section-title"><i class="bi bi-bookmark-fill text-warning"></i> Bookmarks</div>
-                        """ + BM_HTML + """
+                        """
+            + BM_HTML
+            + """
                         <hr style="border-color:var(--border);">
                         <div class="input-group input-group-sm">
                             <input type="number" id="newBookmarkPage" class="form-control" placeholder="Page #" min="1">
@@ -248,7 +326,9 @@ def register_progress_routes(app, login_required, render_page, _rate_limit) -> N
         </div>
         <script>
         function updateProgress(){
-            fetch('/api/reading-progress/""" + book_id + """/update',{
+            fetch('/api/reading-progress/"""
+            + book_id
+            + """/update',{
                 method:'POST',
                 headers:{'Content-Type':'application/json'},
                 body:JSON.stringify({
@@ -263,7 +343,9 @@ def register_progress_routes(app, login_required, render_page, _rate_limit) -> N
         }
         function markAsFinished(){
             if(!confirm('Mark this book as finished?'))return;
-            fetch('/api/reading-progress/""" + book_id + """/finish',{method:'POST'}).then(r=>r.json()).then(function(d){
+            fetch('/api/reading-progress/"""
+            + book_id
+            + """/finish',{method:'POST'}).then(r=>r.json()).then(function(d){
                 if(d.success){showToast(d.message,'success');setTimeout(function(){location.reload()},1000)}
                 else{showToast(d.error,'error')}
             });
@@ -275,7 +357,9 @@ def register_progress_routes(app, login_required, render_page, _rate_limit) -> N
             fetch('/api/bookmarks/add',{
                 method:'POST',
                 headers:{'Content-Type':'application/json'},
-                body:JSON.stringify({book_id:'""" + book_id + """',page:parseInt(p),note:n})
+                body:JSON.stringify({book_id:'"""
+            + book_id
+            + """',page:parseInt(p),note:n})
             }).then(r=>r.json()).then(function(d){
                 if(d.success){showToast(d.message,'success');setTimeout(function(){location.reload()},1000)}
                 else{showToast(d.error,'error')}
@@ -289,6 +373,7 @@ def register_progress_routes(app, login_required, render_page, _rate_limit) -> N
             });
         }
         </script>"""
+        )
         return render_page("Reading: " + book.title, CONTENT)
 
     @app.route("/reading-progress/history")
@@ -312,21 +397,38 @@ def register_progress_routes(app, login_required, render_page, _rate_limit) -> N
                 )
             )
             ROWS += (
-                '<tr>'
-                '<td><a href="/reading-progress/' + h(b["book_id"]) + '" class="fw-bold text-decoration-none" style="color:var(--text);">' + h(b.get("book_title", ""))[:50] + '</a></td>'
-                '<td><span class="badge" style="background:' + cc + '20;color:' + cc + ';">' + h(b.get("book_category", "")) + '</span></td>'
-                '<td>' + status_badge + '</td>'
+                "<tr>"
+                '<td><a href="/reading-progress/'
+                + h(b["book_id"])
+                + '" class="fw-bold text-decoration-none" style="color:var(--text);">'
+                + h(b.get("book_title", ""))[:50]
+                + "</a></td>"
+                '<td><span class="badge" style="background:'
+                + cc
+                + "20;color:"
+                + cc
+                + ';">'
+                + h(b.get("book_category", ""))
+                + "</span></td>"
+                "<td>" + status_badge + "</td>"
                 '<td><div class="d-flex align-items-center gap-2">'
-                '<div class="progress-thin flex-grow-1"><div class="bar" style="width:' + str(pct) + '%;background:var(--primary);"></div></div>'
-                '<small class="fw-bold">' + str(pct) + '%</small></div></td>'
-                '<td>' + str(b.get("current_page", 0)) + '/' + str(b.get("total_pages", 0) or "?") + '</td>'
-                '<td>' + str(b.get("time_spent_minutes", 0)) + 'm</td>'
-                '</tr>'
+                '<div class="progress-thin flex-grow-1"><div class="bar" style="width:'
+                + str(pct)
+                + '%;background:var(--primary);"></div></div>'
+                '<small class="fw-bold">' + str(pct) + "%</small></div></td>"
+                "<td>"
+                + str(b.get("current_page", 0))
+                + "/"
+                + str(b.get("total_pages", 0) or "?")
+                + "</td>"
+                "<td>" + str(b.get("time_spent_minutes", 0)) + "m</td>"
+                "</tr>"
             )
         if not ROWS:
             ROWS = '<tr><td colspan="6" class="text-center text-muted py-4">No reading history yet.</td></tr>'
 
-        CONTENT = """
+        CONTENT = (
+            """
         <div class="animate-in">
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h4 class="fw-bold mb-0"><i class="bi bi-clock-history me-2 text-info"></i>Reading History</h4>
@@ -335,10 +437,13 @@ def register_progress_routes(app, login_required, render_page, _rate_limit) -> N
             <div class="glass-card p-3">
                 <div class="table-responsive"><table class="table table-hover">
                     <thead><tr><th>Book</th><th>Category</th><th>Status</th><th>Progress</th><th>Pages</th><th>Time</th></tr></thead>
-                    <tbody>""" + ROWS + """</tbody>
+                    <tbody>"""
+            + ROWS
+            + """</tbody>
                 </table></div>
             </div>
         </div>"""
+        )
         return render_page("Reading History", CONTENT)
 
     # ── Reading Progress API ──

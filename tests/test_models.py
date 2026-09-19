@@ -3,17 +3,16 @@
 Tests model creation, relationships, and default values.
 """
 
-import pytest
 from datetime import datetime
+
+import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 
 from app.db.database import Base
-from app.db.models import Book, User, Transaction, Fine, Notification, Reservation
+from app.db.models import Book, Fine, Notification, Reservation, Transaction, User
 
 pytestmark = pytest.mark.slow
-
-
 
 
 @pytest.fixture

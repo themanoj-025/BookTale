@@ -4,7 +4,6 @@ import contextlib
 import logging
 from datetime import datetime
 
-
 from app.routes.helpers import avatar_html
 from app.routes.page_state import (
     challenge,

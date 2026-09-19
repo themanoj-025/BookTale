@@ -21,10 +21,10 @@ service layer is fast at realistic scale:
 
 ## Dataset (seeded deterministically, `random.seed(42)`)
 
-| Entity | Rows | Notes |
-| --- | --- | --- |
-| Books | 10,000 | synthetic titles/authors across 19 categories, `available_copies ≥ 1` |
-| Users | 5,000 | all `Active` membership, zero fines, empty `books_issued` |
+| Entity       | Rows   | Notes                                                                    |
+| ------------ | ------ | ------------------------------------------------------------------------ |
+| Books        | 10,000 | synthetic titles/authors across 19 categories, `available_copies ≥ 1`    |
+| Users        | 5,000  | all `Active` membership, zero fines, empty `books_issued`                |
 | Transactions | 50,000 | ~90% closed returns, ~10% open issues; ~2,000 open issues forced overdue |
 
 Seeding (bulk `executemany`, 1,000-row chunks) completes in ~5 seconds.
@@ -43,12 +43,12 @@ Seeding (bulk `executemany`, 1,000-row chunks) completes in ~5 seconds.
 
 ## Results (ms)
 
-| Operation | n | mean | p50 | p95 | p99 |
-| --- | ---: | ---: | ---: | ---: | ---: |
-| checkout (`issue_book`) | 200 | 3.61 | 3.47 | **4.39** | 12.53 |
-| `search_books "the"` | 500 | 1.44 | 1.42 | **2.05** | 2.45 |
-| `get_overdue_list` | 100 | 207.29 | 207.15 | **244.18** | 267.94 |
-| `library_stats` | 100 | 354.42 | 348.22 | **468.24** | 485.44 |
+| Operation               |   n |   mean |    p50 |        p95 |    p99 |
+| ----------------------- | --: | -----: | -----: | ---------: | -----: |
+| checkout (`issue_book`) | 200 |   3.61 |   3.47 |   **4.39** |  12.53 |
+| `search_books "the"`    | 500 |   1.44 |   1.42 |   **2.05** |   2.45 |
+| `get_overdue_list`      | 100 | 207.29 | 207.15 | **244.18** | 267.94 |
+| `library_stats`         | 100 | 354.42 | 348.22 | **468.24** | 485.44 |
 
 ## Phase 2 DoD gate
 

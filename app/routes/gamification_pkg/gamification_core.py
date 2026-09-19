@@ -4,7 +4,6 @@ gamification_core.py — Registration function, feed page, and search page.
 Extracted from gamification_routes.py for focused maintenance.
 """
 
-
 from app.routes.social_shared import (
     login_required,
     render_page,

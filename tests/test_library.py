@@ -4,10 +4,8 @@ test_library.py - Comprehensive test suite for Library Management System
 
 import os
 import shutil
-import sys
 import tempfile
 from datetime import datetime, timedelta
-
 
 import pytest
 
@@ -285,7 +283,9 @@ class TestAuth:
         auth.logout()
         assert auth.is_logged_in() is False
 
-    def test_require_role(self, storage: Storage, lib: Library, admin_user: str, normal_user: str) -> None:
+    def test_require_role(
+        self, storage: Storage, lib: Library, admin_user: str, normal_user: str
+    ) -> None:
         """Test role checking."""
         auth = AuthManager(storage)
         auth.login("ADMIN001", "admin123")
@@ -569,4 +569,3 @@ class TestLibrary:
 
 
 # RECOMMENDER TESTS
-

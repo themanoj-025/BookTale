@@ -2,6 +2,7 @@
 utils.py - CLI utility functions using the Rich library
 """
 
+import logging
 import os
 import re
 from datetime import datetime
@@ -12,7 +13,6 @@ from rich.panel import Panel
 from rich.prompt import Confirm, Prompt
 from rich.table import Table
 from rich.text import Text
-import logging
 
 logger = logging.getLogger(__name__)
 

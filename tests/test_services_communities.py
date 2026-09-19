@@ -28,9 +28,7 @@ class TestBookClubs:
 
     def test_join_club(self, mgr: Communities) -> None:
         club = {"club_id": "C1", "members": [], "owner_id": "u1"}
-        with patch.object(mgr, "_load_json", return_value=[club]), patch.object(
-            mgr, "_save_json"
-        ):
+        with patch.object(mgr, "_load_json", return_value=[club]), patch.object(mgr, "_save_json"):
             ok, _msg = mgr.join_club("C1", "u2")
             assert ok is True
 
@@ -42,9 +40,7 @@ class TestBookClubs:
 
     def test_leave_club(self, mgr: Communities) -> None:
         club = {"club_id": "C1", "members": ["u1", "u2"], "owner_id": "u1"}
-        with patch.object(mgr, "_load_json", return_value=[club]), patch.object(
-            mgr, "_save_json"
-        ):
+        with patch.object(mgr, "_load_json", return_value=[club]), patch.object(mgr, "_save_json"):
             ok, _msg = mgr.leave_club("C1", "u2")
             assert ok is True
 
@@ -63,9 +59,7 @@ class TestBookClubs:
 class TestPolls:
     def test_create_poll(self, mgr: Communities) -> None:
         with patch.object(mgr, "_save_json"):
-            ok, _msg, poll = mgr.create_poll(
-                "u1", "Best fantasy book?", ["LOTR", "HP", "Narnia"]
-            )
+            ok, _msg, poll = mgr.create_poll("u1", "Best fantasy book?", ["LOTR", "HP", "Narnia"])
             assert ok is True
             assert poll["question"] == "Best fantasy book?"
 
@@ -77,9 +71,7 @@ class TestPolls:
                 {"text": "B", "votes": 0, "voters": []},
             ],
         }
-        with patch.object(mgr, "_load_json", return_value=[poll]), patch.object(
-            mgr, "_save_json"
-        ):
+        with patch.object(mgr, "_load_json", return_value=[poll]), patch.object(mgr, "_save_json"):
             ok, _msg = mgr.vote_poll("P1", 0, "u1")
             assert ok is True
 

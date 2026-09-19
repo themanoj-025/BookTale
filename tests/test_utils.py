@@ -3,7 +3,6 @@
 Tests validation helpers, formatting, and ANSI color output.
 """
 
-
 from app.core.utils import (
     colored,
     create_table,

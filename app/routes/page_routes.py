@@ -56,11 +56,11 @@ def init_page_routes(
     )
 
     # Register route modules
-    from app.routes.explore_routes import init_explore_routes
-    from app.routes.reading_routes import init_reading_routes
     from app.routes.admin_page_routes import init_admin_page_routes
     from app.routes.club_routes import init_club_routes
     from app.routes.dashboard_page_routes import init_dashboard_page_routes
+    from app.routes.explore_routes import init_explore_routes
+    from app.routes.reading_routes import init_reading_routes
 
     init_explore_routes(app)
     init_reading_routes(app)

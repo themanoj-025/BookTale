@@ -35,16 +35,16 @@ Replace the per-call rewrite with Python's stdlib `logging`:
 - **One `write()` per record** — `logging` issues a single write per emit, so
   concurrent appends are safe (no read-modify-write race as with the old
   per-call rewrite). Note: rotation can still interleave under multiple
-  *processes*; that's fine for the single-process app today and a non-issue for
+  _processes_; that's fine for the single-process app today and a non-issue for
   the test suite, which uses one process.
 - **Request correlation via `contextvars`** — `set_request_id()` (called by the
   web `before_request` middleware) sets a per-thread/async-task request ID that
   the JSON formatter attaches. No module-level globals, safe under concurrent
   requests and async tasks.
 - **Backward-compatible public API** — `log(action, actor, extra, user_id,
-  book_id)` and `get_logs(limit)` keep the legacy call signatures, so every
+book_id)` and `get_logs(limit)` keep the legacy call signatures, so every
   existing call site (`web_app.py`, route modules, services, CLI) is unchanged.
-- **`reset_logger()` test helper** — closes only *file-based* handlers (detected
+- **`reset_logger()` test helper** — closes only _file-based_ handlers (detected
   via `baseFilename`) and leaves console/stderr handlers alone, because pytest
   owns those streams. This fixes the Windows `PermissionError` where
   `shutil.rmtree` hit an open log handle.

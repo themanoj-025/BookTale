@@ -12,4 +12,3 @@ from app.routes.gamification_pkg import register_gamification_routes
 __all__ = [
     "register_gamification_routes",
 ]
-

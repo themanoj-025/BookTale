@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import os
-import sys
 import tempfile
 
 import pytest
@@ -31,6 +30,7 @@ for _d in (Config.DATA_DIR, Config.LOGS_DIR, Config.BACKUPS_DIR):
     os.makedirs(_d, exist_ok=True)
 
 from flask.testing import FlaskClient
+
 from web_app import app
 
 
@@ -65,10 +65,7 @@ class TestSocialRoutes:
         assert resp.status_code in (302, 401, 403)
 
     def test_social_comment_requires_auth(self, client: FlaskClient) -> None:
-        resp = client.post("/api/social/comment", json={
-            "post_id": "test",
-            "text": "Nice!"
-        })
+        resp = client.post("/api/social/comment", json={"post_id": "test", "text": "Nice!"})
         assert resp.status_code in (302, 401, 403)
 
     def test_follow_requires_auth(self, client: FlaskClient) -> None:

@@ -11,7 +11,6 @@ from functools import wraps
 
 from flask import redirect, session, url_for
 
-
 # ── Module-level shared state (populated by init_social_routes) ──
 
 storage = None
@@ -99,9 +98,7 @@ def _magic_signature_ok(file) -> bool:
     """
     head = file.read(16)
     file.seek(0)
-    if (
-        head.startswith((b"\x89PNG\r\n\x1a\n", b"\xff\xd8\xff", b"GIF87a", b"GIF89a"))
-    ):
+    if head.startswith((b"\x89PNG\r\n\x1a\n", b"\xff\xd8\xff", b"GIF87a", b"GIF89a")):
         return True
     return head[:4] == b"RIFF" and head[8:12] == b"WEBP"
 
@@ -353,11 +350,11 @@ def _render_fav_grid(fav_books: list, is_own: bool) -> str:
             if b.cover_url:
                 cover = f'<img src="{_esc(b.cover_url)}" alt="{_esc(b.title)}" class="bt-cover-img" loading="lazy">'
             else:
-                cover = (
-                    f'<div class="bt-cover-placeholder" style="background:linear-gradient(135deg,{cc},{cc}dd);font-size:1.2rem;">{_esc(b.title[:2].upper())}</div>'
-                )
+                cover = f'<div class="bt-cover-placeholder" style="background:linear-gradient(135deg,{cc},{cc}dd);font-size:1.2rem;">{_esc(b.title[:2].upper())}</div>'
             rm = (
-                '<button class="bt-fav-remove" onclick="removeFav(\'{}\')" aria-label="Remove {}">&times;</button>'.format(b.book_id.replace("'", "\\'").replace('"', "&quot;"), _esc(b.title))
+                '<button class="bt-fav-remove" onclick="removeFav(\'{}\')" aria-label="Remove {}">&times;</button>'.format(
+                    b.book_id.replace("'", "\\'").replace('"', "&quot;"), _esc(b.title)
+                )
                 if is_own
                 else ""
             )

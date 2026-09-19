@@ -225,14 +225,13 @@ class Library(LibraryReportMixin):
                 by_category = q in b.category.lower()
                 by_id = q.upper() in b.book_id.upper()
                 if (
-                    (search_by == "title"
-                    and not by_title)
-                    or (search_by == "author"
-                    and not by_author)
-                    or (search_by == "isbn"
-                    and not by_isbn)
-                    or (search_by == "all"
-                    and not any([by_title, by_author, by_isbn, by_category, by_id]))
+                    (search_by == "title" and not by_title)
+                    or (search_by == "author" and not by_author)
+                    or (search_by == "isbn" and not by_isbn)
+                    or (
+                        search_by == "all"
+                        and not any([by_title, by_author, by_isbn, by_category, by_id])
+                    )
                 ):
                     continue
 

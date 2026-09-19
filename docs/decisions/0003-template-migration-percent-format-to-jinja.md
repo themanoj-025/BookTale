@@ -14,6 +14,7 @@ three distinct classes of problems:
 
 1. **Runtime crashes from malformed format strings.** The audit confirmed five
    sites that raise `ValueError`/`TypeError` when rendered:
+
    - `page_routes.py` — reading-calendar, analytics, admin/users (literal `%`
      in CSS/JS such as `width:100%` and `cutout:"65%"` parsed as format
      specifiers);

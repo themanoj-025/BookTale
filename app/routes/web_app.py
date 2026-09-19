@@ -8,8 +8,8 @@ import contextlib
 import html
 import os
 import sys
-from typing import Any
 from functools import wraps
+from typing import Any
 
 if sys.platform == "win32":
     for _stream in (sys.stdout, sys.stderr):
@@ -60,17 +60,24 @@ validate_secure_config()
 
 # ── CSRF protection ─────────────────────────────────────────────────────────
 app.config["WTF_CSRF_ENABLED"] = os.getenv("WTF_CSRF_ENABLED", "1").strip().lower() in (
-    "1", "true", "yes", "on",
+    "1",
+    "true",
+    "yes",
+    "on",
 )
 try:
     from flask_wtf.csrf import CSRFProtect
+
     csrf = CSRFProtect(app)
 except ImportError:
     csrf = None
 
 # ── Rate limiting ───────────────────────────────────────────────────────────
 app.config["RATELIMIT_ENABLED"] = os.getenv("RATELIMIT_ENABLED", "1").strip().lower() in (
-    "1", "true", "yes", "on",
+    "1",
+    "true",
+    "yes",
+    "on",
 )
 
 
@@ -109,7 +116,9 @@ def _user_key() -> dict[str, str]:
     return f"ip:{request.remote_addr}"
 
 
-def _audit_log(admin_id: str, action: str, target: str = "", old_value: Any = None, new_value: Any = None) -> None:
+def _audit_log(
+    admin_id: str, action: str, target: str = "", old_value: Any = None, new_value: Any = None
+) -> None:
     """Append one row to the admin audit trail."""
     try:
         import app.db.database as _dbmod
@@ -127,8 +136,7 @@ def _audit_log(admin_id: str, action: str, target: str = "", old_value: Any = No
             )
     except (OSError, ValueError) as e:
         log(
-            f"audit write failed (admin={admin_id}, action={action}, "
-            f"target={target}): {e}",
+            f"audit write failed (admin={admin_id}, action={action}, " f"target={target}): {e}",
             "audit",
         )
 
@@ -147,6 +155,7 @@ def asset(path) -> str:
     _manifest = getattr(asset, "_manifest", None)
     if _manifest is None:
         import json as _json
+
         _manifest = {}
         try:
             with open(
@@ -228,16 +237,33 @@ diary_mgr = DiaryManager(storage)
 
 # Social routes
 init_social_routes(
-    app, storage, lib, auth, social, review_mgr, recommender,
-    notif_mgr, book_lists, communities, gamification,
+    app,
+    storage,
+    lib,
+    auth,
+    social,
+    review_mgr,
+    recommender,
+    notif_mgr,
+    book_lists,
+    communities,
+    gamification,
 )
 
 # Feature routes (series, challenge, progress, wishlist, diary)
 from app.routes.feature_routes import init_feature_routes
 
 init_feature_routes(
-    app, storage, lib, auth, notif_mgr, series_mgr,
-    challenge, reading_progress, wishlist, diary_mgr,
+    app,
+    storage,
+    lib,
+    auth,
+    notif_mgr,
+    series_mgr,
+    challenge,
+    reading_progress,
+    wishlist,
+    diary_mgr,
 )
 
 # Auth routes (login, register, forgot-password, reset-password, verify-email)
@@ -256,21 +282,37 @@ from app.routes.api_routes import init_api_routes
 init_api_routes(app, storage, lib, auth, notif_mgr, recommender, social, diary_mgr)
 
 # Page routes
+from collections.abc import Callable
+
+from flask import Response
+
 from app.routes.helpers import init_helpers
 from app.routes.page_routes import init_page_routes
-from collections.abc import Callable
-from flask import Response
 
 init_helpers(storage, notif_mgr)
 init_page_routes(
-    app, storage, lib, auth, notif_mgr, social, review_mgr,
-    recommender, book_lists, communities, gamification, series_mgr,
-    challenge, reading_progress, wishlist, diary_mgr,
+    app,
+    storage,
+    lib,
+    auth,
+    notif_mgr,
+    social,
+    review_mgr,
+    recommender,
+    book_lists,
+    communities,
+    gamification,
+    series_mgr,
+    challenge,
+    reading_progress,
+    wishlist,
+    diary_mgr,
 )
 init_site_pages(app, storage, lib, recommender, social, review_mgr, notif_mgr)
 
 
 # ── Utility helpers ─────────────────────────────────────────────────────────
+
 
 def h(text: object) -> str:
     return html.escape(str(text))
@@ -282,6 +324,7 @@ def login_required(f: Callable[..., Any]) -> Callable[..., Any]:
         if "user_id" not in session:
             return redirect(url_for("login_page"))
         return f(*a, **k)
+
     return d
 
 
@@ -293,6 +336,7 @@ def admin_required(f: Callable[..., Any]) -> Callable[..., Any]:
         if session.get("role") != "admin":
             return jsonify({"error": "Admin access required"}), 403
         return f(*a, **k)
+
     return d
 
 
@@ -311,6 +355,7 @@ def api_key_required(f: Callable[..., Any]) -> Callable[..., Any]:
         if not _secrets.compare_digest(token, api_key):
             return jsonify({"error": "Invalid API key"}), 403
         return f(*a, **k)
+
     return d
 
 
@@ -336,14 +381,15 @@ def render_auth_page(title: str, content: str, **kw: Any) -> str:
     return render_template("auth_base.html", title=title, auth_content=content, session={}, **kw)
 
 
-
 # Helpers extracted to web_app_helpers.py
 from app.routes.web_app_helpers import (
-    _initials,  # noqa: F401
     _avatar_color,  # noqa: F401
     _avatar_html,  # noqa: F401
+    _initials,  # noqa: F401
     cat_color,  # noqa: F401
 )
+
+
 def healthz() -> dict[str, str]:
     return jsonify({"status": "ok"}), 200
 
@@ -352,6 +398,7 @@ def healthz() -> dict[str, str]:
 def readyz() -> dict:
     try:
         from sqlalchemy import text as _sqltext
+
         import app.db.database as _dbmod
 
         with _dbmod.get_session_factory()() as db_session:
@@ -359,6 +406,7 @@ def readyz() -> dict:
         return jsonify({"status": "ok", "database": "connected"}), 200
     except (ValueError, KeyError, OSError) as e:
         from app.core.logger import log as _log
+
         _log(f"readyz probe failed: {e}", "health")
         return jsonify({"status": "not_ready", "error": "database unreachable"}), 503
 
@@ -368,7 +416,7 @@ def readyz() -> dict:
 # ════════════════════════════════════════════════════════════════════════════
 
 try:
-    from prometheus_client import Counter, Histogram, Gauge, generate_latest, CONTENT_TYPE_LATEST
+    from prometheus_client import CONTENT_TYPE_LATEST, Counter, Gauge, Histogram, generate_latest
 
     BOOKTALE_REQUEST_COUNT = Counter(
         "booktale_requests_total",
@@ -385,9 +433,7 @@ try:
         "booktale_active_sessions",
         "Number of active user sessions",
     )
-    BOOKTALE_BOOKS_TOTAL = Gauge(
-        "booktale_books_total", "Total books in the library"
-    )
+    BOOKTALE_BOOKS_TOTAL = Gauge("booktale_books_total", "Total books in the library")
     _PROMETHEUS_AVAILABLE = True
 except ImportError:
     _PROMETHEUS_AVAILABLE = False
@@ -398,6 +444,7 @@ def _prometheus_before_request() -> None:
     if not _PROMETHEUS_AVAILABLE:
         return
     from time import time as _time
+
     g._prom_start = _time()
 
 
@@ -441,6 +488,7 @@ def prometheus_metrics() -> Response:
 @app.route("/api/openapi.json")
 def api_openapi_json() -> str:
     from app.api.api_spec import build_openapi_spec
+
     return jsonify(build_openapi_spec())
 
 
@@ -480,8 +528,12 @@ def api_docs() -> dict:
 # ════════════════════════════════════════════════════════════════════════════
 
 from app.routes.settings_pages import (
-    security_page as _security_page,
     help_page as _help_page,
+)
+from app.routes.settings_pages import (
+    security_page as _security_page,
+)
+from app.routes.settings_pages import (
     settings_page as _settings_page,
 )
 
@@ -508,11 +560,14 @@ def settings_page() -> str:
     """User settings page with Profile, Notifications, Privacy, Appearance, and Reading tabs."""
     return _settings_page(render_page, storage, notif_mgr)
 
+
 if __name__ == "__main__":
     import logging as _logging
+
     _logging.getLogger(__name__).info(
         "Library Management System starting — http://%s:%s",
-        Config.FLASK_HOST, Config.FLASK_PORT,
+        Config.FLASK_HOST,
+        Config.FLASK_PORT,
     )
     socketio.run(
         app,

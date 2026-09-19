@@ -11,7 +11,6 @@ from app.services.books.reviews import ReviewManager
 pytestmark = pytest.mark.unit
 
 
-
 @pytest.fixture()
 def mgr() -> ReviewManager:
     storage = MagicMock()

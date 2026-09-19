@@ -1,16 +1,21 @@
 """Chart and visualization functions."""
 
 from __future__ import annotations
-from app.services.recommendations.ml.Model.ml_pkg.models import ALGORITHM_COLORS
-from app.services.recommendations.ml.Model.ml_pkg.models import ModelResult
-from app.services.recommendations.ml.Model.ml_pkg.models import OUTPUT_DIR
-from app.services.recommendations.ml.Model.ml_pkg.models import PLOTLY_AVAILABLE
-import plotly.graph_objects as go
+
+import logging
+
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
+import plotly.graph_objects as go
 import seaborn as sns
-import logging
+
+from app.services.recommendations.ml.Model.ml_pkg.models import (
+    ALGORITHM_COLORS,
+    OUTPUT_DIR,
+    PLOTLY_AVAILABLE,
+    ModelResult,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -89,7 +94,9 @@ def save_radar_chart(results: list[ModelResult], filename: str = "radar_comparis
     logger.info(f"  ✅ Radar chart saved: {path}")
 
 
-def save_bar_comparison(results: list[ModelResult], metric: str, filename: str | None = None) -> None:
+def save_bar_comparison(
+    results: list[ModelResult], metric: str, filename: str | None = None
+) -> None:
     """Create a bar chart comparing a specific metric across algorithms."""
     names = [r.name for r in results]
     values = [r.metrics.get(metric, 0) for r in results]
@@ -189,7 +196,9 @@ def save_k_distance_plot(k_dist: np.ndarray, filename: str = "k_distance_plot.pn
     logger.info(f"  ✅ k-Distance plot saved: {path}")
 
 
-def save_cluster_visualization(X_2d: np.ndarray, labels: np.ndarray, title: str, filename: str) -> None:
+def save_cluster_visualization(
+    X_2d: np.ndarray, labels: np.ndarray, title: str, filename: str
+) -> None:
     """Save 2D cluster visualization."""
     n_clusters = len(set(labels)) - (1 if -1 in labels else 0)
     _fig, ax = plt.subplots(figsize=(12, 8))
@@ -218,7 +227,9 @@ def save_cluster_visualization(X_2d: np.ndarray, labels: np.ndarray, title: str,
     logger.info(f"  ✅ Cluster viz saved: {path}")
 
 
-def save_heatmap_comparison(results: list[ModelResult], filename: str = "performance_heatmap.png") -> None:
+def save_heatmap_comparison(
+    results: list[ModelResult], filename: str = "performance_heatmap.png"
+) -> None:
     """Create a heatmap of all metrics across all algorithms."""
     metrics_pool = set()
     for r in results:
@@ -291,7 +302,9 @@ def save_heatmap_comparison(results: list[ModelResult], filename: str = "perform
     logger.info(f"  ✅ Heatmap saved: {path}")
 
 
-def save_interactive_radar(results: list[ModelResult], filename: str = "interactive_radar.html") -> None:
+def save_interactive_radar(
+    results: list[ModelResult], filename: str = "interactive_radar.html"
+) -> None:
     """Create interactive radar chart using Plotly."""
     if not PLOTLY_AVAILABLE:
         return
@@ -401,5 +414,3 @@ def save_summary_report(results: list[ModelResult], df: pd.DataFrame) -> None:
 
 
 # 4. MAIN PIPELINE
-
-

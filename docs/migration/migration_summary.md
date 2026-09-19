@@ -7,22 +7,22 @@ commits, flag-don't-delete when uncertain.
 
 ## 1. What was done
 
-| Phase | Action | Result |
-|---|---|---|
-| 1. Analysis | Full inventory + import-graph scan + reference scan | `docs/project/analysis_report.md` |
-| 2. Classification | Every top-level entry tagged | §2 of the analysis report |
-| 3. Duplicate & dead code | SHA-256 hash scan + dependency audit + empty-file walk | 1 scaffold removed · 1 duplicate dep block deduped · 0 real dupes |
-| 4. Target architecture | Adapted to existing feature layout (no force-fit) | `docs/folder_structure.md` |
-| 5. Moves & references | Removal + reference updates | archived `AGENTS_FIX.md` removed; `.dockerignore` updated |
-| 6. AI-artifact cleanup | Scaffolding scan | `docs/assets/agents/AGENTS_FIX.md` (leftover v7.0 prompt) removed |
-| 7. Cross-cutting | Secret scan, ML-output audit, CI review | clean / report-only (findings in §6) |
-| 8. Verification | pytest suite, flake8, py_compile | **full test suite PASS** (§5) |
-| 9. Reporting | This file + architecture + folder structure + analysis report | ✔ |
+| Phase                    | Action                                                        | Result                                                            |
+| ------------------------ | ------------------------------------------------------------- | ----------------------------------------------------------------- |
+| 1. Analysis              | Full inventory + import-graph scan + reference scan           | `docs/project/analysis_report.md`                                 |
+| 2. Classification        | Every top-level entry tagged                                  | §2 of the analysis report                                         |
+| 3. Duplicate & dead code | SHA-256 hash scan + dependency audit + empty-file walk        | 1 scaffold removed · 1 duplicate dep block deduped · 0 real dupes |
+| 4. Target architecture   | Adapted to existing feature layout (no force-fit)             | `docs/folder_structure.md`                                        |
+| 5. Moves & references    | Removal + reference updates                                   | archived `AGENTS_FIX.md` removed; `.dockerignore` updated         |
+| 6. AI-artifact cleanup   | Scaffolding scan                                              | `docs/assets/agents/AGENTS_FIX.md` (leftover v7.0 prompt) removed |
+| 7. Cross-cutting         | Secret scan, ML-output audit, CI review                       | clean / report-only (findings in §6)                              |
+| 8. Verification          | pytest suite, flake8, py_compile                              | **full test suite PASS** (§5)                                     |
+| 9. Reporting             | This file + architecture + folder structure + analysis report | ✔                                                                |
 
 ## 2. Deletion log
 
-| Path | Category | Evidence | Action |
-|---|---|---|---|
+| Path                               | Category                 | Evidence                                                                                                                                                                                                                                                                                 | Action            |
+| ---------------------------------- | ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------- |
 | `docs/assets/agents/AGENTS_FIX.md` | AI scaffolding (Phase 6) | Byte-identical v7.0 "ULTRA MASTER FIX PROMPT" file duplicated across all 16 sibling repos; archived by a prior pass (per CHANGELOG) but with **zero consumers** — no code/CI/Docker references; only a `.dockerignore` exclusion (updated) and a CHANGELOG historical note (left intact) | DELETE (`git rm`) |
 
 Blast-radius check: no dynamic imports, no config/CI/Docker path references,
@@ -46,14 +46,14 @@ identical.
 
 ## 5. Verification report (Phase 8)
 
-| Check | Command | Result |
-|---|---|---|
-| Test suite | `python -m pytest tests/ -q` | **PASS — exit 0**, ~150 tests, 0 failures (2 skipped) |
-| Coverage gate | `--cov=db --cov-fail-under=85` (CI) | exercised by the suite above; no regressions |
-| Lint (critical) | `flake8 . --select=E9,F63,F7,F82` | **PASS** — 0 errors |
-| Syntax | `python -m py_compile` (CI-equivalent) | **PASS** (via suite import) |
-| Docker build / live boot | `docker build`, web boot | **NOT RUN** — no container runtime verified on this host (flagged); changes touch no image paths |
-| ML notebook | Jupyter run | **NOT RUN** — requires data-science env; notebook untouched |
+| Check                    | Command                                | Result                                                                                           |
+| ------------------------ | -------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| Test suite               | `python -m pytest tests/ -q`           | **PASS — exit 0**, ~150 tests, 0 failures (2 skipped)                                            |
+| Coverage gate            | `--cov=db --cov-fail-under=85` (CI)    | exercised by the suite above; no regressions                                                     |
+| Lint (critical)          | `flake8 . --select=E9,F63,F7,F82`      | **PASS** — 0 errors                                                                              |
+| Syntax                   | `python -m py_compile` (CI-equivalent) | **PASS** (via suite import)                                                                      |
+| Docker build / live boot | `docker build`, web boot               | **NOT RUN** — no container runtime verified on this host (flagged); changes touch no image paths |
+| ML notebook              | Jupyter run                            | **NOT RUN** — requires data-science env; notebook untouched                                      |
 
 Nothing is fabricated: the Docker/ML checks are stated exactly as they stand.
 
@@ -110,6 +110,7 @@ Nothing is fabricated: the Docker/ML checks are stated exactly as they stand.
 **Risk & Rollback (P8):** No moves — no new risk.
 
 **Follow-up backlog (P9):**
+
 - tests/test_library.py::TestLogger::test_log fails only in full-suite order (logger singleton + Windows file-handle timing); passes in isolation — pre-existing flake, not a migration regression.
 - docs/ is gitignored in this repo — docs changes must be force-added (repo convention).
 

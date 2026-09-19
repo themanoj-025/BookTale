@@ -6,13 +6,13 @@ Extracted from web_app.py to reduce file size and improve maintainability.
 
 import html
 import os
+from collections.abc import Callable
 from functools import wraps
+from typing import Any
 
 from flask import g, jsonify, redirect, render_template, request, session, url_for
 
 from app.config.settings import Config
-from typing import Any
-from collections.abc import Callable
 
 
 def init_admin_routes(app, storage, lib, auth, notif_mgr) -> None:
@@ -34,7 +34,9 @@ def init_admin_routes(app, storage, lib, auth, notif_mgr) -> None:
     def h(text: object) -> str:
         return html.escape(str(text))
 
-    def _audit_log(admin_id: str, action: str, target: str = "", old_value: Any = None, new_value: Any = None) -> None:
+    def _audit_log(
+        admin_id: str, action: str, target: str = "", old_value: Any = None, new_value: Any = None
+    ) -> None:
         try:
             import app.db.database as _dbmod
             from app.db.repositories import AuditLogRepository
@@ -51,9 +53,9 @@ def init_admin_routes(app, storage, lib, auth, notif_mgr) -> None:
                 )
         except (OSError, ValueError) as e:
             from app.core.logger import log as _log
+
             _log(
-                f"audit write failed (admin={admin_id}, action={action}, "
-                f"target={target}): {e}",
+                f"audit write failed (admin={admin_id}, action={action}, " f"target={target}): {e}",
                 "audit",
             )
 
@@ -78,6 +80,7 @@ def init_admin_routes(app, storage, lib, auth, notif_mgr) -> None:
             if "user_id" not in session:
                 return redirect(url_for("login_page"))
             return f(*a, **k)
+
         return d
 
     def admin_required(f: Callable[..., Any]) -> Callable[..., Any]:
@@ -88,6 +91,7 @@ def init_admin_routes(app, storage, lib, auth, notif_mgr) -> None:
             if session.get("role") != "admin":
                 return jsonify({"error": "Admin access required"}), 403
             return f(*a, **k)
+
         return d
 
     # ── Admin Settings Page ─────────────────────────────────────────────────
@@ -361,6 +365,7 @@ function saveAdminSettings() {
             if len(npw) >= 6:
                 admin.password_hash = _hp(npw)
                 from app.core.logger import log
+
                 log("Admin password changed via admin settings", uid)
                 _audit_log(
                     uid,
@@ -371,6 +376,7 @@ function saveAdminSettings() {
                 )
 
         import json as _json
+
         os.makedirs(Config.DATA_DIR, exist_ok=True)
         override_path = os.path.join(Config.DATA_DIR, "settings_override.json")
         with open(override_path, "w", encoding="utf-8") as f:
@@ -378,6 +384,7 @@ function saveAdminSettings() {
 
         storage.save_users(users)
         from app.core.logger import log
+
         log("Admin settings saved", uid)
         return jsonify(
             {
@@ -423,9 +430,7 @@ function saveAdminSettings() {
                 f.get("created_at", "")[:10],
             )
         if not rows:
-            rows = (
-                '<tr><td colspan="5" class="text-center text-muted py-4">No fines recorded.</td></tr>'
-            )
+            rows = '<tr><td colspan="5" class="text-center text-muted py-4">No fines recorded.</td></tr>'
 
         CONTENT = """<div class="animate-in">
     <div class="glass-card p-0 mb-3" style="overflow:hidden;">

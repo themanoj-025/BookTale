@@ -10,9 +10,9 @@ import logging
 import zlib
 from datetime import datetime
 from functools import wraps
+from typing import Any
 
 from flask import redirect, render_template, session, url_for
-from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -71,16 +71,21 @@ def avatar_html(name, size=32) -> str:
     else:
         initials = parts[0][:2].upper()
     clrs = [
-        "#4f46e5", "#059669", "#d97706", "#dc2626",
-        "#0891b2", "#7c3aed", "#db2777", "#ca8a04",
+        "#4f46e5",
+        "#059669",
+        "#d97706",
+        "#dc2626",
+        "#0891b2",
+        "#7c3aed",
+        "#db2777",
+        "#ca8a04",
     ]
     c = clrs[zlib.crc32(str(name).encode("utf-8")) % len(clrs)]
     return (
         '<div class="avatar" style="width:%dpx;height:%dpx;background:%s20;'
-        'color:%s;font-size:%dpx;font-weight:700;border-radius:50%%;'
-        'display:inline-flex;align-items:center;justify-content:center;'
-        'flex-shrink:0;" title="%s">%s</div>'
-        % (size, size, c, c, size // 2, h(name), h(initials))
+        "color:%s;font-size:%dpx;font-weight:700;border-radius:50%%;"
+        "display:inline-flex;align-items:center;justify-content:center;"
+        'flex-shrink:0;" title="%s">%s</div>' % (size, size, c, c, size // 2, h(name), h(initials))
     )
 
 
@@ -136,16 +141,19 @@ def get_current_user() -> dict | None:
 
 def login_required(f) -> dict:
     """Decorator: redirect to login if user is not authenticated."""
+
     @wraps(f)
     def d(*a, **k) -> Any:
         if "user_id" not in session:
             return redirect(url_for("login_page"))
         return f(*a, **k)
+
     return d
 
 
 def admin_required(f) -> None:
     """Decorator: require admin role, show forbidden page if not."""
+
     @wraps(f)
     def d(*a, **k) -> dict:
         if "user_id" not in session:
@@ -158,6 +166,7 @@ def admin_required(f) -> None:
                 '<p class="text-muted">This page requires admin privileges.</p></div>',
             )
         return f(*a, **k)
+
     return d
 
 

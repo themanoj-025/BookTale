@@ -31,10 +31,9 @@ from app.db.service import LibraryService
 pytestmark = pytest.mark.unit
 
 
-
-
-
 pytestmark = pytest.mark.slow
+
+
 @pytest.fixture()
 def db_env(monkeypatch) -> None:
     """Point the engine at a throwaway SQLite file; rebuild on teardown.

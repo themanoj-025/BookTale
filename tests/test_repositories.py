@@ -3,8 +3,9 @@
 Tests CRUD operations and query helpers.
 """
 
-import pytest
 from datetime import datetime
+
+import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 
@@ -13,13 +14,11 @@ from app.db.models import Book, User
 
 pytestmark = pytest.mark.slow
 from app.db.repositories import (
-
     BookRepository,
     TransactionRepository,
     UserRepository,
     _parse_dt,
 )
-
 
 
 @pytest.fixture

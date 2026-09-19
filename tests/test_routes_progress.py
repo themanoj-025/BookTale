@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import os
-import sys
 import tempfile
 
 import pytest
@@ -31,6 +30,7 @@ for _d in (Config.DATA_DIR, Config.LOGS_DIR, Config.BACKUPS_DIR):
     os.makedirs(_d, exist_ok=True)
 
 from flask.testing import FlaskClient
+
 from web_app import app
 
 
@@ -53,10 +53,7 @@ class TestProgressRoutes:
         assert resp.status_code in (302, 401, 403)
 
     def test_progress_update_requires_auth(self, client: FlaskClient) -> None:
-        resp = client.post("/api/progress", json={
-            "book_id": "test",
-            "page": 50
-        })
+        resp = client.post("/api/progress", json={"book_id": "test", "page": 50})
         assert resp.status_code in (302, 401, 403)
 
     def test_bookmarks_requires_auth(self, client: FlaskClient) -> None:
