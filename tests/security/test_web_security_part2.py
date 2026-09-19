@@ -104,9 +104,9 @@ class TestRedisLimiterStorage:
                 assert c_a.post("/limited").status_code == 200
             assert c_a.post("/limited").status_code == 429
             # Worker B, same Redis, sees the SAME exhausted budget.
-            assert (
-                c_b.post("/limited").status_code == 429
-            ), "budget must be shared across limiter instances (multi-worker)"
+            assert c_b.post("/limited").status_code == 429, (
+                "budget must be shared across limiter instances (multi-worker)"
+            )
         # Clean up the unique test keys so later runs start fresh.
         try:
             import redis as _redis_client
@@ -462,15 +462,15 @@ class TestXssClientSideSinks:
             assert resp.status_code == 200, f"{path} did not render"
             html = resp.get_data(as_text=True)
             assert "booktaleUtils.escapeHtml(b.title)" in html, f"{path}: title display not escaped"
-            assert (
-                "booktaleUtils.escapeHtml(b.author)" in html
-            ), f"{path}: author display not escaped"
-            assert (
-                "booktaleUtils.jsStr(b.title)" in html
-            ), f"{path}: onclick title not jsStr-escaped"
-            assert (
-                "booktaleUtils.jsStr(b.book_id)" in html
-            ), f"{path}: onclick book_id not jsStr-escaped"
+            assert "booktaleUtils.escapeHtml(b.author)" in html, (
+                f"{path}: author display not escaped"
+            )
+            assert "booktaleUtils.jsStr(b.title)" in html, (
+                f"{path}: onclick title not jsStr-escaped"
+            )
+            assert "booktaleUtils.jsStr(b.book_id)" in html, (
+                f"{path}: onclick book_id not jsStr-escaped"
+            )
 
     def test_bookmarks_list_escapes_note_and_title(self, client) -> None:
         """Reading-progress bookmarks interpolate book_title/note into innerHTML."""

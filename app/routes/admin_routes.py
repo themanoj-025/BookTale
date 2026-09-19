@@ -55,7 +55,7 @@ def init_admin_routes(app, storage, lib, auth, notif_mgr) -> None:
             from app.core.logger import log as _log
 
             _log(
-                f"audit write failed (admin={admin_id}, action={action}, " f"target={target}): {e}",
+                f"audit write failed (admin={admin_id}, action={action}, target={target}): {e}",
                 "audit",
             )
 

@@ -37,7 +37,7 @@ def reports_menu(lib: Library) -> None:
             header("📚 Most Issued Books")
             for i, r in enumerate(data, 1):
                 logger.info(
-                    f"  {i:2}. [{r['id']}] {r['title']} — {r['author']} " f"| Issued {r['count']}×"
+                    f"  {i:2}. [{r['id']}] {r['title']} — {r['author']} | Issued {r['count']}×"
                 )
         elif choice == "2":
             data = lib.report_active_users()

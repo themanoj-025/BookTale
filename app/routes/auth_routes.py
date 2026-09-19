@@ -317,7 +317,7 @@ def init_auth_routes(app, storage, lib, auth, notif_mgr) -> None:
             if _gen_csrf is not None:
                 try:
                     _csrf_hidden = (
-                        '<input type="hidden" name="csrf_token" ' 'value="' + _gen_csrf() + '">'
+                        '<input type="hidden" name="csrf_token" value="' + _gen_csrf() + '">'
                     )
                 except (ImportError, RuntimeError):
                     _csrf_hidden = ""

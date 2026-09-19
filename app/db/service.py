@@ -73,14 +73,13 @@ class LibraryService:
                 return False, f"User membership is {user.membership_status}"
             if len(user.books_issued or []) >= Config.MAX_BORROW_LIMIT:
                 return False, (
-                    f"User has reached max borrow limit " f"({Config.MAX_BORROW_LIMIT} books)"
+                    f"User has reached max borrow limit ({Config.MAX_BORROW_LIMIT} books)"
                 )
             if book_id in (user.books_issued or []):
                 return False, "User already has this book issued"
             if user.unpaid_fine > 0:
                 return False, (
-                    f"User has unpaid fine of ₹{user.unpaid_fine:.2f}. "
-                    f"Please clear before issuing."
+                    f"User has unpaid fine of ₹{user.unpaid_fine:.2f}. Please clear before issuing."
                 )
             if book.available_copies <= 0:
                 return self._enqueue_reservation(db, user_id, book_id, book)
@@ -259,8 +258,7 @@ class LibraryService:
         )
         db.commit()
         return False, (
-            f"No copies available. User added to reservation queue "
-            f"(position {int(max_pos) + 1})"
+            f"No copies available. User added to reservation queue (position {int(max_pos) + 1})"
         )
 
     def _pop_reservation_queue(

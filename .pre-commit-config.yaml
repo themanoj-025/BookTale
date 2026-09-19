@@ -1,9 +1,11 @@
 repos:
-  - repo: https://github.com/psf/black
-    rev: 25.9.0
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.16.4
     hooks:
-      - id: black
-        language_version: python3
+      # Same formatter CI checks (ruff format --check). black was here before
+      # and disagrees with ruff-format on wrapped lines with trailing
+      # comments (e.g. `# nosec`), so the two kept rewriting each other.
+      - id: ruff-format
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.16.4

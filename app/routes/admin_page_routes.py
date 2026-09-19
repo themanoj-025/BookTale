@@ -407,7 +407,9 @@ def init_admin_page_routes(app) -> None:
             severity = (
                 "danger"
                 if o["days_overdue"] > 14
-                else "warning" if o["days_overdue"] > 7 else "dark"
+                else "warning"
+                if o["days_overdue"] > 7
+                else "dark"
             )
             rows += (
                 '<tr><td><a href="/profile/'
