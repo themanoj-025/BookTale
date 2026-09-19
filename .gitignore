@@ -36,7 +36,7 @@ logs/
 data/
 backups/
 
-# Generated ML benchmark outputs (recommendation_ml_comparison.py)
+# Generated ML benchmark outputs (ml_pkg/comparison.py)
 data/generated/
 
 # OS

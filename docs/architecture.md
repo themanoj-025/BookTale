@@ -75,7 +75,8 @@ publish via Socket.IO (`app/realtime/`).
 
 ### 3.4 Recommendations (offline ML)
 
-`services/recommendations/ml/Model/recommendation_ml_comparison.py` benchmarks
+`services/recommendations/ml/Model/ml_pkg/comparison.py` (run as a module)
+benchmarks
 candidate models against `ml/Dataset/books.csv` and writes evidence to
 `data/generated/comparison_output/` (charts, radar, report — gitignored,
 regenerated on demand). The runtime `recommender.py` uses the selected
@@ -97,7 +98,7 @@ approach against the live catalog.
 | PostgreSQL       | external service                                | primary store (SQLAlchemy 2)                                          |
 | Alembic versions | `migrations/versions/`                          | 3 revisions tracked                                                   |
 | ML dataset       | `services/recommendations/ml/Dataset/books.csv` | tracked benchmark input                                               |
-| ML outputs       | `data/generated/comparison_output/`             | generated on demand by `recommendation_ml_comparison.py` (gitignored) |
+| ML outputs       | `data/generated/comparison_output/`             | generated on demand by `ml_pkg/comparison.py` (gitignored) |
 
 ## 6. Deployment
 
