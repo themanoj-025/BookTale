@@ -304,9 +304,7 @@ def main() -> int:
         match = c["source"] == c["loaded"]
         ok = ok and match
         status = "✓" if match else "✗ MISMATCH"
-        logger.info(
-            f"  {name:<24} {c['source']:>8} {c['loaded']:>8} " f"{c['skipped']:>8}   {status}"
-        )
+        logger.info(f"  {name:<24} {c['source']:>8} {c['loaded']:>8} {c['skipped']:>8}   {status}")
 
     if not ok:
         logger.error("\nMIGRATION FAILED: row counts disagree (see MISMATCH rows).")

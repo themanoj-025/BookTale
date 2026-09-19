@@ -86,9 +86,7 @@ class Config:
     # validation (validate_secure_config) fail fast instead of running with a
     # forgeable session key.
     SECRET_KEY: str = os.getenv("SECRET_KEY", "")
-    FLASK_HOST: str = os.getenv(
-        "FLASK_HOST", "0.0.0.0"
-    )  # nosec B104 - container/dev server default
+    FLASK_HOST: str = os.getenv("FLASK_HOST", "0.0.0.0")  # nosec B104 - container/dev server default
     FLASK_PORT: int = int(os.getenv("FLASK_PORT", "5000"))
     FLASK_DEBUG: bool = os.getenv("FLASK_DEBUG", "False").lower() == "true"
 

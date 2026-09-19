@@ -87,9 +87,9 @@ class TestPrivilegeEscalation:
         assert resp.status_code == 200
         users = storage.load_users()
         assert "MEM-9001" in users
-        assert (
-            users["MEM-9001"].role == "user"
-        ), "self-registration must never create an admin account"
+        assert users["MEM-9001"].role == "user", (
+            "self-registration must never create an admin account"
+        )
 
     def test_register_with_librarian_role_downgraded(self, client) -> None:
         """role=librarian from a public form must also be downgraded."""
@@ -238,9 +238,9 @@ class TestSettingsOverride:
             with open(override_path, "w", encoding="utf-8") as f:
                 json.dump({"FINE_PER_DAY": 12.5}, f)
             _load_settings_overrides()
-            assert (
-                Config.FINE_PER_DAY == 12.5
-            ), "settings_override.json values must be applied (was NameError dead code)"
+            assert Config.FINE_PER_DAY == 12.5, (
+                "settings_override.json values must be applied (was NameError dead code)"
+            )
         finally:
             if os.path.exists(override_path):
                 os.remove(override_path)
@@ -553,9 +553,9 @@ class TestCSRFProtection:
         app.config["WTF_CSRF_ENABLED"] = True  # suite opted out; force it on
         try:
             resp = client.post("/login", data={"user_id": "ADMIN001", "password": "TestAdmin123"})
-            assert (
-                resp.status_code == 400
-            ), "tokenless state-changing POST must be rejected when CSRF is on"
+            assert resp.status_code == 400, (
+                "tokenless state-changing POST must be rejected when CSRF is on"
+            )
         finally:
             app.config["WTF_CSRF_ENABLED"] = False
 
@@ -611,9 +611,9 @@ class TestCSRFProtection:
             cwd=PROJECT_ROOT,
             timeout=120,
         )
-        assert "ENABLED" in (
-            r.stdout or ""
-        ), f"CSRF defaulted OFF! stdout={r.stdout!r} stderr={r.stderr!r}"
+        assert "ENABLED" in (r.stdout or ""), (
+            f"CSRF defaulted OFF! stdout={r.stdout!r} stderr={r.stderr!r}"
+        )
 
 
 class TestReadyz:
@@ -658,9 +658,9 @@ class TestRateLimiting:
             forgot_password_page,
             reset_password_page,
         ):
-            assert hasattr(
-                view, "__wrapper-limiter-instance"
-            ), f"{view.__name__} is missing a rate-limit decorator"
+            assert hasattr(view, "__wrapper-limiter-instance"), (
+                f"{view.__name__} is missing a rate-limit decorator"
+            )
 
     def test_rate_limit_returns_429_after_breach(self) -> None:
         """The wired limiter returns 429 once a per-route limit is exceeded."""
@@ -755,9 +755,9 @@ class TestRateLimiting:
         global default)."""
         from web_app import api_save_settings
 
-        assert hasattr(
-            api_save_settings, "__wrapper-limiter-instance"
-        ), "api_save_settings is missing an explicit rate-limit decorator"
+        assert hasattr(api_save_settings, "__wrapper-limiter-instance"), (
+            "api_save_settings is missing an explicit rate-limit decorator"
+        )
 
     def _make_settings_save_probe(self) -> None:
         from flask import Flask, g, request
@@ -855,9 +855,9 @@ class TestRateLimiting:
         """api_save_admin_settings must carry a limiter decorator."""
         from web_app import api_save_admin_settings
 
-        assert hasattr(
-            api_save_admin_settings, "__wrapper-limiter-instance"
-        ), "api_save_admin_settings is missing an explicit rate-limit decorator"
+        assert hasattr(api_save_admin_settings, "__wrapper-limiter-instance"), (
+            "api_save_admin_settings is missing an explicit rate-limit decorator"
+        )
 
     def _make_admin_settings_probe(self) -> None:
         from flask import Flask, g, request
@@ -925,9 +925,9 @@ class TestRateLimiting:
 
         view = web_app.app.view_functions.get("api_profile_update")
         assert view is not None, "api_profile_update not registered"
-        assert hasattr(
-            view, "__wrapper-limiter-instance"
-        ), "api_profile_update is missing an explicit rate-limit decorator"
+        assert hasattr(view, "__wrapper-limiter-instance"), (
+            "api_profile_update is missing an explicit rate-limit decorator"
+        )
 
     def _make_profile_update_probe(self) -> None:
         from flask import Flask, g, request
@@ -983,27 +983,27 @@ class TestRateLimiting:
 
         view = web_app.app.view_functions.get("api_upload")
         assert view is not None, "api_upload not registered"
-        assert hasattr(
-            view, "__wrapper-limiter-instance"
-        ), "api_upload is missing an explicit rate-limit decorator"
+        assert hasattr(view, "__wrapper-limiter-instance"), (
+            "api_upload is missing an explicit rate-limit decorator"
+        )
 
     def test_series_delete_has_explicit_rate_limit(self) -> None:
         import web_app
 
         view = web_app.app.view_functions.get("api_series_delete")
         assert view is not None, "api_series_delete not registered"
-        assert hasattr(
-            view, "__wrapper-limiter-instance"
-        ), "api_series_delete is missing an explicit rate-limit decorator"
+        assert hasattr(view, "__wrapper-limiter-instance"), (
+            "api_series_delete is missing an explicit rate-limit decorator"
+        )
 
     def test_wishlist_moderate_has_explicit_rate_limit(self) -> None:
         import web_app
 
         view = web_app.app.view_functions.get("api_moderate_suggestion")
         assert view is not None, "api_moderate_suggestion not registered"
-        assert hasattr(
-            view, "__wrapper-limiter-instance"
-        ), "api_moderate_suggestion is missing an explicit rate-limit decorator"
+        assert hasattr(view, "__wrapper-limiter-instance"), (
+            "api_moderate_suggestion is missing an explicit rate-limit decorator"
+        )
 
     def test_upload_plain_limit_breaches_429(self) -> None:
         """A plain limit on uploads: 3 allowed, 4th -> 429."""
@@ -1155,9 +1155,9 @@ class TestRateLimiting:
         for name in names:
             view = web_app.app.view_functions.get(name)
             assert view is not None, f"{name} not registered"
-            assert hasattr(
-                view, "__wrapper-limiter-instance"
-            ), f"{name} is missing an explicit rate-limit decorator"
+            assert hasattr(view, "__wrapper-limiter-instance"), (
+                f"{name} is missing an explicit rate-limit decorator"
+            )
 
     def test_engagement_endpoints_have_rate_limits(self) -> None:
         """likes/votes/helpful/follows/upvotes: 60/min engagement ceiling."""
@@ -1176,9 +1176,9 @@ class TestRateLimiting:
         for name in names:
             view = web_app.app.view_functions.get(name)
             assert view is not None, f"{name} not registered"
-            assert hasattr(
-                view, "__wrapper-limiter-instance"
-            ), f"{name} is missing an explicit rate-limit decorator"
+            assert hasattr(view, "__wrapper-limiter-instance"), (
+                f"{name} is missing an explicit rate-limit decorator"
+            )
 
     def test_ai_chat_has_explicit_rate_limit(self) -> None:
         """api_ai_chat carries a 30/min ceiling (companion spam / load)."""
@@ -1186,9 +1186,9 @@ class TestRateLimiting:
 
         view = web_app.app.view_functions.get("api_ai_chat")
         assert view is not None, "api_ai_chat not registered"
-        assert hasattr(
-            view, "__wrapper-limiter-instance"
-        ), "api_ai_chat is missing an explicit rate-limit decorator"
+        assert hasattr(view, "__wrapper-limiter-instance"), (
+            "api_ai_chat is missing an explicit rate-limit decorator"
+        )
 
     def _make_shared_surface_probe(self) -> None:
         """Plain-limit probe mirroring the 30/min content endpoints."""
@@ -1317,9 +1317,9 @@ class TestRateLimiting:
             idx = src.index(marker)
             start = src.rindex("@app.route", 0, idx)
             block = src[start:idx]
-            assert (
-                '@_rate_limit("5 per minute", methods=["POST"],' in block
-            ), f"{marker} must scope its limit to POST"
-            assert (
-                'exempt_when=lambda: request.method == "GET"' in block
-            ), f"{marker} must exempt GET page loads"
+            assert '@_rate_limit("5 per minute", methods=["POST"],' in block, (
+                f"{marker} must scope its limit to POST"
+            )
+            assert 'exempt_when=lambda: request.method == "GET"' in block, (
+                f"{marker} must exempt GET page loads"
+            )

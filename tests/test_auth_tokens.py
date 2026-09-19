@@ -165,9 +165,9 @@ class TestPersistenceAndCleanup:
             cwd=PROJECT_ROOT,
             timeout=90,
         )
-        assert "OK" in (
-            r.stdout or ""
-        ), f"token lost on restart: stdout={r.stdout!r} stderr={r.stderr!r}"
+        assert "OK" in (r.stdout or ""), (
+            f"token lost on restart: stdout={r.stdout!r} stderr={r.stderr!r}"
+        )
 
     def test_purge_removes_only_expired(self) -> None:
         fresh = authmod.generate_reset_token("MEM-7")
