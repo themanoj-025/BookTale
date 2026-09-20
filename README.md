@@ -27,6 +27,8 @@ A full-featured library management system — catalog, lending, reservations, fi
 - [📁 Project structure](#-project-structure)
 - [📚 Documentation](#-documentation)
 - [🧭 Roadmap / what's next](#-roadmap--whats-next)
+- [🤝 Contributing](#-contributing)
+- [📬 Support](#-support)
 - [License](#️-license)
 
 ---
@@ -186,9 +188,9 @@ pip install -r requirements.txt
 export SECRET_KEY="$(python -c 'import secrets; print(secrets.token_hex(32))')"
 export DEFAULT_ADMIN_PASSWORD="$(python -c 'import secrets; print(secrets.token_urlsafe(16))')"
 
-# 3. (Optional) seed the catalog — 11,127 books + demo users
-python seed_data.py
-python seed_users.py    # admin: ADMIN001 / the password you set above
+# 3. (Optional) seed demo users — admin: ADMIN001 / the password you set above
+#    (the 11,127-book catalog ships pre-seeded in data/ — no book seeding step needed)
+python scripts/seed_users.py
 
 # 4. Run
 python web_app.py       # http://localhost:5000
@@ -269,7 +271,7 @@ tests/           # test_* + security/ suites
 docs/adr/        # Architecture Decision Records (0001–0010)
 docs/runbooks/   # Deploy / rollback / restore / incident runbooks
 docs/postmortem-*.md   # Incident postmortems (blameless format)
-docs/community\CHANGELOG.md      # Release notes
+docs/community/CHANGELOG.md     # Release notes
 Dockerfile, docker-compose.yml, .github/workflows/
 ```
 
@@ -278,11 +280,11 @@ Dockerfile, docker-compose.yml, .github/workflows/
 ## 📚 Documentation
 
 - **ADRs** — every non-trivial decision is recorded in `docs/adr/`: fail-fast secrets (0001), registration role whitelist (0002), template migration (0003/0005), DB-backed storage (0004), structured logging (0006), CSRF + rate-limited auth (0007), health endpoints + security headers (0008), multi-stage Docker (0009), background jobs with RQ (0010).
-- **CHANGELOG** — `docs/community\CHANGELOG.md`
-- **Project overview & perf report** — `docs/product/PRD.md`, `docs/reference\perf-report.md`
+- **CHANGELOG** — `docs/community/CHANGELOG.md`
+- **Project overview & perf report** — `docs/product/PRD.md`, `docs/reference/perf-report.md`
 - **Smoke checklist** — `SMOKE_TEST.md`
 - **Runbooks** — `docs/runbooks/` (deploy, rollback, restore-from-backup, rotate-secret-key, incident-response)
-- **Postmortem** — `docs/reference\postmortem-privilege-escalation.md` (the worst bug found, in blameless format)
+- **Postmortem** — `docs/reference/postmortem-privilege-escalation.md` (the worst bug found, in blameless format)
 - **Trust page** — live at `/security`
 
 ---
@@ -298,6 +300,26 @@ Honestly-scoped, in rough priority order:
 5. ~~**Coverage gate**~~ — **done**: CI enforces ≥85% line coverage on the `db` data layer (`--cov=db --cov-fail-under=85`).
 6. **App-factory + Blueprints refactor** (the app currently initializes at module import time — working, but not ideal for tests).
 7. **Search on indexed SQL** — today `search_books` loads the catalog and filters in Python; move filtering into indexed queries, then add full-text search (SQLite FTS5 / Postgres `tsvector`).
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md).
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing`)
+3. Commit your changes (`git commit -m 'feat: add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing`)
+5. Open a Pull Request
+
+---
+
+## 📬 Support
+
+- 🐛 [Report a bug](https://github.com/themanoj-025/BookTale/issues)
+- 💡 [Request a feature](https://github.com/themanoj-025/BookTale/issues)
+- ⭐ [Star the repository](https://github.com/themanoj-025/BookTale)
 
 ---
 
