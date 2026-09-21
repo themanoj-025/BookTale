@@ -22,6 +22,10 @@ WORKDIR /build
 COPY requirements.txt .
 RUN python -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
+# Upgrade pip tooling first: the python:3.14-slim base ships setuptools
+# 70.x with CVE-2025-47273 (fixed in 78.1.1); the Trivy image gate fails
+# on HIGH/CRITICAL, so pin the floor explicitly.
+RUN pip install --no-cache-dir --upgrade "pip>=25.0" "setuptools>=78.1.1"
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Install Node.js for frontend build
