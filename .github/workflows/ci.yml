@@ -202,6 +202,33 @@ jobs:
       - name: Build image
         run: docker build -t booktale:ci .
 
+      - name: Scan image (JSON diagnostic for python-pkg ghosts)
+        if: always()
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          image-ref: booktale:ci
+          format: json
+          output: trivy.json
+          exit-code: "0"
+          scanners: vuln
+          severity: CRITICAL,HIGH
+
+      - name: Locate python-pkg finding paths
+        if: always()
+        run: |
+          python3 - <<'PYEOF'
+          import json
+          data = json.load(open('trivy.json'))
+          hits = 0
+          for r in data.get('Results', []):
+              for v in r.get('Vulnerabilities') or []:
+                  hits += 1
+                  print('TARGET:', r.get('Target'), '| CLASS:', r.get('Class'),
+                        '| PKG:', v.get('PkgName'), v.get('InstalledVersion'),
+                        '| PATH:', v.get('PkgPath'), '|', v.get('VulnerabilityID'))
+          print('total HIGH/CRITICAL findings:', hits)
+          PYEOF
+
       - name: Scan image for vulnerabilities
         uses: aquasecurity/trivy-action@v0.36.0
         with:
