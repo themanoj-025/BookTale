@@ -53,6 +53,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libpq5 && \
     rm -rf /var/lib/apt/lists/*
 
+# The base image ships system setuptools 70.x (CVE-2025-47273, fixed in
+# 78.1.1); Trivy scans the whole filesystem, so upgrade the system copy
+# as well - the venv copy is upgraded in the builder stage.
+RUN pip install --no-cache-dir --upgrade "setuptools>=78.1.1"
+
 # Copy virtualenv from builder
 COPY --from=builder /opt/venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
