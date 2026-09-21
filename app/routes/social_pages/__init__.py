@@ -6,6 +6,6 @@ not gamification); the /gamification page itself lives in
 ``app.routes.gamification``.
 """
 
-from app.routes.social_pages.gamification_core import register_social_page_routes
+from app.routes.social_pages.core import register_social_page_routes
 
 __all__ = ["register_social_page_routes"]

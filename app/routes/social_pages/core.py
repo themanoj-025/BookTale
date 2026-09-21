@@ -1,5 +1,5 @@
 """
-gamification_core.py — registration for the social page routes (formerly mis-named gamification).
+gamification_core.py -> core.py — registration for the social page routes (formerly mis-named gamification).
 
 Extracted from gamification_routes.py for focused maintenance.
 """
