@@ -28,23 +28,22 @@ from app.core.utils import (
     print_success,
     print_warning,
 )
-from app.db.storage_adapter import create_storage
-from app.routes.backup_cli import (
+from app.cli.backup_cli import (
     backup_restore_menu,
     logs_menu,
 )
 
-# ── CLI module imports ──
-from app.routes.book_management_cli import (
+# ── CLI module imports (moved from app/routes/ — CLI is not a web layer) ──
+from app.cli.book_management_cli import (
     book_management_menu,
     search_books_menu,
 )
-from app.routes.notifications_cli import (
+from app.cli.notifications_cli import (
     email_overdue_alerts,
     notifications_menu,
     show_notification_badge,
 )
-from app.routes.operations_cli import (
+from app.cli.operations_cli import (
     fine_management_menu,
     issue_book_flow,
     issue_return_menu,
@@ -52,17 +51,17 @@ from app.routes.operations_cli import (
     reservations_menu,
     return_book_flow,
 )
-from app.routes.recommendations_cli import (
+from app.cli.recommendations_cli import (
     recommendations_menu,
     seed_import_menu,
     seed_recommendations_menu,
     user_recommendations_menu,
 )
-from app.routes.reports_cli import (
+from app.cli.reports_cli import (
     export_reports_menu,
     reports_menu,
 )
-from app.routes.user_management_cli import (
+from app.cli.user_management_cli import (
     user_management_menu,
 )
 from app.services.auth.auth import AuthManager, hash_password
