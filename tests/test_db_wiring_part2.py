@@ -60,7 +60,7 @@ def store(db_env) -> DbStorage:
 
 def _seed_users(store, *user_ids: str) -> None:
     """Seed users so FK-referencing rows can be inserted."""
-    from app.models.user import User
+    from app.domain.user import User
 
     users = {}
     for uid in user_ids:
@@ -76,7 +76,7 @@ def _seed_users(store, *user_ids: str) -> None:
 
 
 def _seed_books(store, *book_ids: str) -> None:
-    from app.models.book import Book
+    from app.domain.book import Book
 
     books = {}
     for bid in book_ids:

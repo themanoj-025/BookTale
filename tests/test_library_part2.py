@@ -3,8 +3,8 @@
 import os
 
 from app.core.logger import get_logs, log
-from app.models.book import Book
-from app.models.user import User
+from app.domain.book import Book
+from app.domain.user import User
 from app.services.auth.auth import hash_password
 from app.services.books.backup import create_backup, list_backups, restore_backup
 from app.services.books.library import Library

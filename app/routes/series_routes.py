@@ -65,7 +65,7 @@ def register_series_routes(app, login_required, admin_required, render_page, _ra
     @admin_required
     def series_create() -> Any:
         if request.method == "GET":
-            from app.models.book import CATEGORIES as BOOK_CATEGORIES
+            from app.domain.book import CATEGORIES as BOOK_CATEGORIES
 
             co = "".join(f'<option value="{c}">{c}</option>' for c in BOOK_CATEGORIES)
             try:

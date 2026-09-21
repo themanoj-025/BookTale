@@ -5,7 +5,7 @@ auth.py - Authentication and session management
 import bcrypt
 
 from app.core.exceptions import AuthenticationError
-from app.models.user import User
+from app.domain.user import User
 
 # ─
 MAX_LOGIN_ATTEMPTS = 5

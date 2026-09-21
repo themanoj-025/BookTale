@@ -60,7 +60,7 @@ def _no_redis(monkeypatch) -> None:
 class TestCoverFetchJob:
     def test_persists_cover_on_success(self, monkeypatch) -> None:
         """A successful fetch updates cover_url/description/metadata."""
-        from app.models.book import Book
+        from app.domain.book import Book
 
         book = Book(
             book_id="BK-2026-0001",
@@ -103,7 +103,7 @@ class TestCoverFetchJob:
 
     def test_no_cover_does_not_crash(self, monkeypatch) -> None:
         """A failed fetch returns ok=False and leaves the book untouched."""
-        from app.models.book import Book
+        from app.domain.book import Book
 
         book = Book(
             book_id="BK-2026-0001",

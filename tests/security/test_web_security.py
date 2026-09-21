@@ -467,7 +467,7 @@ class TestXssServerSide:
     PAYLOAD_ATTR = '"><img src=x onerror=alert(1)>'
 
     def _seed_book_with_payload(self) -> None:
-        from app.models.book import Book
+        from app.domain.book import Book
 
         books = storage.load_books()
         books["BK-XSS1"] = Book(
