@@ -7,9 +7,9 @@ from datetime import datetime, timedelta
 
 from app.config.settings import Config
 from app.core.logger import log
-from app.jobs.jobs import enqueue_cover_fetch
 from app.domain.book import Book
 from app.domain.user import MAX_BORROW_LIMIT, User
+from app.jobs.jobs import enqueue_cover_fetch
 from app.services.books.library_reports import LibraryReportMixin
 from app.storage.storage import Storage
 

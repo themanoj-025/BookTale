@@ -6,8 +6,6 @@ Extracted from feature_routes.py for focused maintenance.
 from flask import Response, jsonify, request, session
 
 from app.routes.feature_shared import (
-    _diary,
-    _storage,
     cat_color,
     h,
 )

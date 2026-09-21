@@ -79,8 +79,9 @@ def _redis_reachable(host: str, port: int, timeout: float = 0.25) -> bool:
 _HOST, _PORT = "127.0.0.1", 6379
 if not _redis_reachable(_HOST, _PORT):
     try:
-        from fakeredis import TcpFakeServer
         import threading
+
+        from fakeredis import TcpFakeServer
 
         _server = TcpFakeServer((_HOST, _PORT), server_type="redis")
         _thread = threading.Thread(target=_server.serve_forever, daemon=True)
@@ -123,8 +124,6 @@ def app_client():
     import ``web_app`` lazily (at fixture use, after all test-module Config
     patching has run) and yield a test client.
     """
-    from flask.testing import FlaskClient
-
     from web_app import app
 
     app.config["TESTING"] = True

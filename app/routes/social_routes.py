@@ -14,9 +14,9 @@ from collections.abc import Callable
 
 from flask import Flask
 
-from app.routes.social_pages_routes import register_social_page_routes
 from app.routes.review_routes import register_review_routes
 from app.routes.social_api import register_social_api_routes
+from app.routes.social_pages_routes import register_social_page_routes
 from app.routes.social_shared import init_shared_state
 
 

@@ -5,7 +5,7 @@ Extracted from feature_routes.py for focused maintenance.
 
 from flask import Response, jsonify, request, session
 
-from app.routes.feature_shared import _js_str, _storage, _wishlist, h
+from app.routes.feature_shared import _js_str, h
 
 
 def register_wishlist_routes(app, login_required, admin_required, render_page, _rate_limit) -> None:

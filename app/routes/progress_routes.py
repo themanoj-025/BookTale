@@ -10,9 +10,6 @@ from typing import Any
 from flask import Response, jsonify, request, session
 
 from app.routes.feature_shared import (
-    _challenge,
-    _progress,
-    _storage,
     cat_color,
     h,
 )
