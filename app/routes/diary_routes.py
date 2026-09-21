@@ -21,6 +21,10 @@ from app.services.reading.diary import (
 
 def register_diary_routes(app, login_required, render_page, _rate_limit) -> None:
     """Register reading diary routes on *app*."""
+    # Late-bind shared state: this module's top-level import ran before
+    # init_shared_state populated feature_shared, so module-level names were
+    # captured as None (import-time vs init-time ordering bug).
+    from app.routes.feature_shared import _diary, _storage
 
     @app.route("/diary")
     @login_required

@@ -12,6 +12,10 @@ from app.routes.feature_shared import _series, cat_color, h
 
 def register_series_routes(app, login_required, admin_required, render_page, _rate_limit) -> None:
     """Register series routes on *app*."""
+    # Late-bind shared state: this module's top-level import ran before
+    # init_shared_state populated feature_shared, so module-level names were
+    # captured as None (import-time vs init-time ordering bug).
+    from app.routes.feature_shared import _series
 
     @app.route("/series")
     @login_required

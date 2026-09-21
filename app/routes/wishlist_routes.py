@@ -10,6 +10,10 @@ from app.routes.feature_shared import _js_str, _storage, _wishlist, h
 
 def register_wishlist_routes(app, login_required, admin_required, render_page, _rate_limit) -> None:
     """Register wishlist and suggestion routes on *app*."""
+    # Late-bind shared state: this module's top-level import ran before
+    # init_shared_state populated feature_shared, so module-level names were
+    # captured as None (import-time vs init-time ordering bug).
+    from app.routes.feature_shared import _storage, _wishlist
 
     @app.route("/wishlist")
     @login_required

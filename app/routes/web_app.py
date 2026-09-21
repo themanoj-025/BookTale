@@ -383,11 +383,70 @@ def render_auth_page(title: str, content: str, **kw: Any) -> str:
 
 # Helpers extracted to web_app_helpers.py
 from app.routes.web_app_helpers import (
+    _ERROR_PAGES,
     _avatar_color,  # noqa: F401
     _avatar_html,  # noqa: F401
     _initials,  # noqa: F401
     cat_color,  # noqa: F401
 )
+
+# base.html calls _avatar_html for the logged-in app-bar avatar; register it
+# as a Jinja global so every page rendered via render_page has it available.
+app.jinja_env.globals["_avatar_html"] = _avatar_html
+
+
+# ════════════════════════════════════════════════════════════════════════════
+# Centralized error handlers (Phase 7)
+# JSON envelope for /api paths, styled page for browsers, never a traceback.
+# ════════════════════════════════════════════════════════════════════════════
+
+
+def _api_error_body(status: int, message: str) -> Response:
+    resp = jsonify({"data": None, "error": {"code": status, "message": message}})
+    resp.status_code = status
+    return resp
+
+
+def _error_response(status: int, message: str) -> tuple[Response, int]:
+    """Shared error response: JSON envelope on /api paths, styled page otherwise."""
+    if request.path.startswith("/api"):
+        return _api_error_body(status, message), status
+    code, title, _emoji, blurb = _ERROR_PAGES.get(
+        status, (str(status), f"Error {status}", "⚠️", message)
+    )
+    try:
+        html = render_page(
+            title,
+            f'<div class="glass-card p-5 text-center"><div style="font-size:3rem;">{_emoji}</div>'
+            f'<h1 class="fw-bold">{code} · {title}</h1><p class="text-muted mb-0">{blurb}</p>'
+            f'<a class="btn btn-success mt-3" href="/">Back to home</a></div>',
+        )
+    except Exception:
+        html = (
+            f"<!doctype html><html><head><title>{code} {title}</title></head>"
+            f'<body style="font-family:sans-serif;text-align:center;padding:4rem;">'
+            f"<h1>{code} · {title}</h1><p>{blurb}</p></body></html>"
+        )
+    return Response(html, status=status), status
+
+
+def _register_error_handlers() -> None:
+    for _status, (_num, _title, _emoji, _blurb) in _ERROR_PAGES.items():
+
+        def _handler(_err: Any, _s: int = _status, _t: str = _title, _b: str = _blurb) -> Any:
+            return _error_response(_s, _b)
+
+        _handler.__name__ = f"_error_handler_{_status}"
+        app.errorhandler(_status)(_handler)
+
+    # Werkzeug routes unhandled exceptions to 500 — mirror the generic page.
+    def _server_error_handler(err: Any) -> Any:
+        return _error_response(500, _ERROR_PAGES[500][3])
+
+    app.errorhandler(Exception)(_server_error_handler)
+
+
+_register_error_handlers()
 
 
 def healthz() -> dict[str, str]:

@@ -20,6 +20,10 @@ from app.routes.feature_shared import (
 
 def register_progress_routes(app, login_required, render_page, _rate_limit) -> None:
     """Register reading progress and bookmark routes on *app*."""
+    # Late-bind shared state: this module's top-level import ran before
+    # init_shared_state populated feature_shared, so module-level names were
+    # captured as None (import-time vs init-time ordering bug).
+    from app.routes.feature_shared import _challenge, _progress, _storage
 
     @app.route("/reading-progress")
     @login_required

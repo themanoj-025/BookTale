@@ -14,6 +14,11 @@ from app.routes.feature_shared import _challenge, h
 
 def register_challenge_routes(app, login_required, render_page, _rate_limit) -> None:
     """Register reading challenge routes on *app*."""
+    # Late-bind shared state: this module's top-level import ran before
+    # init_shared_state populated feature_shared, so the module-level names
+    # were captured as None (import-time vs init-time ordering bug).
+    from app.routes.feature_shared import _challenge
+    from app.routes.feature_shared import _avatar_html as avatar_html
 
     @app.route("/reading-challenge")
     @login_required
