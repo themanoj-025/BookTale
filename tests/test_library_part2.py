@@ -12,6 +12,73 @@ from app.services.notifications.notifications import NotificationManager
 from app.services.recommendations.recommender import Recommender
 from app.storage.storage import Storage
 
+import shutil
+import tempfile
+
+import pytest
+
+from app.config.settings import Config
+
+
+@pytest.fixture(autouse=True)
+def clean_data_dirs() -> None:
+    """Use temporary directories for each test to ensure isolation.
+
+    Mirrors tests/test_library.py — restored alongside the storage/lib
+    fixtures that this module referenced but were never committed.
+    """
+    tmpdir = tempfile.mkdtemp()
+    old_data = Config.DATA_DIR
+    old_logs = Config.LOGS_DIR
+    old_backups = Config.BACKUPS_DIR
+    old_log_file = Config.LOG_FILE
+    old_json_log = Config.JSON_LOG
+
+    Config.DATA_DIR = os.path.join(tmpdir, "data")
+    Config.LOGS_DIR = os.path.join(tmpdir, "logs")
+    Config.BACKUPS_DIR = os.path.join(tmpdir, "backups")
+    Config.BOOKS_FILE = os.path.join(Config.DATA_DIR, "books.json")
+    Config.USERS_FILE = os.path.join(Config.DATA_DIR, "users.json")
+    Config.TRANSACTIONS_FILE = os.path.join(Config.DATA_DIR, "transactions.json")
+    Config.RESERVATIONS_FILE = os.path.join(Config.DATA_DIR, "reservations.json")
+    Config.FINES_FILE = os.path.join(Config.DATA_DIR, "fines.json")
+    Config.NOTIFICATIONS_FILE = os.path.join(Config.DATA_DIR, "notifications.json")
+    Config.LOG_FILE = os.path.join(Config.LOGS_DIR, "activity.log")
+    Config.JSON_LOG = os.path.join(Config.LOGS_DIR, "activity.json")
+
+    os.makedirs(Config.DATA_DIR, exist_ok=True)
+    os.makedirs(Config.LOGS_DIR, exist_ok=True)
+    os.makedirs(Config.BACKUPS_DIR, exist_ok=True)
+
+    yield
+
+    Config.DATA_DIR = old_data
+    Config.LOGS_DIR = old_logs
+    Config.BACKUPS_DIR = old_backups
+    Config.BOOKS_FILE = os.path.join(old_data, "books.json")
+    Config.USERS_FILE = os.path.join(old_data, "users.json")
+    Config.TRANSACTIONS_FILE = os.path.join(old_data, "transactions.json")
+    Config.RESERVATIONS_FILE = os.path.join(old_data, "reservations.json")
+    Config.FINES_FILE = os.path.join(old_data, "fines.json")
+    Config.NOTIFICATIONS_FILE = os.path.join(old_data, "notifications.json")
+    Config.LOG_FILE = old_log_file
+    Config.JSON_LOG = old_json_log
+
+    from app.core.logger import reset_logger
+
+    reset_logger()
+    shutil.rmtree(tmpdir)
+
+
+@pytest.fixture
+def storage() -> Storage:
+    return Storage()
+
+
+@pytest.fixture
+def lib(storage: Storage) -> Library:
+    return Library(storage)
+
 
 class TestRecommender:
     def test_recommend_similar_books(self, lib: Library, storage: Storage) -> None:

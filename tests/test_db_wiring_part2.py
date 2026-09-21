@@ -29,6 +29,34 @@ from app.db.storage_adapter import DbStorage, create_storage
 from app.services.books.library import Library
 from app.storage.storage import Storage
 
+import os
+import tempfile
+
+import pytest
+
+
+@pytest.fixture()
+def db_env(monkeypatch) -> None:
+    """Point the engine at a throwaway SQLite file; rebuild on teardown.
+
+    Mirrors tests/test_db_wiring.py — this module referenced db_env/store
+    fixtures that were never committed.
+    """
+    tmpdir = tempfile.mkdtemp(prefix="booktale_wire2_")
+    url = "sqlite:///" + os.path.join(tmpdir, "test.db")
+    monkeypatch.setattr(Config, "DATABASE_URL", url)
+    monkeypatch.setattr(dbmod, "_engine", None)
+    monkeypatch.setattr(dbmod, "_session_factory", None)
+    create_all()
+    yield
+    dbmod._engine = None
+    dbmod._session_factory = None
+
+
+@pytest.fixture()
+def store(db_env) -> DbStorage:
+    return DbStorage()
+
 
 def _seed_users(store, *user_ids: str) -> None:
     """Seed users so FK-referencing rows can be inserted."""

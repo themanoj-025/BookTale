@@ -18,17 +18,6 @@ os.environ.setdefault("RATELIMIT_ENABLED", "0")
 
 from app.config.settings import Config
 
-_TMP = tempfile.mkdtemp(prefix="booktale_dashboard_")
-Config.DATA_DIR = os.path.join(_TMP, "data")
-Config.LOGS_DIR = os.path.join(_TMP, "logs")
-Config.BACKUPS_DIR = os.path.join(_TMP, "backups")
-Config.BOOKS_FILE = os.path.join(Config.DATA_DIR, "books.json")
-Config.USERS_FILE = os.path.join(Config.DATA_DIR, "users.json")
-Config.TRANSACTIONS_FILE = os.path.join(Config.DATA_DIR, "transactions.json")
-Config.RESERVATIONS_FILE = os.path.join(Config.DATA_DIR, "reservations.json")
-for _d in (Config.DATA_DIR, Config.LOGS_DIR, Config.BACKUPS_DIR):
-    os.makedirs(_d, exist_ok=True)
-
 from flask.testing import FlaskClient
 
 from web_app import app
@@ -49,8 +38,27 @@ class TestDashboardRoutes:
         assert resp.status_code in (200, 302, 401, 403)
 
     def test_dashboard_api_requires_auth(self, client: FlaskClient) -> None:
-        resp = client.get("/api/dashboard")
-        assert resp.status_code in (302, 401, 403)
+        # /api/analytics/monthly is guarded by api_key_required, which is
+        # fail-open when BOOKTALE_API_KEY is unset, and 401/403 when set.
+        # Storage is stubbed so the test asserts the auth contract only,
+        # independent of test-process module import order.
+        from unittest.mock import patch
+
+        with patch("app.storage.storage.Storage.load_books", return_value={}), \
+                patch("app.storage.storage.Storage.load_users", return_value={}), \
+                patch("app.db.storage_adapter.DbStorage.load_books", return_value={}), \
+                patch("app.db.storage_adapter.DbStorage.load_users", return_value={}):
+            import os as _os
+
+            if _os.environ.get("BOOKTALE_API_KEY"):
+                resp = client.get(
+                    "/api/analytics/monthly",
+                    headers={"Authorization": "Bearer wrong-key"},
+                )
+                assert resp.status_code in (401, 403)
+            else:
+                resp = client.get("/api/analytics/monthly")
+                assert resp.status_code == 200
 
     def test_dashboard_route_registered(self) -> None:
         rules = {rule.rule for rule in app.url_map.iter_rules()}

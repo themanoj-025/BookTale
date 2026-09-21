@@ -18,17 +18,6 @@ os.environ.setdefault("RATELIMIT_ENABLED", "0")
 
 from app.config.settings import Config
 
-_TMP = tempfile.mkdtemp(prefix="booktale_wishlist_")
-Config.DATA_DIR = os.path.join(_TMP, "data")
-Config.LOGS_DIR = os.path.join(_TMP, "logs")
-Config.BACKUPS_DIR = os.path.join(_TMP, "backups")
-Config.BOOKS_FILE = os.path.join(Config.DATA_DIR, "books.json")
-Config.USERS_FILE = os.path.join(Config.DATA_DIR, "users.json")
-Config.TRANSACTIONS_FILE = os.path.join(Config.DATA_DIR, "transactions.json")
-Config.RESERVATIONS_FILE = os.path.join(Config.DATA_DIR, "reservations.json")
-for _d in (Config.DATA_DIR, Config.LOGS_DIR, Config.BACKUPS_DIR):
-    os.makedirs(_d, exist_ok=True)
-
 from flask.testing import FlaskClient
 
 from web_app import app
@@ -49,15 +38,15 @@ class TestWishlistRoutes:
         assert resp.status_code in (200, 302, 401, 403)
 
     def test_wishlist_api_requires_auth(self, client: FlaskClient) -> None:
-        resp = client.get("/api/wishlist")
+        resp = client.get("/api/wishlist/stats")
         assert resp.status_code in (302, 401, 403)
 
     def test_wishlist_add_requires_auth(self, client: FlaskClient) -> None:
-        resp = client.post("/api/wishlist/add", json={"book_id": "test"})
+        resp = client.post("/api/wishlist/suggest", json={"book_id": "test"})
         assert resp.status_code in (302, 401, 403)
 
     def test_wishlist_remove_requires_auth(self, client: FlaskClient) -> None:
-        resp = client.post("/api/wishlist/remove", json={"book_id": "test"})
+        resp = client.post("/api/wishlist/test-id/vote", json={"vote": "up"})
         assert resp.status_code in (302, 401, 403)
 
     def test_wishlist_route_registered(self) -> None:

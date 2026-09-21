@@ -18,17 +18,6 @@ os.environ.setdefault("RATELIMIT_ENABLED", "0")
 
 from app.config.settings import Config
 
-_TMP = tempfile.mkdtemp(prefix="booktale_progress_")
-Config.DATA_DIR = os.path.join(_TMP, "data")
-Config.LOGS_DIR = os.path.join(_TMP, "logs")
-Config.BACKUPS_DIR = os.path.join(_TMP, "backups")
-Config.BOOKS_FILE = os.path.join(Config.DATA_DIR, "books.json")
-Config.USERS_FILE = os.path.join(Config.DATA_DIR, "users.json")
-Config.TRANSACTIONS_FILE = os.path.join(Config.DATA_DIR, "transactions.json")
-Config.RESERVATIONS_FILE = os.path.join(Config.DATA_DIR, "reservations.json")
-for _d in (Config.DATA_DIR, Config.LOGS_DIR, Config.BACKUPS_DIR):
-    os.makedirs(_d, exist_ok=True)
-
 from flask.testing import FlaskClient
 
 from web_app import app
@@ -45,15 +34,15 @@ class TestProgressRoutes:
     """Test reading progress page and API routes."""
 
     def test_progress_requires_auth(self, client: FlaskClient) -> None:
-        resp = client.get("/progress")
+        resp = client.get("/reading-progress")
         assert resp.status_code in (200, 302, 401, 403)
 
     def test_progress_api_requires_auth(self, client: FlaskClient) -> None:
-        resp = client.get("/api/progress")
+        resp = client.get("/api/reading-progress/stats")
         assert resp.status_code in (302, 401, 403)
 
     def test_progress_update_requires_auth(self, client: FlaskClient) -> None:
-        resp = client.post("/api/progress", json={"book_id": "test", "page": 50})
+        resp = client.post("/api/reading-progress/test/update", json={"book_id": "test", "page": 50})
         assert resp.status_code in (302, 401, 403)
 
     def test_bookmarks_requires_auth(self, client: FlaskClient) -> None:
@@ -62,4 +51,4 @@ class TestProgressRoutes:
 
     def test_progress_route_registered(self) -> None:
         rules = {rule.rule for rule in app.url_map.iter_rules()}
-        assert "/progress" in rules or any("/progress" in r for r in rules)
+        assert "/reading-progress" in rules or any("/progress" in r for r in rules)

@@ -37,22 +37,10 @@ os.environ["RATELIMIT_ENABLED"] = "0"
 
 from app.config.settings import Config
 
-# ── Isolate all data/log/backup paths into a temp dir BEFORE importing web_app,
-#    so module-level singletons (storage, bootstrap admin creation) stay sandboxed.
-_TMP = tempfile.mkdtemp(prefix="booktale_sec_")
-Config.DATA_DIR = os.path.join(_TMP, "data")
-Config.LOGS_DIR = os.path.join(_TMP, "logs")
-Config.BACKUPS_DIR = os.path.join(_TMP, "backups")
-Config.BOOKS_FILE = os.path.join(Config.DATA_DIR, "books.json")
-Config.USERS_FILE = os.path.join(Config.DATA_DIR, "users.json")
-Config.TRANSACTIONS_FILE = os.path.join(Config.DATA_DIR, "transactions.json")
-Config.RESERVATIONS_FILE = os.path.join(Config.DATA_DIR, "reservations.json")
-Config.FINES_FILE = os.path.join(Config.DATA_DIR, "fines.json")
-Config.NOTIFICATIONS_FILE = os.path.join(Config.DATA_DIR, "notifications.json")
-Config.LOG_FILE = os.path.join(Config.LOGS_DIR, "activity.log")
-Config.JSON_LOG = os.path.join(Config.LOGS_DIR, "activity.json")
-for _d in (Config.DATA_DIR, Config.LOGS_DIR, Config.BACKUPS_DIR):
-    os.makedirs(_d, exist_ok=True)
+# Data/log/backup paths are redirected to a shared suite-wide temp dir by
+# tests/conftest.py BEFORE any test module imports web_app (module-level
+# singletons — storage, bootstrap admin creation, DB engine — freeze on the
+# first import, so the sandbox must be owned once, not per-module).
 
 from web_app import app, storage
 

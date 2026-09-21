@@ -18,17 +18,6 @@ os.environ.setdefault("RATELIMIT_ENABLED", "0")
 
 from app.config.settings import Config
 
-_TMP = tempfile.mkdtemp(prefix="booktale_social_")
-Config.DATA_DIR = os.path.join(_TMP, "data")
-Config.LOGS_DIR = os.path.join(_TMP, "logs")
-Config.BACKUPS_DIR = os.path.join(_TMP, "backups")
-Config.BOOKS_FILE = os.path.join(Config.DATA_DIR, "books.json")
-Config.USERS_FILE = os.path.join(Config.DATA_DIR, "users.json")
-Config.TRANSACTIONS_FILE = os.path.join(Config.DATA_DIR, "transactions.json")
-Config.RESERVATIONS_FILE = os.path.join(Config.DATA_DIR, "reservations.json")
-for _d in (Config.DATA_DIR, Config.LOGS_DIR, Config.BACKUPS_DIR):
-    os.makedirs(_d, exist_ok=True)
-
 from flask.testing import FlaskClient
 
 from web_app import app
@@ -45,34 +34,34 @@ class TestSocialRoutes:
     """Test social page and API routes."""
 
     def test_social_requires_auth(self, client: FlaskClient) -> None:
-        resp = client.get("/social")
+        resp = client.get("/feed")
         assert resp.status_code in (200, 302, 401, 403)
 
     def test_community_requires_auth(self, client: FlaskClient) -> None:
-        resp = client.get("/community")
+        resp = client.get("/clubs")
         assert resp.status_code in (200, 302, 401, 403)
 
     def test_social_feed_requires_auth(self, client: FlaskClient) -> None:
-        resp = client.get("/api/social/feed")
+        resp = client.get("/api/feed")
         assert resp.status_code in (302, 401, 403)
 
     def test_social_post_requires_auth(self, client: FlaskClient) -> None:
-        resp = client.post("/api/social/post", json={"text": "Hello!"})
+        resp = client.post("/api/posts", json={"text": "Hello!"})
         assert resp.status_code in (302, 401, 403)
 
     def test_social_like_requires_auth(self, client: FlaskClient) -> None:
-        resp = client.post("/api/social/like", json={"post_id": "test"})
+        resp = client.post("/api/posts/test/like", json={"post_id": "test"})
         assert resp.status_code in (302, 401, 403)
 
     def test_social_comment_requires_auth(self, client: FlaskClient) -> None:
-        resp = client.post("/api/social/comment", json={"post_id": "test", "text": "Nice!"})
+        resp = client.post("/api/posts/test/comments", json={"post_id": "test", "text": "Nice!"})
         assert resp.status_code in (302, 401, 403)
 
     def test_follow_requires_auth(self, client: FlaskClient) -> None:
-        resp = client.post("/api/social/follow", json={"user_id": "test"})
+        resp = client.post("/api/follow/test", json={"user_id": "test"})
         assert resp.status_code in (302, 401, 403)
 
     def test_social_route_registered(self) -> None:
         rules = {rule.rule for rule in app.url_map.iter_rules()}
-        social_routes = [r for r in rules if "/social" in r]
-        assert len(social_routes) >= 3, f"Expected >=3 social routes, got {len(social_routes)}"
+        social_routes = [r for r in rules if "/api/posts" in r]
+        assert len(social_routes) >= 3, f"Expected >=3 social API routes, got {len(social_routes)}"
