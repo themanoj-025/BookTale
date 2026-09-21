@@ -20,8 +20,8 @@ pytestmark = pytest.mark.unit
 @pytest.fixture()
 def storage(monkeypatch):
     st = type("Storage", (), {})()
-    st.load_transactions = lambda: []
-    st.load_users = lambda: {}
+    st.load_transactions = list
+    st.load_users = dict
     return st
 
 
@@ -117,7 +117,7 @@ class TestLeaderboardAndSummary:
                 "return_date": "2026-03-01T10:00:00",
             }
         ]
-        storage.load_users = lambda: {}
+        storage.load_users = dict
         board = challenge.get_leaderboard(2026)
         assert isinstance(board, list)
         assert len(board) == 1

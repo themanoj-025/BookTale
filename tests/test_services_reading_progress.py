@@ -104,7 +104,7 @@ class TestGetters:
 
 class TestBookmarks:
     def test_add_and_get_bookmarks(self, progress: ReadingProgress) -> None:
-        ok, msg, bm = progress.add_bookmark("u1", "b1", page=42, note="ch 3")
+        ok, _msg, bm = progress.add_bookmark("u1", "b1", page=42, note="ch 3")
         assert ok is True
         assert bm["page"] == 42
         bookmarks = progress.get_user_bookmarks("u1")
@@ -112,7 +112,7 @@ class TestBookmarks:
         assert bookmarks[0]["page"] == 42
 
     def test_add_bookmark_invalid_page(self, progress: ReadingProgress) -> None:
-        ok, msg, bm = progress.add_bookmark("u1", "b1", page=0)
+        ok, _msg, bm = progress.add_bookmark("u1", "b1", page=0)
         assert ok is False
         assert bm is None
 

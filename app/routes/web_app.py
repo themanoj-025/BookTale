@@ -384,8 +384,7 @@ def render_auth_page(title: str, content: str, **kw: Any) -> str:
 # Helpers extracted to web_app_helpers.py
 from app.routes.web_app_helpers import (
     _ERROR_PAGES,
-    _avatar_color,  # noqa: F401
-    _avatar_html,  # noqa: F401
+    _avatar_html,
     _initials,  # noqa: F401
     cat_color,  # noqa: F401
 )
