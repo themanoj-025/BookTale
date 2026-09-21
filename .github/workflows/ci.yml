@@ -262,10 +262,16 @@ jobs:
         run: npm run build
       - name: Install Lighthouse CI
         run: npm install -g @lhci/cli
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
       - name: Start Flask + run Lighthouse
         run: |
-          UNION_BANK_TESTING=1 python -m flask run --port 5000 &
-          sleep 5
+          export FLASK_APP=web_app.py
+          export SECRET_KEY=$(python -c "import secrets; print(secrets.token_urlsafe(32))")
+          python -m flask run --port 5000 &
+          for i in $(seq 1 15); do curl -fsS http://127.0.0.1:5000/readyz >/dev/null 2>&1 && break; sleep 2; done
           lhci autorun --config=lighthouserc.json
       - name: Upload Lighthouse reports
         if: always()
