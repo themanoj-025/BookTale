@@ -81,15 +81,15 @@ factual record and was left intact.
 
 ## 4. Root allowlist compliance
 
-| Root entry                                                                                               | Status                             |
-| -------------------------------------------------------------------------------------------------------- | ---------------------------------- |
-| `main.py`, `start.py`, `web_app.py`, `worker.py`                                                         | ✔ entry points (thin wrappers)    |
-| `Dockerfile`, `docker-compose.yml`, `docker/`                                                            | ✔ container tooling               |
-| `Makefile`, `pyproject.toml`, `requirements.txt`, `package.json`, `alembic.ini`                          | ✔ standard metadata               |
+| Root entry                                                                                               | Status                                                         |
+| -------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------- |
+| `main.py`, `start.py`, `web_app.py`, `worker.py`                                                         | ✔ entry points (thin wrappers)                                |
+| `Dockerfile`, `docker-compose.yml`, `docker/`                                                            | ✔ container tooling                                           |
+| `Makefile`, `pyproject.toml`, `requirements.txt`, `package.json`, `alembic.ini`                          | ✔ standard metadata                                           |
 | `README.md`, `LICENSE`                                                                                   | ✔ metadata / docs (`docs/PROJECT_*.md`, `docs/SMOKE_TEST.md`) |
-| `app/`, `migrations/`, `tests/`, `docs/`, `scripts/`, `docker/`, `.github/`                              | ✔ top-level folders               |
-| `apex_lib.bat`, `apex_lib_install.bat`, `start.bat`                                                      | ✔ platform helpers (flagged §6.3) |
-| `.env.example`, `.gitignore`, `.dockerignore`, `.editorconfig`, `.gitattributes`, `.vscode/`, `.gemini/` | ✔ config / metadata               |
+| `app/`, `migrations/`, `tests/`, `docs/`, `scripts/`, `docker/`, `.github/`                              | ✔ top-level folders                                           |
+| `apex_lib.bat`, `apex_lib_install.bat`, `start.bat`                                                      | ✔ platform helpers (flagged §6.3)                             |
+| `.env.example`, `.gitignore`, `.dockerignore`, `.editorconfig`, `.gitattributes`, `.vscode/`, `.gemini/` | ✔ config / metadata                                           |
 
 Result: **no stray files remain at root**.
 

@@ -130,19 +130,19 @@ deletions required; no unresolved findings.
 Branch `restructure/app-modularization`. Discovery report:
 `discovery_report.md` (same directory); per-file ledger: `file_move_ledger.md`.
 
-| Check | Command (local venv) | Result |
-| --- | --- | --- |
-| Baseline before moves | `python -m pytest tests/ -q -o addopts="-m 'not slow'"` | 451 passed, 0 failed (127 deselected) |
-| After move 1 (app/cli) | same | 451 passed, 0 failed |
-| After move 2 (app/domain) | same | 451 passed, 0 failed |
-| After move 3 (social_pages) | same + URL-map probe (`web_app.app.url_map`, 137 rules; /feed /search /profile/edit /author /gamification present) | 451 passed, 0 failed; routes intact |
-| After move 4 (root hygiene) | same | 451 passed, 0 failed |
-| Coverage gate | `python -m pytest tests/ -q --no-header -o addopts="-m 'not slow'" --cov=app/db --cov-fail-under=70` | 71.38% ≥ 70 |
-| Slow-marked jobs tests | `python -m pytest tests/test_jobs.py -m slow` | 16 passed |
-| Import resolution | `python -c "import app.routes.main, app.cli.operations_cli, app.domain, web_app"` (SECRET_KEY set) | OK |
-| Static template refs | AST scan (`render_template` targets vs `app/templates/`) | 0 missing |
-| Circular imports | Tarjan SCC over 172-file import graph | 0 cycles |
-| Flakiness | two consecutive full runs | both green |
+| Check                       | Command (local venv)                                                                                               | Result                                |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------------ | ------------------------------------- |
+| Baseline before moves       | `python -m pytest tests/ -q -o addopts="-m 'not slow'"`                                                            | 451 passed, 0 failed (127 deselected) |
+| After move 1 (app/cli)      | same                                                                                                               | 451 passed, 0 failed                  |
+| After move 2 (app/domain)   | same                                                                                                               | 451 passed, 0 failed                  |
+| After move 3 (social_pages) | same + URL-map probe (`web_app.app.url_map`, 137 rules; /feed /search /profile/edit /author /gamification present) | 451 passed, 0 failed; routes intact   |
+| After move 4 (root hygiene) | same                                                                                                               | 451 passed, 0 failed                  |
+| Coverage gate               | `python -m pytest tests/ -q --no-header -o addopts="-m 'not slow'" --cov=app/db --cov-fail-under=70`               | 71.38% ≥ 70                           |
+| Slow-marked jobs tests      | `python -m pytest tests/test_jobs.py -m slow`                                                                      | 16 passed                             |
+| Import resolution           | `python -c "import app.routes.main, app.cli.operations_cli, app.domain, web_app"` (SECRET_KEY set)                 | OK                                    |
+| Static template refs        | AST scan (`render_template` targets vs `app/templates/`)                                                           | 0 missing                             |
+| Circular imports            | Tarjan SCC over 172-file import graph                                                                              | 0 cycles                              |
+| Flakiness                   | two consecutive full runs                                                                                          | both green                            |
 
 **Risk & Rollback (P8):** every move is its own commit via `git mv`;
 rollback = `git revert <phase-commit>` (revert-tested pattern from the
