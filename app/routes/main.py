@@ -64,6 +64,7 @@ from app.cli.reports_cli import (
 from app.cli.user_management_cli import (
     user_management_menu,
 )
+from app.db.storage_adapter import create_storage
 from app.services.auth.auth import AuthManager, hash_password
 from app.services.books.backup import create_backup
 from app.services.books.library import Library
