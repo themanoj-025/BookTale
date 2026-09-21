@@ -122,3 +122,33 @@ Full v5.0 protocol re-execution. Duplicate scan (content hash): none.
 Empty-file scan: only intentional package markers (`__init__.py`) and
 documented artifacts. Root allowlist: conforms. No moves required; no
 deletions required; no unresolved findings.
+
+---
+
+## 2026-09-21 restructuring pass — verification report (Phase 7/8)
+
+Branch `restructure/app-modularization`. Discovery report:
+`discovery_report.md` (same directory); per-file ledger: `file_move_ledger.md`.
+
+| Check | Command (local venv) | Result |
+| --- | --- | --- |
+| Baseline before moves | `python -m pytest tests/ -q -o addopts="-m 'not slow'"` | 451 passed, 0 failed (127 deselected) |
+| After move 1 (app/cli) | same | 451 passed, 0 failed |
+| After move 2 (app/domain) | same | 451 passed, 0 failed |
+| After move 3 (social_pages) | same + URL-map probe (`web_app.app.url_map`, 137 rules; /feed /search /profile/edit /author /gamification present) | 451 passed, 0 failed; routes intact |
+| After move 4 (root hygiene) | same | 451 passed, 0 failed |
+| Coverage gate | `python -m pytest tests/ -q --no-header -o addopts="-m 'not slow'" --cov=app/db --cov-fail-under=70` | 71.38% ≥ 70 |
+| Slow-marked jobs tests | `python -m pytest tests/test_jobs.py -m slow` | 16 passed |
+| Import resolution | `python -c "import app.routes.main, app.cli.operations_cli, app.domain, web_app"` (SECRET_KEY set) | OK |
+| Static template refs | AST scan (`render_template` targets vs `app/templates/`) | 0 missing |
+| Circular imports | Tarjan SCC over 172-file import graph | 0 cycles |
+| Flakiness | two consecutive full runs | both green |
+
+**Risk & Rollback (P8):** every move is its own commit via `git mv`;
+rollback = `git revert <phase-commit>` (revert-tested pattern from the
+v5.0 pass; branch not merged until CI green).
+
+**Follow-up backlog (P9 additions):** `ml_pkg` relocation (zero importers,
+deferred); god-module splits via the sanctioned route-extraction pattern;
+PostgreSQL service in CI for the 19 slow DB tests (~90% app/db coverage);
+`validate_email` multi-label TLD support.
