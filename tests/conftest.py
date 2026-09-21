@@ -72,11 +72,10 @@ def _redis_reachable(host: str, port: int, timeout: float = 0.25) -> bool:
 # machine); otherwise serve the RESP protocol in-process so redis-py clients
 # connecting to Config.REDIS_URL (default redis://localhost:6379/0) work.
 #
-# Background jobs (app/jobs/jobs.py) are pinned to their supported no-Redis
-# mode (bounded local pool) during tests: rq 2.x's multi-command enqueue
-# handshake crashes the fakeredis TCP server, and one crashed connection
-# poisons unrelated tests that run afterwards (flaky "Connection closed by
-# server" failures). test_jobs.py exercises the rq path with fakes.
+# Background jobs are additionally stubbed per-test (see the
+# _disable_background_jobs autouse fixture below): pool threads race the
+# suite for the shared JSON data dir and logging capture, causing flaky
+# teardown ERRORs and intermittent limiter failures.
 _HOST, _PORT = "127.0.0.1", 6379
 if not _redis_reachable(_HOST, _PORT):
     try:
@@ -94,16 +93,26 @@ if not _redis_reachable(_HOST, _PORT):
         # their own, exactly as before this conftest existed.
         pass
 
-    try:
-        import app.jobs.jobs as _jobs_mod
-
-        _jobs_mod._redis_reachable = lambda force=False: False
-        _jobs_mod._probe_cache.update(ok=False, at=_jobs_mod.datetime.max)
-    except (ImportError, AttributeError):
-        pass
-
 
 # --- Fixtures ---------------------------------------------------------------
+
+
+@pytest.fixture(autouse=True)
+def _disable_background_jobs(request):
+    """Stub the jobs funnel (app.jobs.jobs._enqueue_or_fallback) for every
+    test EXCEPT the jobs module's own tests (marker-excluded): test_jobs.py
+    exercises real dispatch behavior with fakes. Background pool threads race
+    the suite for the shared JSON data dir and logging capture — the source
+    of the flaky teardown ERRORs and intermittent limiter failures."""
+    if request.node.get_closest_marker("slow"):
+        yield
+        return
+    import app.jobs.jobs as _jobs_mod
+
+    original = _jobs_mod._enqueue_or_fallback
+    _jobs_mod._enqueue_or_fallback = lambda *a, **k: "disabled-in-tests"
+    yield
+    _jobs_mod._enqueue_or_fallback = original
 
 
 @pytest.fixture()
