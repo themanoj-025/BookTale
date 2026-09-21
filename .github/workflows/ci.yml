@@ -79,8 +79,10 @@ jobs:
           pip install pytest pytest-cov
 
       - name: Run tests with pytest
+        # Plain verbose run; coverage is enforced by the dedicated gate below
+        # (whole-repo union here would measure 58% and trip any fail-under).
         run: |
-          python -m pytest tests/ -v --tb=short --cov=. --cov-report=term-missing
+          python -m pytest tests/ -v --tb=short
 
       - name: Coverage gate on core data layer
         # -o addopts= overrides pyproject's bare --cov (which unions with

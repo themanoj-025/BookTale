@@ -16,18 +16,6 @@ import logging
 import os
 from datetime import datetime
 
-from app.config.settings import Config
-from app.core.logger import log
-from app.core.utils import (
-    console,
-    header,
-    menu,
-    pause,
-    print_error,
-    print_info,
-    print_success,
-    print_warning,
-)
 from app.cli.backup_cli import (
     backup_restore_menu,
     logs_menu,
@@ -63,6 +51,18 @@ from app.cli.reports_cli import (
 )
 from app.cli.user_management_cli import (
     user_management_menu,
+)
+from app.config.settings import Config
+from app.core.logger import log
+from app.core.utils import (
+    console,
+    header,
+    menu,
+    pause,
+    print_error,
+    print_info,
+    print_success,
+    print_warning,
 )
 from app.db.storage_adapter import create_storage
 from app.services.auth.auth import AuthManager, hash_password
