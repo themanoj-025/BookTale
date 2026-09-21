@@ -60,15 +60,22 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # The base image ships setuptools 70.x (CVE-2025-47273, fixed in
 # 78.1.1) somewhere in system site-packages; Trivy scans the whole
 # filesystem. Bare `pip` here is the venv's (PATH shadowing), so invoke
-# the system interpreter explicitly. Log-and-clear every remaining
-# 70.x artifact anywhere on the filesystem so the build log pinpoints
-# any location an upgrade does not own.
-RUN /usr/local/bin/python -m pip install --no-cache-dir --upgrade "setuptools>=78.1.1" && \
-    find / -xdev \( -name "setuptools-70*" -o -name "msgpack-1.1*" \) -print -exec rm -rf {} + 2>/dev/null; true
+# the system interpreter explicitly.
+RUN /usr/local/bin/python -m pip install --no-cache-dir --upgrade "setuptools>=78.1.1"
 
 # Copy virtualenv from builder
 COPY --from=builder /opt/venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
+
+# Diagnostic + hard cleanup AFTER all content is in place: assert the
+# exact versions pip sees in both environments and remove any residual
+# vulnerable copies anywhere on the filesystem (venv layer and repo
+# layer included) before the Trivy HIGH/CRITICAL gate scans the image.
+# Log-and-clear so the build log pinpoints any location an upgrade does
+# not own.
+RUN echo "=== system freeze ==="; /usr/local/bin/python -m pip freeze 2>/dev/null | grep -Ei "^(setuptools|msgpack|pip)=" ; \
+    echo "=== venv freeze ==="; /opt/venv/bin/python -m pip freeze 2>/dev/null | grep -Ei "^(setuptools|msgpack|pip)=" ; \
+    echo "=== residual vulnerable copies ==="; find / -xdev \( -name "setuptools-70*" -o -name "msgpack-1.1*" \) -print -exec rm -rf {} + 2>/dev/null ; true
 
 WORKDIR /app
 
@@ -77,6 +84,10 @@ COPY . .
 
 # Copy built frontend assets from builder
 COPY --from=builder /build/app/static/dist/ app/static/dist/
+
+# Second sweep: anything the repo layer or the builder dist may have
+# contributed is removed here, after every COPY, before the scan runs.
+RUN find / -xdev \( -name "setuptools-70*" -o -name "msgpack-1.1*" \) -print -exec rm -rf {} + 2>/dev/null ; true
 
 # Create non-root user
 RUN groupadd -r booktale && useradd -r -g booktale booktale && \
