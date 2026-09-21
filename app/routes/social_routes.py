@@ -7,14 +7,14 @@ registration to the focused sub-modules:
 - social_shared.py   – shared state, helpers, image verification, renderers
 - social_api.py      – feed, post CRUD, upload, follow, hashtags, search, lists API
 - review_routes.py   – reviews, shelves, bookshelves, profile API
-- gamification_routes.py – feed/search/profile/author pages + gamification renderers
+- social_pages_routes.py – feed/search/profile/author pages + gamification renderers
 """
 
 from collections.abc import Callable
 
 from flask import Flask
 
-from app.routes.gamification_routes import register_gamification_routes
+from app.routes.social_pages_routes import register_social_page_routes
 from app.routes.review_routes import register_review_routes
 from app.routes.social_api import register_social_api_routes
 from app.routes.social_shared import init_shared_state
@@ -57,6 +57,6 @@ def init_social_routes(
     # Register each route group.
     register_social_api_routes(app, _rate_limit)
     register_review_routes(app, _rate_limit)
-    register_gamification_routes(app, _rate_limit)
+    register_social_page_routes(app, _rate_limit)
 
     return {}
