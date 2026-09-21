@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import os
-import tempfile
 
 import pytest
 
@@ -16,7 +15,6 @@ os.environ.setdefault("DEFAULT_ADMIN_PASSWORD", "TestAdmin123")
 os.environ.setdefault("WTF_CSRF_ENABLED", "0")
 os.environ.setdefault("RATELIMIT_ENABLED", "0")
 
-from app.config.settings import Config
 
 from flask.testing import FlaskClient
 

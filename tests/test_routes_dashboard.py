@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import os
-import tempfile
 
 import pytest
 
@@ -16,7 +15,6 @@ os.environ.setdefault("DEFAULT_ADMIN_PASSWORD", "TestAdmin123")
 os.environ.setdefault("WTF_CSRF_ENABLED", "0")
 os.environ.setdefault("RATELIMIT_ENABLED", "0")
 
-from app.config.settings import Config
 
 from flask.testing import FlaskClient
 
@@ -44,10 +42,12 @@ class TestDashboardRoutes:
         # independent of test-process module import order.
         from unittest.mock import patch
 
-        with patch("app.storage.storage.Storage.load_books", return_value={}), \
-                patch("app.storage.storage.Storage.load_users", return_value={}), \
-                patch("app.db.storage_adapter.DbStorage.load_books", return_value={}), \
-                patch("app.db.storage_adapter.DbStorage.load_users", return_value={}):
+        with (
+            patch("app.storage.storage.Storage.load_books", return_value={}),
+            patch("app.storage.storage.Storage.load_users", return_value={}),
+            patch("app.db.storage_adapter.DbStorage.load_books", return_value={}),
+            patch("app.db.storage_adapter.DbStorage.load_users", return_value={}),
+        ):
             import os as _os
 
             if _os.environ.get("BOOKTALE_API_KEY"):

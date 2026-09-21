@@ -90,9 +90,7 @@ class TestAchievements:
         assert ud["points"] >= 10  # 10 pts for the review (+ achievement bonus)
         assert ud["unlocked_achievements"] >= 1  # first_review unlocked
 
-    def test_on_post_created_grants_points(
-        self, gamification: Gamification, storage
-    ) -> None:
+    def test_on_post_created_grants_points(self, gamification: Gamification, storage) -> None:
         gamification.on_post_created("hook-poster")
         ud = gamification.get_user_gamification("hook-poster")
         assert ud["points"] >= 5

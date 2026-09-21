@@ -71,6 +71,27 @@ class TestRedisLimiterStorage:
         monkeypatch.delenv("RATELIMIT_STORAGE_URI", raising=False)
         assert _limiter_storage_uri() == Config.REDIS_URL
 
+    @staticmethod
+    def _ephemeral_redis() -> tuple[object, str]:
+        """Dedicated fakeredis for one test.
+
+        Hermetic by construction: the budget tests burn real rate-limit
+        counters, and sharing the conftest server made them sensitive to
+        cross-test connection churn. Keys die with the server, so no
+        cleanup pass is needed either.
+        """
+        import threading
+
+        from fakeredis import TcpFakeServer
+
+        server = TcpFakeServer(("127.0.0.1", 0), server_type="redis")
+        # flask-limiter keeps pooled connections open; without this,
+        # server_close() would join those handler threads forever.
+        server.block_on_close = False
+        threading.Thread(target=server.serve_forever, daemon=True).start()
+        port = server.server_address[1]
+        return server, f"redis://127.0.0.1:{port}/0"
+
     def test_redis_budget_shared_across_limiter_instances(self) -> None:
         """Two limiter instances on the same Redis share ONE budget.
 
@@ -78,14 +99,13 @@ class TestRedisLimiterStorage:
         budget must be visible to instance B (same Redis, same key prefix),
         which plain per-process memory storage cannot provide.
         """
-        if not self._redis_reachable():
-            pytest.skip("Redis not reachable — multi-worker sharing not verified")
         import uuid
 
         from flask import Flask
         from flask_limiter import Limiter
         from flask_limiter.util import get_remote_address
 
+        server, redis_uri = self._ephemeral_redis()
         prefix = f"booktale-test-{uuid.uuid4().hex[:8]}"
 
         def _build() -> None:
@@ -93,7 +113,7 @@ class TestRedisLimiterStorage:
             probe.config["RATELIMIT_ENABLED"] = True
             lim = Limiter(
                 key_func=get_remote_address,
-                storage_uri=Config.REDIS_URL,
+                storage_uri=redis_uri,
                 key_prefix=prefix,
             )
             lim.init_app(probe)
@@ -117,15 +137,7 @@ class TestRedisLimiterStorage:
             assert c_b.post("/limited").status_code == 429, (
                 "budget must be shared across limiter instances (multi-worker)"
             )
-        # Clean up the unique test keys so later runs start fresh.
-        try:
-            import redis as _redis_client
-
-            _r = _redis_client.Redis.from_url(Config.REDIS_URL)
-            for key in _r.scan_iter(f"limiter/{prefix}/*"):
-                _r.delete(key)
-        except (OSError, ConnectionError, TimeoutError):
-            pass
+        server.shutdown()
 
     def test_redis_budget_survives_limiter_recreation(self) -> None:
         """A fresh limiter (simulating a worker restart) inherits the budget.
@@ -134,14 +146,13 @@ class TestRedisLimiterStorage:
         burn 3 of 4 requests, then build a brand-new limiter and assert the
         old budget is still enforced (only 1 request left, not 4).
         """
-        if not self._redis_reachable():
-            pytest.skip("Redis not reachable — restart persistence not verified")
         import uuid
 
         from flask import Flask
         from flask_limiter import Limiter
         from flask_limiter.util import get_remote_address
 
+        server, redis_uri = self._ephemeral_redis()
         prefix = f"booktale-restart-{uuid.uuid4().hex[:8]}"
 
         def _build() -> None:
@@ -149,7 +160,7 @@ class TestRedisLimiterStorage:
             probe.config["RATELIMIT_ENABLED"] = True
             lim = Limiter(
                 key_func=get_remote_address,
-                storage_uri=Config.REDIS_URL,
+                storage_uri=redis_uri,
                 key_prefix=prefix,
             )
             lim.init_app(probe)
@@ -171,14 +182,7 @@ class TestRedisLimiterStorage:
         with app_b.test_client() as c_b:
             assert c_b.post("/limited").status_code == 200  # 4th = last allowed
             assert c_b.post("/limited").status_code == 429  # budget carried over
-        try:
-            import redis as _redis_client
-
-            _r = _redis_client.Redis.from_url(Config.REDIS_URL)
-            for key in _r.scan_iter(f"limiter/{prefix}/*"):
-                _r.delete(key)
-        except (OSError, ConnectionError, TimeoutError):
-            pass
+        server.shutdown()
 
 
 class TestAdminAuditLog:

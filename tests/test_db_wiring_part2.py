@@ -20,7 +20,11 @@ Proves the app actually runs on the relational layer:
 from __future__ import annotations
 
 import json
+import os
+import tempfile
 import threading
+
+import pytest
 
 import app.db.database as dbmod
 from app.config.settings import Config
@@ -28,11 +32,6 @@ from app.db.database import create_all
 from app.db.storage_adapter import DbStorage, create_storage
 from app.services.books.library import Library
 from app.storage.storage import Storage
-
-import os
-import tempfile
-
-import pytest
 
 
 @pytest.fixture()

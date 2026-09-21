@@ -1,7 +1,12 @@
 """test_library.py - Comprehensive test suite for Library Management System — Part 2."""
 
 import os
+import shutil
+import tempfile
 
+import pytest
+
+from app.config.settings import Config
 from app.core.logger import get_logs, log
 from app.domain.book import Book
 from app.domain.user import User
@@ -11,13 +16,6 @@ from app.services.books.library import Library
 from app.services.notifications.notifications import NotificationManager
 from app.services.recommendations.recommender import Recommender
 from app.storage.storage import Storage
-
-import shutil
-import tempfile
-
-import pytest
-
-from app.config.settings import Config
 
 
 @pytest.fixture(autouse=True)

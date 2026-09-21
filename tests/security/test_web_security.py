@@ -15,7 +15,6 @@ fail-fast boot validation).
 import json
 import os
 import sys
-import tempfile
 
 import pytest
 
@@ -41,7 +40,6 @@ from app.config.settings import Config
 # tests/conftest.py BEFORE any test module imports web_app (module-level
 # singletons — storage, bootstrap admin creation, DB engine — freeze on the
 # first import, so the sandbox must be owned once, not per-module).
-
 from web_app import app, storage
 
 

@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import os
-import tempfile
 
 import pytest
 
@@ -16,7 +15,6 @@ os.environ.setdefault("DEFAULT_ADMIN_PASSWORD", "TestAdmin123")
 os.environ.setdefault("WTF_CSRF_ENABLED", "0")
 os.environ.setdefault("RATELIMIT_ENABLED", "0")
 
-from app.config.settings import Config
 
 from flask.testing import FlaskClient
 
@@ -42,7 +40,9 @@ class TestProgressRoutes:
         assert resp.status_code in (302, 401, 403)
 
     def test_progress_update_requires_auth(self, client: FlaskClient) -> None:
-        resp = client.post("/api/reading-progress/test/update", json={"book_id": "test", "page": 50})
+        resp = client.post(
+            "/api/reading-progress/test/update", json={"book_id": "test", "page": 50}
+        )
         assert resp.status_code in (302, 401, 403)
 
     def test_bookmarks_requires_auth(self, client: FlaskClient) -> None:
