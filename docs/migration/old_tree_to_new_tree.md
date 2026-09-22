@@ -5,7 +5,7 @@
 Delta-focused pass on top of the v5.0 layout; full per-file ledger in
 `file_move_ledger.md` (§ 2026-09-21). Shape of the change:
 
-```
+```text
 Before                                 After
 ──────                                 ─────
 app/routes/*_cli.py (7 files)    →     app/cli/*_cli.py            (new layer)
@@ -27,7 +27,7 @@ root entry-point shims (`web_app.py`, `main.py`, `start.py`, `worker.py`),
 
 ## This pass (2026-08-11)
 
-```
+```text
 Before                                After
 ──────                                ─────
 docs/migration_summary.md      →      docs/migration/migration_summary.md
@@ -42,7 +42,7 @@ modernization pass. Its complete record (deletion log §2, move log §3, import
 update summary §4, verification report §5, Needs-Human-Review list §6, DoD
 checklist §7) lives at `docs/migration/migration_summary.md`. Tree-level view:
 
-```
+```text
 Before (flat)                         After (canonical)
 ──────                                ─────
 *.py flat modules            →        app/ package

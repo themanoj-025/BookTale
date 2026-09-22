@@ -15,7 +15,7 @@ Four thin root entry points (`main.py`, `start.py`, `web_app.py`,
 
 ## 2. Layered model
 
-```
+```text
 ┌──────────────────────────────────────────────────────────────────────┐
 │  Entry points (thin wrappers)                                        │
 │   main.py (CLI) · start.py (launcher) · web_app.py (Flask+SocketIO)  │

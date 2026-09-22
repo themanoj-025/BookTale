@@ -2,7 +2,7 @@
 
 ## 1. Web app
 
-```
+```text
 python web_app.py
    └─ web_app.py (root, thin entry)
         ├─ sys.path.insert(0, <project root>)
@@ -32,7 +32,7 @@ Alternative entry: `gunicorn -w 4 web_app:app` (Dockerfile CMD) — same import 
 
 ## 2. CLI
 
-```
+```text
 python main.py
    └─ main.py (root, thin) → from app.routes.main import main; main()
         └─ bootstrap(storage, auth)  # creates default admin, initializes services
@@ -40,7 +40,7 @@ python main.py
 
 ## 3. Launcher (web / CLI / both)
 
-```
+```text
 python start.py [--web|--cli|--both]
    └─ start.py (root, thin) → app.routes.start.main()
         └─ launches `python web_app.py` and/or `python main.py` as subprocesses
@@ -49,7 +49,7 @@ python start.py [--web|--cli|--both]
 
 ## 4. Background worker
 
-```
+```text
 python worker.py          # (docker-compose worker service)
    └─ worker.py (root, thin) → from app.jobs.worker import main; main()
         └─ requires Redis (exits with a clear error if unreachable)
@@ -59,7 +59,7 @@ python worker.py          # (docker-compose worker service)
 
 ## 5. Database & migrations
 
-```
+```text
 alembic upgrade head      # from project root (alembic.ini prepend_sys_path = .)
    └─ migrations/env.py → from app.db.database import Base, resolve_database_url
                           importlib.import_module("app.db.models")
@@ -70,7 +70,7 @@ On first web boot with the DB backend, `DbStorage.__init__` calls
 
 ## 6. Frontend asset pipeline
 
-```
+```text
 npm run build
    └─ scripts/build_frontend.mjs → reads app/static/js + css, writes hashed
       bundles to app/static/dist/ + manifest.json

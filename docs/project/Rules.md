@@ -25,7 +25,7 @@
 - Formatter: black; linter: ruff; isort.
 - Structure:
 
-```
+```text
 web_app.py / main.py / start.py / worker.py   # thin entry points
 app/
   config/      # settings, fail-fast validation

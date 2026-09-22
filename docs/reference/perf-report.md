@@ -52,7 +52,7 @@ Seeding (bulk `executemany`, 1,000-row chunks) completes in ~5 seconds.
 
 ## Phase 2 DoD gate
 
-```
+```text
 checkout p95 < 50ms -> 4.39ms PASS ✅
 ```
 

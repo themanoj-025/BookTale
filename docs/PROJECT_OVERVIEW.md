@@ -123,7 +123,7 @@
 
 ## 4. High-Level Architecture
 
-```
+```text
 ┌──────────────────────── Browser ────────────────────────┐
 │  Jinja2 templates (base.html, macros)  +  bundled JS    │
 │  (static/js → esbuild → static/dist, content-hashed)    │
@@ -170,7 +170,7 @@
 
 ## 5. Complete Folder Structure Tree
 
-```
+```text
 Book-Tale/
 ├── web_app.py                    # Flask app setup + core routes
 ├── main.py                       # CLI entry point
@@ -583,7 +583,7 @@ node scripts/build_frontend.mjs
 
 ### Flow 1: Book Checkout
 
-```
+```text
 1. User searches catalog → /books page
 2. User clicks "Checkout" → POST /checkout
 3. login_required decorator verifies session
@@ -598,7 +598,7 @@ node scripts/build_frontend.mjs
 
 ### Flow 2: Social Post + Realtime
 
-```
+```text
 1. User creates post → POST /api/posts
 2. social.py stores post in DB
 3. Socket.IO emits "new_post" event
@@ -608,7 +608,7 @@ node scripts/build_frontend.mjs
 
 ### Flow 3: Background Cover Fetch
 
-```
+```text
 1. Book added without cover image
 2. RQ job enqueued: fetch_book_cover(book_id)
 3. Worker downloads from OpenLibrary API
@@ -623,7 +623,7 @@ node scripts/build_frontend.mjs
 
 ### Internal Dependencies
 
-```
+```text
 web_app.py
   ├── routes/page_routes.py → services/*
   ├── routes/social_routes.py → services/social.py
