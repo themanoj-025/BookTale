@@ -74,7 +74,7 @@ Stray root artifacts: `radar_balance.txt` (log junk — delete), `apex_lib*.bat`
 
 The existing tree already matches the enterprise skeleton to a large degree (`app/{api,config,core,db,jobs,routes,services,storage,realtime,templates,static}`). The restructuring is therefore a **targeted delta**, not a rebuild:
 
-```
+```text
 app/
 ├── cli/                    # NEW: F5 moves (7 *_cli.py + TUI menu support)
 ├── domain/                 # NEW: F4 legacy domain structs (renamed from app/models/)

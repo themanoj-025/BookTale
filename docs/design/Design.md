@@ -62,7 +62,7 @@
 
 **Button:**
 
-```
+```text
 ┌────────────────┐
 │  Issue Book     │ ← primary
 └────────────────┘
@@ -72,7 +72,7 @@ variants: primary, secondary, danger, ghost
 
 **Card (book):**
 
-```
+```text
 ┌──────────────────────────────┐
 │ [cover]  Title (bold)        │
 │          Author · Year       │
