@@ -7,7 +7,7 @@ docs suite.
 
 ## 1. Current tree (canonical)
 
-```
+```text
 Book-Tale/
 ├── main.py                       # ENTRY: CLI (thin wrapper → app/routes/main)
 ├── start.py                      # ENTRY: launcher (→ app/routes/start)
@@ -54,7 +54,7 @@ Book-Tale/
 
 ## 2. Docs tree
 
-```
+```text
 docs/
 ├── architecture.md               # ← this pass
 ├── folder_structure.md           # ← this pass

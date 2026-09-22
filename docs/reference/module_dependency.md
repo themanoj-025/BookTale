@@ -4,7 +4,7 @@ Dependency direction: **routes → services → storage/db → core/config/model
 Domain services depend on storage/db, models, core (logger/exceptions), and
 config — never on routes. Routes depend on services, realtime, and api.
 
-```
+```text
                             ┌──────────────────────────┐
                             │   Entry points (root)    │
                             │  web_app.py main.py      │
