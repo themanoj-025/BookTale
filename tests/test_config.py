@@ -60,6 +60,15 @@ class TestValidateSecureConfig:
     def test_known_insecure_keys(self) -> None:
         assert "" in _INSECURE_SECRET_KEYS
         assert "change-this-secret-key-in-production" in _INSECURE_SECRET_KEYS
+        assert "change-me-in-production" in _INSECURE_SECRET_KEYS
+
+    def test_compose_default_secret_raises(self) -> None:
+        """The docker-compose.yml default must be rejected at boot."""
+        with (
+            patch.object(Config, "SECRET_KEY", "change-me-in-production"),
+            pytest.raises(RuntimeError, match="SECRET_KEY"),
+        ):
+            validate_secure_config()
 
 
 class TestSettingsOverrides:
