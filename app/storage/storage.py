@@ -10,8 +10,8 @@ from typing import Any
 
 from app.config.settings import Config
 from app.core.exceptions import StorageError
-from app.models.book import Book
-from app.models.user import User
+from app.domain.book import Book
+from app.domain.user import User
 
 # ─
 

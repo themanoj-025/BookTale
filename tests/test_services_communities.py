@@ -1,4 +1,13 @@
-"""Tests for Book-Tale Communities service."""
+"""Tests for Book-Tale Communities service (clubs + polls).
+
+Rewritten against the real app.services.social.communities API:
+- create_club(name, description, owner_id) -> (ok, msg, club)
+- join_club / leave_club(club_id, user_id) -> (ok, msg)
+- get_club(club_id) -> club | None
+- create_poll(club_id, user_id, question, options, ...) -> (ok, msg, poll)
+- vote_poll(poll_id, user_id, option_indices) -> (ok, msg)
+  (re-voting is allowed: previous votes are removed first; option votes are lists)
+"""
 
 from __future__ import annotations
 
@@ -12,6 +21,7 @@ from app.services.social.communities import Communities
 @pytest.fixture()
 def mgr() -> Communities:
     storage = MagicMock()
+    storage.load_users.return_value = {}
     return Communities(storage)
 
 
@@ -59,30 +69,62 @@ class TestBookClubs:
 class TestPolls:
     def test_create_poll(self, mgr: Communities) -> None:
         with patch.object(mgr, "_save_json"):
-            ok, _msg, poll = mgr.create_poll("u1", "Best fantasy book?", ["LOTR", "HP", "Narnia"])
+            ok, _msg, poll = mgr.create_poll(
+                "C1", "u1", "Best fantasy book?", ["LOTR", "HP", "Narnia"]
+            )
             assert ok is True
             assert poll["question"] == "Best fantasy book?"
+            assert len(poll["options"]) == 3
+
+    def test_create_poll_needs_two_options(self, mgr: Communities) -> None:
+        ok, _msg, _ = mgr.create_poll("C1", "u1", "Only one?", ["LOTR"])
+        assert ok is False
 
     def test_vote_poll(self, mgr: Communities) -> None:
         poll = {
             "poll_id": "P1",
+            "is_active": True,
+            "expires_at": "2099-01-01T00:00:00",
             "options": [
-                {"text": "A", "votes": 0, "voters": []},
-                {"text": "B", "votes": 0, "voters": []},
+                {"text": "A", "votes": []},
+                {"text": "B", "votes": []},
             ],
         }
         with patch.object(mgr, "_load_json", return_value=[poll]), patch.object(mgr, "_save_json"):
-            ok, _msg = mgr.vote_poll("P1", 0, "u1")
+            ok, _msg = mgr.vote_poll("P1", "u1", [0])
             assert ok is True
+            assert poll["options"][0]["votes"] == ["u1"]
 
-    def test_vote_poll_already_voted(self, mgr: Communities) -> None:
+    def test_vote_poll_revotes_clear_previous(self, mgr: Communities) -> None:
+        # vote_poll removes previous votes before adding new ones (no rejection)
         poll = {
             "poll_id": "P1",
+            "is_active": True,
+            "expires_at": "2099-01-01T00:00:00",
             "options": [
-                {"text": "A", "votes": 1, "voters": ["u1"]},
-                {"text": "B", "votes": 0, "voters": []},
+                {"text": "A", "votes": ["u1"]},
+                {"text": "B", "votes": []},
             ],
         }
+        with patch.object(mgr, "_load_json", return_value=[poll]), patch.object(mgr, "_save_json"):
+            ok, _msg = mgr.vote_poll("P1", "u1", [1])
+            assert ok is True
+            assert poll["options"][0]["votes"] == []
+            assert poll["options"][1]["votes"] == ["u1"]
+
+    def test_vote_poll_not_found(self, mgr: Communities) -> None:
+        with patch.object(mgr, "_load_json", return_value=[]):
+            ok, msg = mgr.vote_poll("NOPE", "u1", [0])
+            assert ok is False
+            assert "not found" in msg.lower()
+
+    def test_vote_poll_ended(self, mgr: Communities) -> None:
+        poll = {
+            "poll_id": "P1",
+            "is_active": False,
+            "options": [{"text": "A", "votes": []}],
+        }
         with patch.object(mgr, "_load_json", return_value=[poll]):
-            ok, _msg = mgr.vote_poll("P1", 0, "u1")
-            assert ok is False or "already" in _msg.lower()
+            ok, msg = mgr.vote_poll("P1", "u1", [0])
+            assert ok is False
+            assert "ended" in msg.lower()

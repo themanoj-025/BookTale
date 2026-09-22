@@ -4,7 +4,7 @@ pytestmark = pytest.mark.integration
 
 """Tests for Book model (app/models/book.py)."""
 
-from app.models.book import CATEGORIES, Book
+from app.domain.book import CATEGORIES, Book
 
 
 class TestBookCreation:
