@@ -155,6 +155,7 @@ _INSECURE_SECRET_KEYS = {
     "",
     "change-this-secret-key-in-production",
     "change-this-to-a-random-secret-key-in-production",
+    "change-me-in-production",  # docker-compose.yml default
 }
 
 
