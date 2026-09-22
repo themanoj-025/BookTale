@@ -282,7 +282,7 @@ Dockerfile, docker-compose.yml, .github/workflows/
 - **ADRs** — every non-trivial decision is recorded in `docs/adr/`: fail-fast secrets (0001), registration role whitelist (0002), template migration (0003/0005), DB-backed storage (0004), structured logging (0006), CSRF + rate-limited auth (0007), health endpoints + security headers (0008), multi-stage Docker (0009), background jobs with RQ (0010).
 - **CHANGELOG** — `docs/community/CHANGELOG.md`
 - **Project overview & perf report** — `docs/product/PRD.md`, `docs/reference/perf-report.md`
-- **Smoke checklist** — `SMOKE_TEST.md`
+- **Smoke checklist** — `docs/SMOKE_TEST.md`
 - **Runbooks** — `docs/runbooks/` (deploy, rollback, restore-from-backup, rotate-secret-key, incident-response)
 - **Postmortem** — `docs/reference/postmortem-privilege-escalation.md` (the worst bug found, in blameless format)
 - **Trust page** — live at `/security`

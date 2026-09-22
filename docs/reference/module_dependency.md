@@ -43,7 +43,7 @@ config — never on routes. Routes depend on services, realtime, and api.
             ▼
 ┌───────────────────────────────────────────┐
 │   app/core/  (logger, exceptions, utils)  │  ← depended on by nearly all layers
-│   app/models/ (Book, User dataclasses)    │
+│   app/domain/ (Book, User dataclasses)    │
 └───────────────────────────────────────────┘
 ```
 

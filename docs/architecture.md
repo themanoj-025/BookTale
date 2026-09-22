@@ -93,11 +93,11 @@ approach against the live catalog.
 
 ## 5. Persistence
 
-| Artifact         | Location                                        | Note                                                                  |
-| ---------------- | ----------------------------------------------- | --------------------------------------------------------------------- |
-| PostgreSQL       | external service                                | primary store (SQLAlchemy 2)                                          |
-| Alembic versions | `migrations/versions/`                          | 3 revisions tracked                                                   |
-| ML dataset       | `services/recommendations/ml/Dataset/books.csv` | tracked benchmark input                                               |
+| Artifact         | Location                                        | Note                                                       |
+| ---------------- | ----------------------------------------------- | ---------------------------------------------------------- |
+| PostgreSQL       | external service                                | primary store (SQLAlchemy 2)                               |
+| Alembic versions | `migrations/versions/`                          | 3 revisions tracked                                        |
+| ML dataset       | `services/recommendations/ml/Dataset/books.csv` | tracked benchmark input                                    |
 | ML outputs       | `data/generated/comparison_output/`             | generated on demand by `ml_pkg/comparison.py` (gitignored) |
 
 ## 6. Deployment

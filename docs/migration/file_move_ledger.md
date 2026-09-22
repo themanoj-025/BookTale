@@ -6,31 +6,58 @@
 | --------------------------- | ------------------------------------- | --------- | ----------------------------------------------------------------------------- | --------------- | ---------------------------------------------------------------------------------------------------- |
 | `docs/migration_summary.md` | `docs/migration/migration_summary.md` | Meta/docs | Consolidate migration records under `docs/migration/` per enterprise standard | Low (docs only) | ✅ `git mv` preserved history; single inbound tree reference updated (`docs/folder_structure.md` §2) |
 
-## Prior pass (v5.0 modernization, commit `0cd6fa0`)
+## 2026-09-21 restructuring pass (branch `restructure/app-modularization`)
 
-The v5.0 pass moved application code into the `app/` package layout. Its full
-ledger is preserved at `docs/migration/migration_summary.md`:
+Phase 4/5 moves from the Phase 1 discovery report (`discovery_report.md`).
+Every move is a `git mv` (history preserved), committed as its own verified
+unit (suite green after each), listed in dependency-ordered execution order.
 
-- §2 **Deletion log** — every removed file with justification
-- §3 **Move log** — old path → new path for every moved file (git mv)
-- §4 **Import/reference update summary**
-- §5 **Verification report** (Phase 8)
-- §7 **Definition of Done checklist**
+| Old path                                                  | New path                                        | Category         | Reason                                                                                                                                                                             | Risk       | Verified                                                                |
+| --------------------------------------------------------- | ----------------------------------------------- | ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------- | ----------------------------------------------------------------------- |
+| `app/routes/backup_cli.py`                                | `app/cli/backup_cli.py`                         | Interface/CLI    | CLI is not a web layer (F5)                                                                                                                                                        | Low        | ✅ 451 passed; sole importer `app/routes/main.py` updated; 100% rename  |
+| `app/routes/book_management_cli.py`                       | `app/cli/book_management_cli.py`                | Interface/CLI    | F5                                                                                                                                                                                 | Low        | ✅ 451 passed; 100% rename                                              |
+| `app/routes/notifications_cli.py`                         | `app/cli/notifications_cli.py`                  | Interface/CLI    | F5                                                                                                                                                                                 | Low        | ✅ 451 passed; 100% rename                                              |
+| `app/routes/operations_cli.py`                            | `app/cli/operations_cli.py`                     | Interface/CLI    | F5                                                                                                                                                                                 | Low        | ✅ 451 passed; 100% rename                                              |
+| `app/routes/recommendations_cli.py`                       | `app/cli/recommendations_cli.py`                | Interface/CLI    | F5                                                                                                                                                                                 | Low        | ✅ 451 passed; 100% rename                                              |
+| `app/routes/reports_cli.py`                               | `app/cli/reports_cli.py`                        | Interface/CLI    | F5                                                                                                                                                                                 | Low        | ✅ 451 passed; 100% rename                                              |
+| `app/routes/user_management_cli.py`                       | `app/cli/user_management_cli.py`                | Interface/CLI    | F5                                                                                                                                                                                 | Low        | ✅ 451 passed; 100% rename                                              |
+| —                                                         | `app/cli/__init__.py`                           | Meta             | Package init documenting the layer                                                                                                                                                 | Low        | ✅                                                                      |
+| `app/models/__init__.py`                                  | `app/domain/__init__.py`                        | Domain           | Two-models-homes resolved (F4): legacy structs are domain objects; SQLAlchemy stays canonical in `app/db/models.py` (3 string-based `importlib` call sites keep their stable path) | Medium     | ✅ 451 passed; 16 files re-pointed; `git grep app.models` = 0           |
+| `app/models/book.py`                                      | `app/domain/book.py`                            | Domain           | F4                                                                                                                                                                                 | Medium     | ✅ 100% rename                                                          |
+| `app/models/user.py`                                      | `app/domain/user.py`                            | Domain           | F4                                                                                                                                                                                 | Medium     | ✅ 100% rename                                                          |
+| `app/routes/gamification_pkg/` (5 files)                  | `app/routes/social_pages/`                      | Interface/routes | Triple-name collapse (F6): the routes are /feed, /search, /profile/edit, /author — social pages, not gamification                                                                  | Medium     | ✅ 451 passed; URL map diff clean (137 rules, all prior routes present) |
+| `app/routes/gamification_routes.py`                       | `app/routes/social_pages_routes.py`             | Interface/routes | F6 re-exporter renamed with its package                                                                                                                                            | Medium     | ✅ URL map intact                                                       |
+| `app/routes/social_pages/gamification_core.py`            | `app/routes/social_pages/core.py`               | Interface/routes | Name no longer lies after the rename                                                                                                                                               | Low        | ✅ 451 passed                                                           |
+| function `register_gamification_routes(app, _rate_limit)` | `register_social_page_routes(app, _rate_limit)` | Interface/routes | Latent collision with the real gamification page's same-named function                                                                                                             | Medium     | ✅ URL map intact; `social_routes.py` updated                           |
+| `tests/test_models_book.py`                               | `tests/test_domain_book.py`                     | Meta/tests       | Mirror the app/domain move (test-naming rule)                                                                                                                                      | Low        | ✅ 451 passed                                                           |
+| `tests/test_models_user.py`                               | `tests/test_domain_user.py`                     | Meta/tests       | Mirror the app/domain move                                                                                                                                                         | Low        | ✅ 451 passed                                                           |
+| `PROJECT_OVERVIEW.md`                                     | `docs/PROJECT_OVERVIEW.md`                      | Meta/docs        | Root keeps only canonical metadata (F7)                                                                                                                                            | Low (docs) | ✅ README link updated                                                  |
+| `PROJECT_ANALYSIS.md`                                     | `docs/PROJECT_ANALYSIS.md`                      | Meta/docs        | F7                                                                                                                                                                                 | Low (docs) | ✅                                                                      |
+| `SMOKE_TEST.md`                                           | `docs/SMOKE_TEST.md`                            | Meta/docs        | F7; `scripts/smoke_checklist.py` journeys doc repointed                                                                                                                            | Low (docs) | ✅ README + script refs updated                                         |
+| `load-test.js`                                            | `scripts/loadtest/load-test.js`                 | Operational      | k6 script is a script, not root metadata (F7)                                                                                                                                      | Low        | ✅                                                                      |
+| `radar_balance.txt`                                       | _(deleted)_                                     | Junk             | Stray log fragment                                                                                                                                                                 | Low        | ✅ not referenced anywhere                                              |
+| `.coverage`                                               | _(deleted from disk)_                           | Junk             | Build artifact (gitignored)                                                                                                                                                        | Low        | ✅                                                                      |
 
-Representative moves from that pass (see §3 for the full list):
+### Import-fix log (Phase 4 §5.3 checklist, summarized)
 
-| Old path (flat root)       | New path                        | Reason                                                                                                |
-| -------------------------- | ------------------------------- | ----------------------------------------------------------------------------------------------------- |
-| `models.py` / `schemas.py` | `app/db/models.py`              | DB models into the db layer                                                                           |
-| `services/*`               | `app/services/<domain>/`        | Feature-owned service verticals (auth, books, reading, social, recommendations, email, notifications) |
-| `routes.py` / `api.py`     | `app/routes/`                   | Routing layer                                                                                         |
-| `worker.py` logic          | `app/jobs/worker.py`            | RQ worker + cron scheduler                                                                            |
-| (static/templates)         | `app/static/`, `app/templates/` | Presentation assets                                                                                   |
+- `app/routes/main.py`: 7 `from app.routes.*_cli import ...` → `from app.cli.*_cli import ...` (sole importer; header comment notes the layer rule).
+- 16 files (10 app, 1 script, 5+ test modules): `app.models` → `app.domain` via mechanical rewrite; verified zero remaining by `git grep`.
+- `app/routes/social_routes.py`: import + call of the renamed `register_social_page_routes`.
+- `app/routes/social_pages/__init__.py`, `core.py`, `social_pages_routes.py`: internal imports + docstrings aligned.
+- Docs: `README.md`, `scripts/smoke_checklist.py`, `docs/reference/module_dependency.md`, `docs/reference/package_overview.md`, `docs/folder_structure.md` path references updated (see commit diffs).
 
-## Non-moves (documented decisions)
+### Naming standardization log (Phase 5)
 
-| Path                                                                      | Decision          | Reason                                                                                                                                     |
-| ------------------------------------------------------------------------- | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
-| `main.py`, `web_app.py`, `worker.py`, `start.py` (root)                   | keep              | Thin entry launchers — the Docker/CI/`apex_lib.bat` contract (`python web_app.py`); they only bootstrap `sys.path` and delegate to `app.*` |
-| `app/services/recommendations/ml/`                                        | keep              | Notebook + dataset + images — self-contained ML experiment referenced by recommender                                                       |
-| `node_modules/`, `.coverage`, `logs/`, `data/booktale.db`, `.hypothesis/` | leave (untracked) | Runtime/build artifacts, correctly gitignored                                                                                              |
+| Item                                        | Rationale                                                                                                            |
+| ------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| `app/cli/` layer created                    | CLI modules out of the web-routes package                                                                            |
+| `app/domain/` replaces `app/models/`        | Ends the `app.models` vs `app.db.models` ambiguity; documented in both `__init__` docstrings                         |
+| `social_pages/` + `social_pages_routes.py`  | Feature name now matches content; duplicate `register_gamification_routes` symbols eliminated                        |
+| `backup_cli.py`, `services/books/backup.py` | Kept: "backup" is a legitimate domain term here, not banned-token junk (exemption documented in discovery report F6) |
+
+### Deferred / flagged (not silently done)
+
+- `ml_pkg` relocation to top-level `ml/` — zero importers, zero urgency (F3).
+- God-module splits (31 files > 350 lines) — high behavior risk; the route-extraction pattern is the sanctioned mechanism (F8).
+- Slow-marked PostgreSQL tests need a CI `postgres` service to be meaningful; would lift `app/db` coverage ~90%.
+- `validate_email` regex rejects multi-label TLDs (`user.name@example.co.uk`) — behavior intentionally unchanged in a test-maintenance pass.

@@ -1,5 +1,5 @@
 """
-gamification_core.py — Registration function, feed page, and search page.
+gamification_core.py -> core.py — registration for the social page routes (formerly mis-named gamification).
 
 Extracted from gamification_routes.py for focused maintenance.
 """
@@ -10,7 +10,7 @@ from app.routes.social_shared import (
 )
 
 
-def register_gamification_routes(app, _rate_limit) -> None:
+def register_social_page_routes(app, _rate_limit) -> None:
     """Register page routes on *app*.
 
     Parameters
@@ -26,7 +26,7 @@ def register_gamification_routes(app, _rate_limit) -> None:
     @app.route("/feed")
     @login_required
     def feed_page() -> str:
-        from app.routes.gamification_pkg.feed_page import render_feed_page
+        from app.routes.social_pages.feed_page import render_feed_page
 
         return render_feed_page()
 
@@ -45,7 +45,7 @@ def register_gamification_routes(app, _rate_limit) -> None:
     @app.route("/profile/edit")
     @login_required
     def profile_edit_page() -> str:
-        from app.routes.gamification_pkg.profile_edit_page import render_profile_edit_page
+        from app.routes.social_pages.profile_edit_page import render_profile_edit_page
 
         return render_profile_edit_page()
 
@@ -54,6 +54,6 @@ def register_gamification_routes(app, _rate_limit) -> None:
     @app.route("/author/<author_name>")
     @login_required
     def author_page(author_name) -> str:
-        from app.routes.gamification_pkg.author_page import render_author_page
+        from app.routes.social_pages.author_page import render_author_page
 
         return render_author_page(author_name)

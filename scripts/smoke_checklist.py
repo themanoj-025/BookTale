@@ -1,17 +1,17 @@
 """
-scripts/smoke_checklist.py - Run the SMOKE_TEST.md core journeys against the
+scripts/smoke_checklist.py - Run the docs/SMOKE_TEST.md core journeys against the
 DB-backed app (web_app boots on DbStorage/SQLite — the relational layer).
 
 Usage:
     python scripts/smoke_checklist.py
 
 Boots web_app against a throwaway temp DATA_DIR (SQLite lands there), then walks
-the A–E journeys from SMOKE_TEST.md through the Flask test client + the app's
+the A–E journeys from docs/SMOKE_TEST.md through the Flask test client + the app's
 own Library and social-module objects (the web layer has no checkout routes;
 issue/return are the CLI/Library journeys the checklist marks as Lb). Prints
 ✅/❌ per item and exits non-zero on any failure.
 
-Intentional gaps (documented in SMOKE_TEST.md as manual/future-phase):
+Intentional gaps (documented in docs/SMOKE_TEST.md as manual/future-phase):
   #8 reset-password (needs a generated token + browser flow)
   #10 settings override restart (covered by tests/security)
   #26 profile-with-favorites (covered by the line-151 regression test)

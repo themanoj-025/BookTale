@@ -134,7 +134,7 @@ class DbStorage:
     # ── Books ──────────────────────────────────────────────────────
 
     def load_books(self, force: bool = False) -> dict[str, Any]:
-        from app.models.book import Book
+        from app.domain.book import Book
 
         with session_scope() as db:
             rows = db.scalars(select(BookRow)).all()
@@ -148,7 +148,7 @@ class DbStorage:
     # ── Users ──────────────────────────────────────────────────────
 
     def load_users(self, force: bool = False) -> dict[str, Any]:
-        from app.models.user import User
+        from app.domain.user import User
 
         with session_scope() as db:
             rows = db.scalars(select(UserRow)).all()

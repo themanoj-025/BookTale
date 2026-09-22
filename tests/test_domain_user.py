@@ -2,7 +2,7 @@
 
 from datetime import datetime, timedelta
 
-from app.models.user import (
+from app.domain.user import (
     MAX_BORROW_LIMIT,
     MEMBERSHIP_VALIDITY_DAYS,
     ROLES,

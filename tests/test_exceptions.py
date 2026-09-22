@@ -43,23 +43,23 @@ class TestBookErrors:
         exc = BookNotFoundError("BK001")
         assert exc.book_id == "BK001"
         assert "BK001" in str(exc)
-        assert issubclass(exc, BookError)
+        assert isinstance(exc, BookError)
 
     def test_book_not_available(self) -> None:
         exc = BookNotAvailableError("BK002")
         assert exc.book_id == "BK002"
-        assert issubclass(exc, BookError)
+        assert isinstance(exc, BookError)
 
     def test_book_already_deleted(self) -> None:
         exc = BookAlreadyDeletedError("BK003")
         assert exc.book_id == "BK003"
-        assert issubclass(exc, BookError)
+        assert isinstance(exc, BookError)
 
     def test_duplicate_isbn(self) -> None:
         exc = DuplicateISBNError("978-0-13-468599-1", "BK004")
         assert exc.isbn == "978-0-13-468599-1"
         assert exc.existing_id == "BK004"
-        assert issubclass(exc, BookError)
+        assert isinstance(exc, BookError)
 
 
 class TestUserErrors:
@@ -68,30 +68,30 @@ class TestUserErrors:
     def test_user_not_found(self) -> None:
         exc = UserNotFoundError("USER001")
         assert exc.user_id == "USER001"
-        assert issubclass(exc, UserError)
+        assert isinstance(exc, UserError)
 
     def test_user_already_exists(self) -> None:
         exc = UserAlreadyExistsError("USER002")
         assert exc.user_id == "USER002"
-        assert issubclass(exc, UserError)
+        assert isinstance(exc, UserError)
 
     def test_user_blocked(self) -> None:
         exc = UserBlockedError("USER003", "blocked")
         assert exc.user_id == "USER003"
         assert exc.status == "blocked"
-        assert issubclass(exc, UserError)
+        assert isinstance(exc, UserError)
 
     def test_borrow_limit_exceeded(self) -> None:
         exc = BorrowLimitExceededError("USER004", 3)
         assert exc.user_id == "USER004"
         assert exc.limit == 3
-        assert issubclass(exc, UserError)
+        assert isinstance(exc, UserError)
 
     def test_outstanding_fine(self) -> None:
         exc = OutstandingFineError("USER005", 150.50)
         assert exc.user_id == "USER005"
         assert exc.amount == 150.50
-        assert issubclass(exc, UserError)
+        assert isinstance(exc, UserError)
 
 
 class TestAuthError:
@@ -100,7 +100,7 @@ class TestAuthError:
     def test_message(self) -> None:
         exc = AuthenticationError()
         assert "Invalid credentials" in str(exc)
-        assert issubclass(exc, LibraryError)
+        assert isinstance(exc, LibraryError)
 
 
 class TestTransactionErrors:
@@ -110,7 +110,7 @@ class TestTransactionErrors:
         exc = BookNotIssuedError("USER006", "BK005")
         assert exc.user_id == "USER006"
         assert exc.book_id == "BK005"
-        assert issubclass(exc, TransactionError)
+        assert isinstance(exc, TransactionError)
 
 
 class TestStorageError:

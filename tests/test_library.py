@@ -10,8 +10,8 @@ from datetime import datetime, timedelta
 import pytest
 
 from app.config.settings import Config
-from app.models.book import Book
-from app.models.user import User
+from app.domain.book import Book
+from app.domain.user import User
 from app.services.auth.auth import AuthManager, hash_password, verify_password
 from app.services.books.library import Library
 from app.storage.storage import Storage

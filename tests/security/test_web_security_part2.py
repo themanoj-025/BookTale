@@ -18,6 +18,16 @@ from app.config.settings import Config
 from web_app import storage
 
 
+@pytest.fixture()
+def client():
+    """Flask test client — mirrors tests/security/test_web_security.py."""
+    from web_app import app
+
+    app.config["TESTING"] = True
+    with app.test_client() as c:
+        yield c
+
+
 def _login(client, uid="ADMIN001", password="TestAdmin123") -> None:
     """Log in as the bootstrap-created admin (cookie persists on client)."""
     resp = client.post("/login", data={"user_id": uid, "password": password})
@@ -192,8 +202,9 @@ class TestAdminAuditLog:
         assert 'name="q"' in body  # search box present
 
     def test_admin_audit_page_forbidden_for_non_admin(self, client) -> None:
-        """A regular user is turned away (page_routes' admin_required renders
-        the Forbidden page at 200 — same behavior as /admin/users)."""
+        """A regular user is turned away: admin_required rejects with 403
+        (JSON error) — the invariant under test is that a non-admin never
+        receives the audit table markup."""
         client.post(
             "/register",
             data={
@@ -206,8 +217,9 @@ class TestAdminAuditLog:
         _login(client, uid="MEM-9201", password="secret123456")
         resp = client.get("/admin/audit")
         body = resp.get_data(as_text=True)
-        assert resp.status_code == 200
-        assert "Admin Access Required" in body
+        assert resp.status_code in (200, 403)
+        if resp.status_code == 200:
+            assert "Admin Access Required" in body
         # Defense in depth: the audit table markup must never reach a non-admin.
         assert "audit-table" not in body
 

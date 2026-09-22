@@ -13,7 +13,7 @@ recommendation engine with a Goodreads seed-data cold-start fallback.
 | --------------- | ------------------------------------------------ | --------------------------------------------------------------------------------------------------------------- |
 | `app/config`    | Env-driven settings, fail-fast secret validation | `settings.py`                                                                                                   |
 | `app/core`      | Cross-cutting infrastructure                     | `logger.py`, `exceptions.py`, `utils.py`                                                                        |
-| `app/models`    | Domain dataclasses                               | `book.py`, `user.py`                                                                                            |
+| `app/domain`    | Domain dataclasses (relocated from `app/models`) | `book.py`, `user.py`                                                                                            |
 | `app/storage`   | Legacy JSON persistence                          | `storage.py`                                                                                                    |
 | `app/db`        | Relational layer (default backend)               | `database.py`, `models.py`, `repositories.py`, `service.py`, `storage_adapter.py`                               |
 | `app/routes`    | HTTP routes + CLI + launcher                     | `web_app.py`, `page_routes.py`, `social_routes.py`, `feature_routes.py`, `site_pages.py`, `main.py`, `start.py` |

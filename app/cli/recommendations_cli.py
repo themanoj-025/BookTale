@@ -372,7 +372,7 @@ def seed_import_menu(lib: Library, auth: AuthManager) -> None:
         return
 
     try:
-        from app.models.book import CATEGORIES as _BOOK_CATS
+        from app.domain.book import CATEGORIES as _BOOK_CATS
     except ImportError:
         _BOOK_CATS = ["Fiction", "Non-Fiction", "Science", "Other"]
 

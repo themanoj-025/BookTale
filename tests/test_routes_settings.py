@@ -32,7 +32,7 @@ class TestSecurityPage:
         """Security page should mention key security features."""
         from app.routes.settings_pages import security_page
 
-        rendered = security_page(lambda content: content)
+        rendered = security_page(lambda title, content: content)
         assert "Password hashing" in rendered
         assert "CSRF protection" in rendered
         assert "Rate limiting" in rendered
@@ -42,7 +42,7 @@ class TestSecurityPage:
         """Security page should escape HTML in content."""
         from app.routes.settings_pages import security_page
 
-        rendered = security_page(lambda content: content)
+        rendered = security_page(lambda title, content: content)
         # Should not contain unescaped HTML tags from user content
         assert "&lt;" in rendered or "script" not in rendered
 
