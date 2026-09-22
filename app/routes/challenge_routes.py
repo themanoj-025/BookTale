@@ -8,12 +8,17 @@ from datetime import datetime
 
 from flask import Response, jsonify, request, session
 
-from app.routes.feature_shared import _avatar_html as avatar_html
-from app.routes.feature_shared import _challenge, h
+from app.routes.feature_shared import h
 
 
 def register_challenge_routes(app, login_required, render_page, _rate_limit) -> None:
     """Register reading challenge routes on *app*."""
+    # Late-bind shared state: feature_shared globals are populated by
+    # init_shared_state() at app startup, after this module is imported.
+    # The route closures below must capture the real objects here, not
+    # import-time None placeholders.
+    from app.routes.feature_shared import _avatar_html as avatar_html
+    from app.routes.feature_shared import _challenge
 
     @app.route("/reading-challenge")
     @login_required

@@ -30,8 +30,8 @@ import app.db.database as dbmod
 from app.config.settings import Config
 from app.db.database import create_all
 from app.db.storage_adapter import DbStorage
-from app.models.book import Book
-from app.models.user import User
+from app.domain.book import Book
+from app.domain.user import User
 
 pytestmark = pytest.mark.unit
 

@@ -14,7 +14,7 @@ from app.core.utils import (
     print_warning,
     validate_email,
 )
-from app.models.user import ROLES
+from app.domain.user import ROLES
 from app.services.auth.auth import AuthManager, hash_password
 from app.services.books.library import Library
 from app.storage.storage import Storage

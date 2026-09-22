@@ -19,10 +19,13 @@ Book-Tale/
 │   ├── core/   exceptions, logger, utils
 │   ├── db/     database, models, repositories, service, storage_adapter
 │   ├── jobs/   jobs, tasks, worker
-│   ├── models/ book, user
+│   ├── domain/  book, user            # legacy structs (relocated from models/;
+│   │                                 #   SQLAlchemy models stay in db/models.py)
+│   ├── cli/     book_management, user_management, operations, reports,
+│   │            recommendations, notifications, backup  (TUI menus)
 │   ├── realtime/  realtime.py
 │   ├── routes/  main, web_app, start, feature_routes, page_routes,
-│   │            site_pages, social_routes
+│   │            site_pages, social_routes, social_pages/
 │   ├── services/
 │   │   ├── auth/         auth
 │   │   ├── books/        library, reviews, series, lists, cover_service, backup
@@ -43,7 +46,7 @@ Book-Tale/
 ├── docs/                         # documentation suite (see §2)
 ├── Dockerfile  docker-compose.yml
 ├── Makefile  pyproject.toml  requirements.txt  package.json  alembic.ini
-├── README.md  PROJECT_OVERVIEW.md  PROJECT_ANALYSIS.md  SMOKE_TEST.md  LICENSE
+├── README.md  LICENSE                # docs live under docs/ (PROJECT_*.md, SMOKE_TEST.md)
 ├── apex_lib.bat  apex_lib_install.bat  start.bat     # Windows helpers
 └── .env.example  .gitignore  .dockerignore  .editorconfig  .gitattributes
     .vscode/  .gemini/  .github/
@@ -78,15 +81,15 @@ factual record and was left intact.
 
 ## 4. Root allowlist compliance
 
-| Root entry                                                                                               | Status                             |
-| -------------------------------------------------------------------------------------------------------- | ---------------------------------- |
-| `main.py`, `start.py`, `web_app.py`, `worker.py`                                                         | ✔ entry points (thin wrappers)    |
-| `Dockerfile`, `docker-compose.yml`, `docker/`                                                            | ✔ container tooling               |
-| `Makefile`, `pyproject.toml`, `requirements.txt`, `package.json`, `alembic.ini`                          | ✔ standard metadata               |
-| `README.md`, `PROJECT_OVERVIEW.md`, `PROJECT_ANALYSIS.md`, `SMOKE_TEST.md`, `LICENSE`                    | ✔ metadata / docs                 |
-| `app/`, `migrations/`, `tests/`, `docs/`, `scripts/`, `docker/`, `.github/`                              | ✔ top-level folders               |
-| `apex_lib.bat`, `apex_lib_install.bat`, `start.bat`                                                      | ✔ platform helpers (flagged §6.3) |
-| `.env.example`, `.gitignore`, `.dockerignore`, `.editorconfig`, `.gitattributes`, `.vscode/`, `.gemini/` | ✔ config / metadata               |
+| Root entry                                                                                               | Status                                                         |
+| -------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------- |
+| `main.py`, `start.py`, `web_app.py`, `worker.py`                                                         | ✔ entry points (thin wrappers)                                |
+| `Dockerfile`, `docker-compose.yml`, `docker/`                                                            | ✔ container tooling                                           |
+| `Makefile`, `pyproject.toml`, `requirements.txt`, `package.json`, `alembic.ini`                          | ✔ standard metadata                                           |
+| `README.md`, `LICENSE`                                                                                   | ✔ metadata / docs (`docs/PROJECT_*.md`, `docs/SMOKE_TEST.md`) |
+| `app/`, `migrations/`, `tests/`, `docs/`, `scripts/`, `docker/`, `.github/`                              | ✔ top-level folders                                           |
+| `apex_lib.bat`, `apex_lib_install.bat`, `start.bat`                                                      | ✔ platform helpers (flagged §6.3)                             |
+| `.env.example`, `.gitignore`, `.dockerignore`, `.editorconfig`, `.gitattributes`, `.vscode/`, `.gemini/` | ✔ config / metadata                                           |
 
 Result: **no stray files remain at root**.
 

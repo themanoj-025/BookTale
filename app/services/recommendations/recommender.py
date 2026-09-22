@@ -12,7 +12,7 @@ Strategies:
 from collections import Counter
 from datetime import datetime, timedelta
 
-from app.models.book import Book
+from app.domain.book import Book
 from app.storage.storage import Storage
 
 # Seed data integration for cold-start recommendations

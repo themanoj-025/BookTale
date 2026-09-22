@@ -20,7 +20,7 @@ from app.core.utils import (
     print_warning,
     validate_isbn,
 )
-from app.models.book import CATEGORIES
+from app.domain.book import CATEGORIES
 from app.services.auth.auth import AuthManager
 from app.services.books.library import Library
 

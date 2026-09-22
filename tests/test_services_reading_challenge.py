@@ -1,61 +1,131 @@
-"""Tests for Book-Tale reading challenge service."""
+"""Tests for Book-Tale ReadingChallenge service.
+
+Rewritten against the real app.services.reading.reading_challenge API:
+- set_goal(user_id, year, goal) -> (success, message); 1..1000 books
+- get_goal(user_id, year=None) -> dict with goal/progress/percentage/remaining
+- books_read counted from "return" transactions + finished reading progress
+- get_leaderboard counts returns per user across ALL users (needs load_users)
+Each test uses a unique user_id: challenge state persists in a shared JSON file.
+"""
 
 from __future__ import annotations
-
-from unittest.mock import MagicMock, patch
 
 import pytest
 
 from app.services.reading.reading_challenge import ReadingChallenge
 
+pytestmark = pytest.mark.unit
+
 
 @pytest.fixture()
-def mgr() -> ReadingChallenge:
-    storage = MagicMock()
+def storage(monkeypatch):
+    st = type("Storage", (), {})()
+    st.load_transactions = list
+    st.load_users = dict
+    return st
+
+
+@pytest.fixture()
+def challenge(storage) -> ReadingChallenge:
     return ReadingChallenge(storage)
 
 
-class TestReadingChallenge:
-    def test_create_challenge(self, mgr: ReadingChallenge) -> None:
-        with (
-            patch.object(mgr, "_load_challenges", return_value=[]),
-            patch.object(mgr, "_save_challenges"),
-        ):
-            ok, _msg, ch = mgr.create_challenge("u1", "Read 20 books in 2026", target=20)
-            assert ok is True
-            assert ch["target"] == 20
+class TestSetGoal:
+    def test_set_goal(self, challenge: ReadingChallenge) -> None:
+        ok, msg = challenge.set_goal("set-goal-user", 2026, 12)
+        assert ok is True
+        assert "12" in msg
 
-    def test_create_challenge_empty_desc(self, mgr: ReadingChallenge) -> None:
-        ok, _msg, _ = mgr.create_challenge("u1", "  ", target=10)
+    def test_set_goal_zero_invalid(self, challenge: ReadingChallenge) -> None:
+        ok, msg = challenge.set_goal("zero-goal-user", 2026, 0)
         assert ok is False
+        assert "at least 1" in msg
 
-    def test_join_challenge(self, mgr: ReadingChallenge) -> None:
-        ch = {"challenge_id": "CH1", "participants": {}}
-        with (
-            patch.object(mgr, "_load_challenges", return_value=[ch]),
-            patch.object(mgr, "_save_challenges"),
-        ):
-            ok, _msg = mgr.join_challenge("CH1", "u2")
-            assert ok is True
+    def test_set_goal_too_high(self, challenge: ReadingChallenge) -> None:
+        ok, msg = challenge.set_goal("high-goal-user", 2026, 1001)
+        assert ok is False
+        assert "1000" in msg
 
-    def test_join_already_joined(self, mgr: ReadingChallenge) -> None:
-        ch = {"challenge_id": "CH1", "participants": {"u2": {"progress": 0}}}
-        with patch.object(mgr, "_load_challenges", return_value=[ch]):
-            ok, _msg = mgr.join_challenge("CH1", "u2")
-            assert ok is False or "already" in _msg.lower()
+    def test_set_goal_updates_existing(self, challenge: ReadingChallenge) -> None:
+        challenge.set_goal("update-goal-user", 2026, 12)
+        ok, _msg = challenge.set_goal("update-goal-user", 2026, 20)
+        assert ok is True
+        assert challenge.get_goal("update-goal-user", 2026)["goal"] == 20
 
-    def test_update_progress(self, mgr: ReadingChallenge) -> None:
-        ch = {"challenge_id": "CH1", "participants": {"u1": {"progress": 3}}, "target": 20}
-        with (
-            patch.object(mgr, "_load_challenges", return_value=[ch]),
-            patch.object(mgr, "_save_challenges"),
-        ):
-            ok, _msg = mgr.update_progress("CH1", "u1", books_read=5)
-            assert ok is True
 
-    def test_get_challenge(self, mgr: ReadingChallenge) -> None:
-        ch = {"challenge_id": "CH1", "name": "Test Challenge"}
-        with patch.object(mgr, "_load_challenges", return_value=[ch]):
-            result = mgr.get_challenge("CH1")
-            assert result is not None
-            assert result["name"] == "Test Challenge"
+class TestGetGoal:
+    def test_get_goal_unset(self, challenge: ReadingChallenge) -> None:
+        entry = challenge.get_goal("never-set-user", 2026)
+        assert entry["goal"] == 0
+        assert entry["progress"] == 0
+        assert entry["percentage"] == 0
+
+    def test_get_goal_counts_returned_books(self, challenge: ReadingChallenge, storage) -> None:
+        storage.load_transactions = lambda: [
+            {
+                "user_id": "return-counter",
+                "type": "return",
+                "book_id": "b1",
+                "return_date": "2026-03-01T10:00:00",
+            },
+            {
+                "user_id": "return-counter",
+                "type": "return",
+                "book_id": "b2",
+                "return_date": "2026-05-01T10:00:00",
+            },
+            {  # wrong year — must not count
+                "user_id": "return-counter",
+                "type": "return",
+                "book_id": "b3",
+                "return_date": "2025-01-01T10:00:00",
+            },
+            {  # not a return — must not count
+                "user_id": "return-counter",
+                "type": "checkout",
+                "book_id": "b4",
+                "return_date": "2026-05-02T10:00:00",
+            },
+        ]
+        entry = challenge.get_goal("return-counter", 2026)
+        assert entry["progress"] == 2
+        assert set(entry["books_read"]) == {"b1", "b2"}
+
+    def test_percentage_math(self, challenge: ReadingChallenge, storage) -> None:
+        storage.load_transactions = lambda: [
+            {
+                "user_id": "pct-user",
+                "type": "return",
+                "book_id": f"b{i}",
+                "return_date": "2026-03-01T10:00:00",
+            }
+            for i in range(6)
+        ]
+        challenge.set_goal("pct-user", 2026, 12)
+        entry = challenge.get_goal("pct-user", 2026)
+        assert entry["percentage"] == 50.0
+        assert entry["remaining"] == 6
+
+
+class TestLeaderboardAndSummary:
+    def test_get_leaderboard(self, challenge: ReadingChallenge, storage) -> None:
+        storage.load_transactions = lambda: [
+            {
+                "user_id": "board-user",
+                "type": "return",
+                "book_id": "b1",
+                "return_date": "2026-03-01T10:00:00",
+            }
+        ]
+        storage.load_users = dict
+        board = challenge.get_leaderboard(2026)
+        assert isinstance(board, list)
+        assert len(board) == 1
+        assert board[0]["user_id"] == "board-user"
+        assert board[0]["count"] == 1
+        assert board[0]["rank"] == 1
+
+    def test_get_user_challenges_summary(self, challenge: ReadingChallenge) -> None:
+        challenge.set_goal("summary-user", 2026, 12)
+        summary = challenge.get_user_challenges_summary("summary-user")
+        assert summary is not None

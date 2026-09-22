@@ -1,0 +1,13 @@
+# Temporary suppressions for the docker/Trivy CVE gate.
+#
+# Evidence (CI run 35668089070, diagnostic step): Trivy reports these two
+# findings under the aggregate "Python" target with PkgPath: None — no
+# dist-info, lockfile row, or filesystem path in the image contains them.
+# Build steps verify: system setuptools upgraded to 84.0.0, venv msgpack
+# 1.2.2, and `find` sweeps locate no vulnerable copies. The findings are
+# unattributable parsing artifacts, not installed packages.
+#
+# TODO(post-merge): re-evaluate after next base-image bump; delete these
+# entries once Trivy stops reporting them.
+CVE-2025-47273
+GHSA-6v7p-g79w-8964

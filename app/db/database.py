@@ -52,6 +52,12 @@ def get_engine() -> Engine:
             "check_same_thread": False,
             "timeout": 30,
         }
+        # Fresh checkouts have no data/ (gitignored); SQLite cannot open a
+        # file whose parent directory does not exist. Only the local-file
+        # form needs this - absolute paths yield a 4-slash scheme URL.
+        _, _, sqlite_path = url.partition("///")
+        if sqlite_path:
+            os.makedirs(os.path.dirname(sqlite_path), exist_ok=True)
     _engine = create_engine(url, connect_args=connect_args, pool_pre_ping=True)
 
     if url.startswith("sqlite"):

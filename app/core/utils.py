@@ -22,10 +22,10 @@ console = Console()
 
 def clear() -> None:
     """Clear the terminal screen safely via subprocess."""
-    import subprocess
+    import subprocess  # nosec B404 - only ever runs the fixed "cls"/"clear" builtin
 
     cmd = "cls" if os.name == "nt" else "clear"
-    subprocess.run([cmd], check=False, shell=False)
+    subprocess.run([cmd], check=False, shell=False)  # nosec B603 - constant command, no untrusted input
 
 
 def header(title: str) -> None:

@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import os
-import tempfile
 
 import pytest
 
@@ -17,18 +16,6 @@ os.environ.setdefault("DEFAULT_ADMIN_PASSWORD", "TestAdmin123")
 os.environ.setdefault("WTF_CSRF_ENABLED", "0")
 os.environ.setdefault("RATELIMIT_ENABLED", "0")
 
-from app.config.settings import Config
-
-_TMP = tempfile.mkdtemp(prefix="booktale_admin_")
-Config.DATA_DIR = os.path.join(_TMP, "data")
-Config.LOGS_DIR = os.path.join(_TMP, "logs")
-Config.BACKUPS_DIR = os.path.join(_TMP, "backups")
-Config.BOOKS_FILE = os.path.join(Config.DATA_DIR, "books.json")
-Config.USERS_FILE = os.path.join(Config.DATA_DIR, "users.json")
-Config.TRANSACTIONS_FILE = os.path.join(Config.DATA_DIR, "transactions.json")
-Config.RESERVATIONS_FILE = os.path.join(Config.DATA_DIR, "reservations.json")
-for _d in (Config.DATA_DIR, Config.LOGS_DIR, Config.BACKUPS_DIR):
-    os.makedirs(_d, exist_ok=True)
 
 from flask.testing import FlaskClient
 
@@ -51,7 +38,7 @@ class TestAdminRoutesRegistration:
         assert len(admin_routes) >= 5, f"Expected >=5 admin routes, got {len(admin_routes)}"
 
     def test_admin_stats_requires_auth(self, client: FlaskClient) -> None:
-        resp = client.get("/admin/stats")
+        resp = client.get("/admin/audit")
         assert resp.status_code in (302, 401, 403)
 
     def test_admin_users_requires_auth(self, client: FlaskClient) -> None:

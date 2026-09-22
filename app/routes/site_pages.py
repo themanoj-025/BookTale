@@ -13,7 +13,7 @@ from typing import Any
 from flask import redirect, render_template, session, url_for
 
 from app.config.settings import Config
-from app.models.book import CATEGORIES as BOOK_CATEGORIES
+from app.domain.book import CATEGORIES as BOOK_CATEGORIES
 from app.routes.helpers import cat_color
 
 

@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import os
-import tempfile
 
 import pytest
 
@@ -16,18 +15,6 @@ os.environ.setdefault("DEFAULT_ADMIN_PASSWORD", "TestAdmin123")
 os.environ.setdefault("WTF_CSRF_ENABLED", "0")
 os.environ.setdefault("RATELIMIT_ENABLED", "0")
 
-from app.config.settings import Config
-
-_TMP = tempfile.mkdtemp(prefix="booktale_diary_")
-Config.DATA_DIR = os.path.join(_TMP, "data")
-Config.LOGS_DIR = os.path.join(_TMP, "logs")
-Config.BACKUPS_DIR = os.path.join(_TMP, "backups")
-Config.BOOKS_FILE = os.path.join(Config.DATA_DIR, "books.json")
-Config.USERS_FILE = os.path.join(Config.DATA_DIR, "users.json")
-Config.TRANSACTIONS_FILE = os.path.join(Config.DATA_DIR, "transactions.json")
-Config.RESERVATIONS_FILE = os.path.join(Config.DATA_DIR, "reservations.json")
-for _d in (Config.DATA_DIR, Config.LOGS_DIR, Config.BACKUPS_DIR):
-    os.makedirs(_d, exist_ok=True)
 
 from flask.testing import FlaskClient
 
@@ -53,7 +40,7 @@ class TestDiaryRoutes:
         assert resp.status_code in (200, 302, 401, 403)
 
     def test_diary_api_requires_auth(self, client: FlaskClient) -> None:
-        resp = client.get("/api/diary")
+        resp = client.get("/api/diary/stats")
         assert resp.status_code in (302, 401, 403)
 
     def test_diary_route_registered(self) -> None:
@@ -68,15 +55,15 @@ class TestDiaryHelpers:
         from app.services.reading.diary import RATING_LABELS
 
         assert "timepass" in RATING_LABELS
-        assert "masterpiece" in RATING_LABELS
-        assert len(RATING_LABELS) == 6
+        assert "perfection" in RATING_LABELS
+        assert len(RATING_LABELS) == 4
 
     def test_rating_scores_exist(self) -> None:
         from app.services.reading.diary import RATING_SCORES
 
-        assert len(RATING_SCORES) == 6
+        assert len(RATING_SCORES) == 4
         scores = list(RATING_SCORES.values())
-        assert scores == sorted(scores)
+        assert scores == sorted(scores, reverse=True)
 
     def test_rating_badge_html(self) -> None:
         from app.services.reading.diary import rating_badge_html
@@ -88,6 +75,6 @@ class TestDiaryHelpers:
     def test_star_rating_html(self) -> None:
         from app.services.reading.diary import star_rating_html
 
-        stars = star_rating_html(4.5)
+        stars = star_rating_html(4)
         assert isinstance(stars, str)
-        assert len(stars) > 0
+        assert "★" in stars
