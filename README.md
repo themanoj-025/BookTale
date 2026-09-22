@@ -104,7 +104,7 @@ A full-featured library management system — catalog, lending, reservations, fi
 
 ## 🏗️ Architecture
 
-```
+```text
 ┌──────────────────────── Browser ────────────────────────┐
 │  Jinja2 templates (base.html, macros)  +  bundled JS    │
 │  (static/js → esbuild → static/dist, content-hashed)    │
@@ -249,7 +249,7 @@ Nothing here is hidden: the code is the source of truth, and the UI labels refle
 
 ## 📁 Project structure
 
-```
+```text
 web_app.py / main.py / start.py / worker.py   # Thin entry points -> app.routes / app.jobs
 app/
   config/        # settings.py: env-driven config + fail-fast SECRET_KEY validation
