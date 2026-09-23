@@ -1,9 +1,14 @@
 """Lightweight circuit breaker for external API calls.
 
-CANONICAL COPY — this file is the single source of truth. It is synced
-verbatim into every portfolio repo by ``tools/sync_circuit_breaker.py``
-(see ``shared/README.md``). Make changes HERE, then re-run the sync;
-do not edit the per-repo copies directly.
+CANONICAL COPY — the single source of truth is ``shared/circuit_breaker.py``
+in the portfolio workspace, synced verbatim into every repo by
+``shared/tools/sync_circuit_breaker.py``. Make changes in the shared copy,
+then re-run the sync; per-repo copies are generated — do not edit them
+directly. Drift is detectable with ``--check``.
+
+Formatting contract: every line stays under 88 columns so black/ruff-format
+agree at any repo line-length (the except tuple below keeps its magic
+trailing comma, which pins the wrapped form under every formatter).
 
 Usage:
     from circuit_breaker import CircuitBreaker
@@ -58,12 +63,10 @@ class CircuitBreaker:
 
     @property
     def state(self) -> CircuitState:
-        if (
-            self._state == CircuitState.OPEN
-            and time.monotonic() - self._last_failure_time >= self.recovery_timeout
-        ):
-            self._state = CircuitState.HALF_OPEN
-            logger.info("Circuit breaker %s: OPEN -> HALF_OPEN", self.name)
+        if self._state == CircuitState.OPEN:
+            if time.monotonic() - self._last_failure_time >= self.recovery_timeout:
+                self._state = CircuitState.HALF_OPEN
+                logger.info("Circuit breaker %s: OPEN -> HALF_OPEN", self.name)
         return self._state
 
     def record_success(self) -> None:
@@ -98,7 +101,14 @@ class CircuitBreaker:
                 return result
             except CircuitBreakerOpenError:
                 raise
-            except (ConnectionError, TimeoutError, OSError, ValueError, KeyError, TypeError):
+            except (
+                ConnectionError,
+                TimeoutError,
+                OSError,
+                ValueError,
+                KeyError,
+                TypeError,
+            ):
                 self.record_failure()
                 raise
             except Exception:
