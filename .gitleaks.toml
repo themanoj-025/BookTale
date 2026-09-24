@@ -1,0 +1,14 @@
+# Gitleaks configuration
+# Extends gitleaks' default ruleset with repository-specific allowlists.
+# NOTE: allowlists here are for NON-PRODUCTION test fixtures only.
+title = "gitleaks config for Book-Tale"
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Smoke-test payloads (dummy values by design)"
+regexes = [
+  # scripts/smoke_live.py password-change check payload (dummy password).
+  '''newpass456789''',
+]
