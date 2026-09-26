@@ -4,7 +4,6 @@
   <img src="https://img.shields.io/badge/Python-3.10%2B-3776AB?logo=python&logoColor=white" alt="Python" />
   <img src="https://img.shields.io/badge/Flask-000000?logo=flask" alt="Flask" />
   <img src="https://img.shields.io/badge/SQLAlchemy-2.x-d71f00?logo=sqlalchemy&logoColor=white" alt="SQLAlchemy" />
-  <img src="https://img.shields.io/badge/tests-202%20passing-brightgreen" alt="Tests" />
   <img src="https://img.shields.io/github/license/themanoj-025/BookTale" alt="License" />
   <img src="https://img.shields.io/github/actions/workflow/status/themanoj-025/BookTale/ci.yml?label=CI" alt="CI" />
 </p>
