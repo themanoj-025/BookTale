@@ -10,12 +10,13 @@ import pandas as pd
 import plotly.graph_objects as go
 import seaborn as sns
 
-from app.services.recommendations.ml.Model.ml_pkg.models import (
+from app.services.recommendations.ml_models.ml_pkg.data_loading import (
     ALGORITHM_COLORS,
     OUTPUT_DIR,
     PLOTLY_AVAILABLE,
-    ModelResult,
 )
+from app.services.recommendations.ml_models.ml_pkg.evaluation import ModelResult
+
 
 logger = logging.getLogger(__name__)
 

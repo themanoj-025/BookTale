@@ -1,12 +1,12 @@
-from ml_pkg.comparison import get_best_model_weights, run_comparison
-from ml_pkg.data_loading import get_numerical_features, get_tfidf_features, load_and_preprocess_data
-from ml_pkg.evaluation import (
+from .comparison import get_best_model_weights, run_comparison
+from .data_loading import get_numerical_features, get_tfidf_features, load_and_preprocess_data
+from .evaluation import (
     ModelResult,
     content_based_filtering,
     evaluate_clustering,
     evaluate_recommendation,
 )
-from ml_pkg.models import (
+from .models import (
     agglomerative_model,
     dbscan_model,
     hybrid_model,
@@ -18,7 +18,7 @@ from ml_pkg.models import (
     tsne_kmeans_model,
     xgboost_model,
 )
-from ml_pkg.visualization import (
+from .visualization import (
     save_bar_comparison,
     save_cluster_visualization,
     save_elbow_plot,

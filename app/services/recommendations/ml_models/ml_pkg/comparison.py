@@ -6,26 +6,45 @@ import logging
 
 import numpy as np
 
-from app.services.recommendations.ml.Model.ml_pkg.models import (
+from app.services.recommendations.ml_models.ml_pkg.data_loading import (
+    DATA_PATH,
+    OUTPUT_DIR,
+    N_CLUSTERS,
+    N_NEIGHBORS,
+    RANDOM_STATE,
+    TEST_SIZE,
+    XGB_AVAILABLE,
+)
+from app.services.recommendations.ml_models.ml_pkg.data_loading import (
+    N_CLUSTERS,
+    N_NEIGHBORS,
+    RANDOM_STATE,
+    TEST_SIZE,
+    XGB_AVAILABLE,
     ALGORITHM_COLORS,
     DATA_PATH,
     OUTPUT_DIR,
-    agglomerative_model,
-    content_based_filtering,
-    dbscan_model,
     get_numerical_features,
     get_tfidf_features,
+    load_and_preprocess_data,
+)
+from app.services.recommendations.ml_models.ml_pkg.models import (
+    agglomerative_model,
+    dbscan_model,
     hybrid_model,
     kmeans_model,
     knn_model,
-    load_and_preprocess_data,
     neural_network_model,
     pca_kmeans_model,
     svd_model,
     tsne_kmeans_model,
     xgboost_model,
 )
-from app.services.recommendations.ml.Model.ml_pkg.visualization import (
+from app.services.recommendations.ml_models.ml_pkg.evaluation import (
+    evaluate_clustering,
+    evaluate_recommendation,
+)
+from app.services.recommendations.ml_models.ml_pkg.visualization import (
     save_bar_comparison,
     save_cluster_visualization,
     save_elbow_plot,

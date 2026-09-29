@@ -72,3 +72,11 @@ radar_balance.txt
 *.db-wal
 .coverage.*
 coverage.xml
+
+# ML artifacts (scripts + dataset + images) - gitignored, see MODERNIZATION_AUDIT.md
+app/services/recommendations/ml/
+
+# ── docs/ (repository documentation) ────────────────────────────────
+# The audit/modernization docs under docs/ are force-added and tracked
+# (see MODERNIZATION_AUDIT.md / docs/ML_ARTIFACTS_GITIGNORE_EXCEPTION.md).
+# Do not add a blanket `docs/` ignore here; only tool-output noise is ignored.

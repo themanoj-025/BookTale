@@ -71,7 +71,7 @@ warnings.filterwarnings("ignore")
 SCRIPT_DIR = Path(__file__).parent.absolute()
 # Repo root: Model -> ml -> recommendations -> services -> app -> repo root
 PROJECT_ROOT = SCRIPT_DIR.parents[4]
-DATASET_DIR = SCRIPT_DIR.parent / "Dataset"
+DATASET_DIR = SCRIPT_DIR.parent.parent / "ml_datasets"
 DATA_PATH = DATASET_DIR / "books.csv"
 # Generated benchmark outputs live under the gitignored data/ tree, not in source
 OUTPUT_DIR = PROJECT_ROOT / "data" / "generated" / "comparison_output"

@@ -109,5 +109,12 @@ HEALTHCHECK --interval=30s --timeout=5s --retries=3 \
 
 USER booktale
 
-# Run with gunicorn in production, Flask dev server in dev
-CMD ["sh", "-c", "gunicorn -w 4 -b 0.0.0.0:5000 --timeout 120 web_app:app 2>/dev/null || python web_app.py"]
+# Run with gunicorn in production, Flask dev server in dev. The entrypoint
+# (scripts/entrypoint.sh) first rotates + prunes app/logs/ so the age-based
+# retention policy takes effect before the service starts.
+CMD ["sh", "-c", "scripts/entrypoint.sh 'gunicorn -w 4 -b 0.0.0.0:5000 --timeout 120 web_app:app'"]
+
+# Dev / local override: the Flask dev server is used with DEBUG forced
+# OFF (app/config/settings.py) so no Werkzeug reloader runs in production.
+# CMD ["sh", "-c", "scripts/entrypoint.sh 'python web_app.py'"]
+
