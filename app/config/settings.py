@@ -22,12 +22,14 @@ class Config:
     # ── Data Directories ────────────────────────────────────────
     BASE_DIR: str = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     DATA_DIR: str = os.path.join(BASE_DIR, "data")
+    # app/logs/ holds the structured logs: RotatingFileHandler (5 MB, 5 backups)
+    # + age-based retention driven by the env vars below.
     LOGS_DIR: str = os.path.join(BASE_DIR, "logs")
     BACKUPS_DIR: str = os.path.join(BASE_DIR, "backups")
     UPLOADS_DIR: str = os.path.join(BASE_DIR, "uploads")
 
     # ── Upload Settings ─────────────────────────────────────────
-    MAX_UPLOAD_SIZE: int = int(os.getenv("MAX_UPLOAD_SIZE", str(5 * 1024 * 1024)))  # 5 MB
+    MAX_UPLOAD_SIZE: int = int(os.getenv("MAX_UPLOAD_SIZE", str(5 * 2048 * 1024)))  # 10 MB
     ALLOWED_EXTENSIONS: set = set(
         os.getenv("ALLOWED_EXTENSIONS", ".jpg,.jpeg,.png,.gif,.webp").split(",")
     )
@@ -41,8 +43,15 @@ class Config:
     NOTIFICATIONS_FILE: str = os.path.join(DATA_DIR, "notifications.json")
 
     # ── Logging ─────────────────────────────────────────────────
+    # Each identifier (text/JSON) is written by a RotatingFileHandler (5 MB,
+    # 5 backups) so file growth is capped at runtime. Retention is age-based:
+    # LOG_RETENTION_DAYS (default 30) and LOG_RETENTION_KEEP (default 10)
+    # control how many rotated files are kept per identifier. See core/logger.py
+    # and scripts/rotate_logs.py for the sweep implementation.
     LOG_FILE: str = os.path.join(LOGS_DIR, "activity.log")
     JSON_LOG: str = os.path.join(LOGS_DIR, "activity.json")
+    LOG_RETENTION_DAYS: int = int(os.getenv("LOG_RETENTION_DAYS", "30"))
+    LOG_RETENTION_KEEP: int = int(os.getenv("LOG_RETENTION_KEEP", "10"))
 
     # ── Default Admin ───────────────────────────────────────────
     DEFAULT_ADMIN_ID: str = os.getenv("DEFAULT_ADMIN_ID", "ADMIN001")
@@ -88,7 +97,10 @@ class Config:
     SECRET_KEY: str = os.getenv("SECRET_KEY", "")
     FLASK_HOST: str = os.getenv("FLASK_HOST", "0.0.0.0")  # nosec B104 - container/dev server default
     FLASK_PORT: int = int(os.getenv("FLASK_PORT", "5000"))
-    FLASK_DEBUG: bool = os.getenv("FLASK_DEBUG", "False").lower() == "true"
+    # Force debug=False in production: the container/Dockerfile already set
+    # FLASK_DEBUG=False, and the default here must never re-enable the debug
+    # Werkzeug reloader in a production/in-container deployment.
+    FLASK_DEBUG: bool = False
 
     # ── OpenLibrary API ─────────────────────────────────────────
     OPENLIBRARY_BASE_URL: str = "https://openlibrary.org"

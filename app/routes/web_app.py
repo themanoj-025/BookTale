@@ -631,6 +631,10 @@ if __name__ == "__main__":
         app,
         host=Config.FLASK_HOST,
         port=Config.FLASK_PORT,
-        debug=Config.FLASK_DEBUG,
+        # debug is intentionally disabled: FLASK_DEBUG is forced to False in
+        # app/config/settings.py so the Werkzeug reloader never starts in a
+        # production/in-container deployment. allow_unsafe_werkzeug is still
+        # passed for dev parity but never becomes an active debug endpoint.
+        debug=False,
         allow_unsafe_werkzeug=True,
     )

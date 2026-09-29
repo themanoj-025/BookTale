@@ -11,12 +11,12 @@ from sklearn.cluster import KMeans
 from sklearn.metrics import calinski_harabasz_score, davies_bouldin_score, silhouette_score
 from sklearn.metrics.pairwise import cosine_similarity
 
-from app.services.recommendations.ml.Model.ml_pkg.data_loading import (
+from app.services.recommendations.ml_models.ml_pkg.data_loading import (
     N_CLUSTERS,
     RANDOM_STATE,
     TOP_N_RECS,
 )
-from app.services.recommendations.ml.Model.ml_pkg.models import ALGORITHM_COLORS
+from app.services.recommendations.ml_models.ml_pkg.data_loading import ALGORITHM_COLORS
 
 logger = logging.getLogger(__name__)
 
