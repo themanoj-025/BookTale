@@ -1,0 +1,69 @@
+{
+  "schemaVersion": "1.0",
+  "project": "book-tale",
+  "aiAssisted": true,
+  "tools": [
+    {
+      "name": "Claude Opus",
+      "provider": "Anthropic",
+      "model": "claude-opus-4-20250514",
+      "mode": "cli",
+      "firstUsed": "2025-11-15",
+      "lastUsed": "2026-09-30"
+    },
+    {
+      "name": "Claude Sonnet",
+      "provider": "Anthropic",
+      "model": "claude-sonnet-4-20250514",
+      "mode": "cli",
+      "firstUsed": "2025-11-15",
+      "lastUsed": "2026-09-30"
+    },
+    {
+      "name": "Cursor",
+      "provider": "Anysphere",
+      "model": "Model 5",
+      "mode": "IDE agent",
+      "firstUsed": "2026-03-01",
+      "lastUsed": "2026-09-30"
+    }
+  ],
+  "scope": {
+    "code": "flask api + ml recommendation pipeline + scheduler",
+    "docs": "README, CONTRIBUTING, CI workflows, audit docs",
+    "design": "architecture decisions, security model, caching strategy"
+  },
+  "estimatedAiSharePercent": {
+    "min": 60,
+    "max": 75,
+    "basis": "maintainer estimate from line-level authorship; automation not instrumented"
+  },
+  "humanReview": {
+    "performed": true,
+    "method": "line-by-line PR review, bandit/gitleaks CI gates, full pytest suite"
+  },
+  "evidence": [
+    {
+      "type": "commit",
+      "ref": "82d2f2e",
+      "note": "README.md per universal documentation blueprint"
+    },
+    {
+      "type": "commit",
+      "ref": "80ea726",
+      "note": "Fix Book-Tale: safety, logging, ML layout, docs tracking"
+    },
+    {
+      "type": "file",
+      "ref": "docs/ai/README.md",
+      "note": "AI tools documentation"
+    },
+    {
+      "type": "file",
+      "ref": "docs/ai/PROVENANCE.md",
+      "note": "AI-assisted milestone ledger"
+    }
+  ],
+  "disclosureDoc": "AI_DISCLOSURE.md",
+  "lastUpdated": "2026-10-06"
+}
