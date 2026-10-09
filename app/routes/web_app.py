@@ -1,0 +1,640 @@
+"""web_app.py - Library Management System Web Interface
+
+Application bootstrap, middleware, error handlers, and utility helpers.
+Route modules are registered via init_*_routes() calls below.
+"""
+
+import contextlib
+import html
+import os
+import sys
+from functools import wraps
+from typing import Any
+
+if sys.platform == "win32":
+    for _stream in (sys.stdout, sys.stderr):
+        with contextlib.suppress(AttributeError, OSError, ValueError):
+            _stream.reconfigure(encoding="utf-8", errors="replace")
+
+from flask import (
+    Flask,
+    g,
+    jsonify,
+    redirect,
+    render_template,
+    render_template_string,
+    request,
+    session,
+    url_for,
+)
+from flask_cors import CORS
+
+from app.config.settings import Config, validate_secure_config
+from app.core.logger import log, set_request_id
+from app.db.storage_adapter import create_storage
+from app.routes.site_pages import init_site_pages
+from app.routes.social_routes import init_social_routes
+from app.services.auth.auth import AuthManager
+from app.services.books.library import Library
+from app.services.books.lists import BookLists
+from app.services.books.series import SeriesManager
+from app.services.notifications.notifications import NotificationManager
+from app.services.reading.diary import DiaryManager
+from app.services.reading.reading_challenge import ReadingChallenge
+from app.services.reading.reading_progress import ReadingProgress
+from app.services.reading.wishlist import Wishlist
+from app.services.recommendations.recommender import Recommender
+from app.services.social.communities import Communities
+from app.services.social.gamification import Gamification
+
+# ── Flask app ───────────────────────────────────────────────────────────────
+_PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+app = Flask(
+    __name__,
+    template_folder=os.path.join(_PROJECT_ROOT, "app", "templates"),
+    static_folder=os.path.join(_PROJECT_ROOT, "app", "static"),
+)
+app.secret_key = Config.SECRET_KEY
+
+validate_secure_config()
+
+# ── CSRF protection ─────────────────────────────────────────────────────────
+app.config["WTF_CSRF_ENABLED"] = os.getenv("WTF_CSRF_ENABLED", "1").strip().lower() in (
+    "1",
+    "true",
+    "yes",
+    "on",
+)
+try:
+    from flask_wtf.csrf import CSRFProtect
+
+    csrf = CSRFProtect(app)
+except ImportError:
+    csrf = None
+
+# ── Rate limiting ───────────────────────────────────────────────────────────
+app.config["RATELIMIT_ENABLED"] = os.getenv("RATELIMIT_ENABLED", "1").strip().lower() in (
+    "1",
+    "true",
+    "yes",
+    "on",
+)
+
+
+def _limiter_storage_uri() -> str:
+    override = os.getenv("RATELIMIT_STORAGE_URI", "").strip()
+    return override or Config.REDIS_URL
+
+
+try:
+    from flask_limiter import Limiter
+    from flask_limiter.util import get_remote_address
+
+    limiter = Limiter(
+        key_func=get_remote_address,
+        default_limits=["200 per minute"],
+        storage_uri=_limiter_storage_uri(),
+        in_memory_fallback_enabled=True,
+    )
+    limiter.init_app(app)
+    app.extensions["booktale_limiter"] = limiter
+except ImportError:
+    limiter = None
+
+
+def _rate_limit(limit_value: str, **kwargs: Any) -> Any:
+    """Rate-limit decorator; no-op fallback if flask-limiter is not installed."""
+    if limiter is None:
+        return lambda f: f
+    return limiter.limit(limit_value, **kwargs)
+
+
+def _user_key() -> dict[str, str]:
+    uid = session.get("user_id")
+    if uid:
+        return f"user:{uid}"
+    return f"ip:{request.remote_addr}"
+
+
+def _audit_log(
+    admin_id: str, action: str, target: str = "", old_value: Any = None, new_value: Any = None
+) -> None:
+    """Append one row to the admin audit trail."""
+    try:
+        import app.db.database as _dbmod
+        from app.db.repositories import AuditLogRepository
+
+        with _dbmod.session_scope() as db:
+            AuditLogRepository(db).add(
+                admin_id=admin_id,
+                action=action,
+                target=target,
+                old_value=old_value,
+                new_value=new_value,
+                ip_address=request.remote_addr or "",
+                user_agent=request.headers.get("User-Agent", ""),
+            )
+    except (OSError, ValueError) as e:
+        log(
+            f"audit write failed (admin={admin_id}, action={action}, target={target}): {e}",
+            "audit",
+        )
+
+
+# ── Session cookie security ────────────────────────────────────────────────
+app.config["SESSION_COOKIE_HTTPONLY"] = True
+app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
+if not Config.FLASK_DEBUG and os.getenv("SESSION_COOKIE_SECURE", "").strip() == "1":
+    app.config["SESSION_COOKIE_SECURE"] = True
+
+# ── Frontend asset pipeline ─────────────────────────────────────────────────
+
+
+def asset(path) -> str:
+    """Return the content-hashed URL for a logical static asset path."""
+    _manifest = getattr(asset, "_manifest", None)
+    if _manifest is None:
+        import json as _json
+
+        _manifest = {}
+        try:
+            with open(
+                os.path.join(_PROJECT_ROOT, "app", "static", "dist", "manifest.json"),
+                encoding="utf-8",
+            ) as _f:
+                _manifest = _json.load(_f)
+        except (OSError, ValueError):
+            pass
+        asset._manifest = _manifest
+    return _manifest.get(path, "/static/" + path)
+
+
+app.jinja_env.globals["asset"] = asset
+
+# ── CORS ────────────────────────────────────────────────────────────────────
+CORS(
+    app,
+    origins=["http://localhost:5000", "http://127.0.0.1:5000"],
+    supports_credentials=True,
+)
+
+
+# ── Middleware ───────────────────────────────────────────────────────────────
+@app.before_request
+def _request_id_middleware() -> None:
+    set_request_id()
+
+
+@app.after_request
+def apply_security_headers(response) -> dict:
+    """Set security headers on every response."""
+    response.headers["Content-Security-Policy"] = (
+        "default-src 'self'; "
+        "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://code.jquery.com https://cdnjs.cloudflare.com; "
+        "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://fonts.googleapis.com; "
+        "font-src 'self' https://cdnjs.cloudflare.com https://fonts.gstatic.com; "
+        "img-src 'self' data: https:; "
+        "connect-src 'self' https://openlibrary.org; "
+        "frame-ancestors 'none';"
+    )
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+    response.headers["X-XSS-Protection"] = "0"
+    response.headers["Permissions-Policy"] = (
+        "camera=(), microphone=(), geolocation=(), interest-cohort=()"
+    )
+    return response
+
+
+# ── Service instances ───────────────────────────────────────────────────────
+storage = create_storage()
+lib = Library(storage)
+auth = AuthManager(storage)
+recommender = Recommender(storage)
+notif_mgr = NotificationManager(storage)
+from app.routes.main import bootstrap
+
+bootstrap(storage, auth)
+
+from app.realtime.realtime import init_socketio as _init_socketio
+from app.services.books.reviews import ReviewManager
+from app.services.social.social import SocialFeed
+
+socketio = _init_socketio(app, storage)
+social = SocialFeed(storage)
+review_mgr = ReviewManager(storage)
+book_lists = BookLists(storage)
+communities = Communities(storage)
+gamification = Gamification(storage)
+series_mgr = SeriesManager(storage)
+challenge = ReadingChallenge(storage)
+reading_progress = ReadingProgress(storage)
+wishlist = Wishlist(storage)
+diary_mgr = DiaryManager(storage)
+
+# ── Register route modules ──────────────────────────────────────────────────
+
+# Social routes
+init_social_routes(
+    app,
+    storage,
+    lib,
+    auth,
+    social,
+    review_mgr,
+    recommender,
+    notif_mgr,
+    book_lists,
+    communities,
+    gamification,
+)
+
+# Feature routes (series, challenge, progress, wishlist, diary)
+from app.routes.feature_routes import init_feature_routes
+
+init_feature_routes(
+    app,
+    storage,
+    lib,
+    auth,
+    notif_mgr,
+    series_mgr,
+    challenge,
+    reading_progress,
+    wishlist,
+    diary_mgr,
+)
+
+# Auth routes (login, register, forgot-password, reset-password, verify-email)
+from app.routes.auth_routes import init_auth_routes
+
+init_auth_routes(app, storage, lib, auth, notif_mgr)
+
+# Admin routes (admin settings, admin fines)
+from app.routes.admin_routes import init_admin_routes
+
+init_admin_routes(app, storage, lib, auth, notif_mgr)
+
+# API routes (JSON endpoints: trending, random, search, settings, AI, etc.)
+from app.routes.api_routes import init_api_routes
+
+init_api_routes(app, storage, lib, auth, notif_mgr, recommender, social, diary_mgr)
+
+# Page routes
+from collections.abc import Callable
+
+from flask import Response
+
+from app.routes.helpers import init_helpers
+from app.routes.page_routes import init_page_routes
+
+init_helpers(storage, notif_mgr)
+init_page_routes(
+    app,
+    storage,
+    lib,
+    auth,
+    notif_mgr,
+    social,
+    review_mgr,
+    recommender,
+    book_lists,
+    communities,
+    gamification,
+    series_mgr,
+    challenge,
+    reading_progress,
+    wishlist,
+    diary_mgr,
+)
+init_site_pages(app, storage, lib, recommender, social, review_mgr, notif_mgr)
+
+
+# ── Utility helpers ─────────────────────────────────────────────────────────
+
+
+def h(text: object) -> str:
+    return html.escape(str(text))
+
+
+def login_required(f: Callable[..., Any]) -> Callable[..., Any]:
+    @wraps(f)
+    def d(*a: Any, **k: Any) -> Any:
+        if "user_id" not in session:
+            return redirect(url_for("login_page"))
+        return f(*a, **k)
+
+    return d
+
+
+def admin_required(f: Callable[..., Any]) -> Callable[..., Any]:
+    @wraps(f)
+    def d(*a: Any, **k: Any) -> Any:
+        if "user_id" not in session:
+            return redirect(url_for("login_page"))
+        if session.get("role") != "admin":
+            return jsonify({"error": "Admin access required"}), 403
+        return f(*a, **k)
+
+    return d
+
+
+def api_key_required(f: Callable[..., Any]) -> Callable[..., Any]:
+    import secrets as _secrets
+
+    @wraps(f)
+    def d(*a: Any, **k: Any) -> Any:
+        api_key = os.environ.get("BOOKTALE_API_KEY", "")
+        if not api_key:
+            return f(*a, **k)
+        auth_header = request.headers.get("Authorization", "")
+        if not auth_header.startswith("Bearer "):
+            return jsonify({"error": "Missing Authorization header"}), 401
+        token = auth_header[7:]
+        if not _secrets.compare_digest(token, api_key):
+            return jsonify({"error": "Invalid API key"}), 403
+        return f(*a, **k)
+
+    return d
+
+
+def get_current_user() -> Any:
+    if "user_id" not in session:
+        return None
+    return storage.load_users().get(session["user_id"])
+
+
+def render_page(title: str, content: str, **kw: Any) -> str:
+    user = get_current_user()
+    return render_template(
+        "base.html",
+        title=title,
+        content=content,
+        notif_count=notif_mgr.get_unread_count(user.user_id) if user else 0,
+        **kw,
+    )
+
+
+def render_auth_page(title: str, content: str, **kw: Any) -> str:
+    """Render an auth page using the split-screen auth_base.html template."""
+    return render_template("auth_base.html", title=title, auth_content=content, session={}, **kw)
+
+
+# Helpers extracted to web_app_helpers.py
+from app.routes.web_app_helpers import (
+    _ERROR_PAGES,
+    _avatar_html,
+    _initials,  # noqa: F401
+    cat_color,  # noqa: F401
+)
+
+# base.html calls _avatar_html for the logged-in app-bar avatar; register it
+# as a Jinja global so every page rendered via render_page has it available.
+app.jinja_env.globals["_avatar_html"] = _avatar_html
+
+
+# ════════════════════════════════════════════════════════════════════════════
+# Centralized error handlers (Phase 7)
+# JSON envelope for /api paths, styled page for browsers, never a traceback.
+# ════════════════════════════════════════════════════════════════════════════
+
+
+def _api_error_body(status: int, message: str) -> Response:
+    resp = jsonify({"data": None, "error": {"code": status, "message": message}})
+    resp.status_code = status
+    return resp
+
+
+def _error_response(status: int, message: str) -> tuple[Response, int]:
+    """Shared error response: JSON envelope on /api paths, styled page otherwise."""
+    if request.path.startswith("/api"):
+        return _api_error_body(status, message), status
+    code, title, _emoji, blurb = _ERROR_PAGES.get(
+        status, (str(status), f"Error {status}", "⚠️", message)
+    )
+    try:
+        html = render_page(
+            title,
+            f'<div class="glass-card p-5 text-center"><div style="font-size:3rem;">{_emoji}</div>'
+            f'<h1 class="fw-bold">{code} · {title}</h1><p class="text-muted mb-0">{blurb}</p>'
+            f'<a class="btn btn-success mt-3" href="/">Back to home</a></div>',
+        )
+    except Exception:
+        html = (
+            f"<!doctype html><html><head><title>{code} {title}</title></head>"
+            f'<body style="font-family:sans-serif;text-align:center;padding:4rem;">'
+            f"<h1>{code} · {title}</h1><p>{blurb}</p></body></html>"
+        )
+    return Response(html, status=status), status
+
+
+def _register_error_handlers() -> None:
+    for _status, (_num, _title, _emoji, _blurb) in _ERROR_PAGES.items():
+
+        def _handler(_err: Any, _s: int = _status, _t: str = _title, _b: str = _blurb) -> Any:
+            return _error_response(_s, _b)
+
+        _handler.__name__ = f"_error_handler_{_status}"
+        app.errorhandler(_status)(_handler)
+
+    # Werkzeug routes unhandled exceptions to 500 — mirror the generic page.
+    def _server_error_handler(err: Any) -> Any:
+        return _error_response(500, _ERROR_PAGES[500][3])
+
+    app.errorhandler(Exception)(_server_error_handler)
+
+
+_register_error_handlers()
+
+
+def healthz() -> dict[str, str]:
+    return jsonify({"status": "ok"}), 200
+
+
+@app.route("/readyz")
+def readyz() -> dict:
+    try:
+        from sqlalchemy import text as _sqltext
+
+        import app.db.database as _dbmod
+
+        with _dbmod.get_session_factory()() as db_session:
+            db_session.execute(_sqltext("SELECT 1"))
+        return jsonify({"status": "ok", "database": "connected"}), 200
+    except (ValueError, KeyError, OSError) as e:
+        from app.core.logger import log as _log
+
+        _log(f"readyz probe failed: {e}", "health")
+        return jsonify({"status": "not_ready", "error": "database unreachable"}), 503
+
+
+# ════════════════════════════════════════════════════════════════════════════
+# Prometheus metrics
+# ════════════════════════════════════════════════════════════════════════════
+
+try:
+    from prometheus_client import CONTENT_TYPE_LATEST, Counter, Gauge, Histogram, generate_latest
+
+    BOOKTALE_REQUEST_COUNT = Counter(
+        "booktale_requests_total",
+        "Total HTTP requests",
+        ["method", "endpoint", "status"],
+    )
+    BOOKTALE_REQUEST_LATENCY = Histogram(
+        "booktale_request_duration_seconds",
+        "HTTP request latency in seconds",
+        ["method", "endpoint"],
+        buckets=(0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1.0, 2.5, 5.0, 10.0),
+    )
+    BOOKTALE_ACTIVE_SESSIONS = Gauge(
+        "booktale_active_sessions",
+        "Number of active user sessions",
+    )
+    BOOKTALE_BOOKS_TOTAL = Gauge("booktale_books_total", "Total books in the library")
+    _PROMETHEUS_AVAILABLE = True
+except ImportError:
+    _PROMETHEUS_AVAILABLE = False
+
+
+@app.before_request
+def _prometheus_before_request() -> None:
+    if not _PROMETHEUS_AVAILABLE:
+        return
+    from time import time as _time
+
+    g._prom_start = _time()
+
+
+@app.after_request
+def _prometheus_after_request(response) -> None:
+    if not _PROMETHEUS_AVAILABLE:
+        return response
+    # Skip the /metrics endpoint itself to avoid recursive counting
+    if request.path == "/metrics":
+        return response
+    from time import time as _time
+
+    endpoint = request.path
+    # Normalise dynamic path segments to avoid high-cardinality labels
+    if endpoint.startswith("/api/"):
+        parts = endpoint.split("/")
+        if len(parts) > 3 and parts[3].isdigit():
+            endpoint = "/".join(parts[:3]) + "/{id}"
+    method = request.method
+    status = response.status_code
+
+    BOOKTALE_REQUEST_COUNT.labels(method=method, endpoint=endpoint, status=str(status)).inc()
+    latency = _time() - getattr(g, "_prom_start", _time())
+    BOOKTALE_REQUEST_LATENCY.labels(method=method, endpoint=endpoint).observe(latency)
+    return response
+
+
+@app.route("/metrics")
+def prometheus_metrics() -> Response:
+    """Prometheus scrape endpoint."""
+    if not _PROMETHEUS_AVAILABLE:
+        return jsonify({"status": "prometheus_client not installed"}), 501
+    return generate_latest(), 200, {"Content-Type": CONTENT_TYPE_LATEST}
+
+
+# ════════════════════════════════════════════════════════════════════════════
+# OpenAPI / Swagger UI
+# ════════════════════════════════════════════════════════════════════════════
+
+
+@app.route("/api/openapi.json")
+def api_openapi_json() -> str:
+    from app.api.api_spec import build_openapi_spec
+
+    return jsonify(build_openapi_spec())
+
+
+@app.route("/api/docs")
+def api_docs() -> dict:
+    return render_template_string(
+        """<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>BookTale API Docs — Swagger UI</title>
+<meta name="description" content="Interactive OpenAPI documentation for the BookTale API.">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5.17.14/swagger-ui.css">
+</head>
+<body style="margin:0">
+<div id="swagger-ui"></div>
+<script src="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5.17.14/swagger-ui-bundle.js"></script>
+<script>
+  window.onload = function() {
+    window.ui = SwaggerUIBundle({
+      url: "/api/openapi.json",
+      dom_id: "#swagger-ui",
+      deepLinking: true,
+      persistAuthorization: true,
+      displayRequestDuration: true
+    });
+  };
+</script>
+</body>
+</html>"""
+    )
+
+
+# ════════════════════════════════════════════════════════════════════════════
+# Security / Help / Settings pages — content extracted to settings_pages.py
+# ════════════════════════════════════════════════════════════════════════════
+
+from app.routes.settings_pages import (
+    help_page as _help_page,
+)
+from app.routes.settings_pages import (
+    security_page as _security_page,
+)
+from app.routes.settings_pages import (
+    settings_page as _settings_page,
+)
+
+
+@app.route("/security")
+def security_page() -> str:
+    return _security_page(render_page)
+
+
+@app.route("/help")
+@login_required
+def help_page() -> str:
+    return _help_page(render_page)
+
+
+# ════════════════════════════════════════════════════════════════════════════
+# User Settings page (large inline HTML — stays in web_app)
+# ════════════════════════════════════════════════════════════════════════════
+
+
+@app.route("/settings")
+@login_required
+def settings_page() -> str:
+    """User settings page with Profile, Notifications, Privacy, Appearance, and Reading tabs."""
+    return _settings_page(render_page, storage, notif_mgr)
+
+
+if __name__ == "__main__":
+    import logging as _logging
+
+    _logging.getLogger(__name__).info(
+        "Library Management System starting — http://%s:%s",
+        Config.FLASK_HOST,
+        Config.FLASK_PORT,
+    )
+    socketio.run(
+        app,
+        host=Config.FLASK_HOST,
+        port=Config.FLASK_PORT,
+        # debug is intentionally disabled: FLASK_DEBUG is forced to False in
+        # app/config/settings.py so the Werkzeug reloader never starts in a
+        # production/in-container deployment. allow_unsafe_werkzeug is still
+        # passed for dev parity but never becomes an active debug endpoint.
+        debug=False,
+        allow_unsafe_werkzeug=True,
+    )

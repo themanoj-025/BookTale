@@ -1,0 +1,41 @@
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.16.4
+    hooks:
+      # Same formatter CI checks (ruff format --check). black was here before
+      # and disagrees with ruff-format on wrapped lines with trailing
+      # comments (e.g. `# nosec`), so the two kept rewriting each other.
+      - id: ruff-format
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.16.4
+    hooks:
+      - id: ruff
+        args: [--fix, --select, "E9,F,I"]
+
+  - repo: https://github.com/pre-commit/mirrors-prettier
+    rev: v3.1.0
+    hooks:
+      - id: prettier
+        types_or: [javascript, jsx, ts, tsx, json, css, scss, markdown]
+        # app/static/dist/ is committed build output (hashed bundles); prettier
+        # must not reformat generated artifacts, only the sources in app/static/.
+        # scripts/loadtest/load-test.js is a byte-synced canonical from the
+        # portfolio workspace (shared/loadtest/load-test.js, S-19) and must not
+        # be reformatted locally — prettier rewrites it, the sync tool then
+        # reports drift, and CI's pre-commit leg reds on every checkout.
+        exclude: '^app/static/dist/|^scripts/loadtest/load-test\.js$'
+
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-added-large-files
+        args: ['--maxkb=1000']
+  # NOTE: mypy intentionally runs only as the advisory CI job ("Type check
+  # with mypy (advisory)", continue-on-error in ci.yml). The codebase carries
+  # ~700 pre-existing findings across ~100 files; a blocking pre-commit hook
+  # here has never passed and gates unrelated changes. Re-enable locally via:
+  #   mypy . --ignore-missing-imports

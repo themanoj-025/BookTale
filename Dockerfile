@@ -1,0 +1,120 @@
+# ── Multi-stage Dockerfile for BookTale ──────────────────────────────────────
+# Builder stage: install deps + build frontend assets
+# Runtime stage: slim image with only runtime deps
+#
+# Usage:
+#   docker build -t booktale .
+#   docker run -p 5000:5000 -e SECRET_KEY=... -e DATABASE_URL=... booktale
+
+# ══════════════════════════════════════════════════════════════════════════════
+# Stage 1: Builder
+# ══════════════════════════════════════════════════════════════════════════════
+FROM python:3.12-slim AS builder
+
+# System deps for psycopg2-binary and python-magic
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    gcc libpq-dev && \
+    rm -rf /var/lib/apt/lists/*
+
+WORKDIR /build
+
+# Install Python deps into a virtualenv
+COPY requirements.txt .
+RUN python -m venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+# Upgrade pip tooling first: the python:3.14-slim base ships setuptools
+# 70.x with CVE-2025-47273 (fixed in 78.1.1); the Trivy image gate fails
+# on HIGH/CRITICAL, so pin the floor explicitly.
+RUN pip install --no-cache-dir --upgrade "pip>=25.0" "setuptools>=78.1.1"
+RUN pip install --no-cache-dir -r requirements.txt
+# Transitive deps can resolve below the Trivy HIGH-severity floors on
+# newer Pythons (e.g. fakeredis pulling msgpack 1.1.x, GHSA-6v7p-g79w-8964
+# fixed in 1.2.1); force the fixed floors after resolution.
+RUN pip install --no-cache-dir --upgrade "setuptools>=78.1.1" "msgpack>=1.2.1"
+
+# Install Node.js for frontend build
+RUN apt-get update && apt-get install -y --no-install-recommends curl && \
+    curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
+    apt-get install -y --no-install-recommends nodejs && \
+    rm -rf /var/lib/apt/lists/*
+
+# Build frontend assets
+COPY package.json .
+RUN npm install --ignore-scripts 2>/dev/null || true
+COPY scripts/build_frontend.mjs scripts/
+COPY app/static/js/ app/static/js/
+COPY app/static/css/ app/static/css/
+COPY app/static/dist/ app/static/dist/
+RUN node scripts/build_frontend.mjs
+
+# ══════════════════════════════════════════════════════════════════════════════
+# Stage 2: Runtime
+# ══════════════════════════════════════════════════════════════════════════════
+FROM python:3.12-slim AS runtime
+
+# Runtime deps
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libpq5 && \
+    rm -rf /var/lib/apt/lists/*
+
+# The base image ships setuptools 70.x (CVE-2025-47273, fixed in
+# 78.1.1) somewhere in system site-packages; Trivy scans the whole
+# filesystem. Bare `pip` here is the venv's (PATH shadowing), so invoke
+# the system interpreter explicitly.
+RUN /usr/local/bin/python -m pip install --no-cache-dir --upgrade "setuptools>=78.1.1"
+
+# Copy virtualenv from builder
+COPY --from=builder /opt/venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+
+# Diagnostic + hard cleanup AFTER all content is in place: assert the
+# exact versions pip sees in both environments and remove any residual
+# vulnerable copies anywhere on the filesystem (venv layer and repo
+# layer included) before the Trivy HIGH/CRITICAL gate scans the image.
+# Log-and-clear so the build log pinpoints any location an upgrade does
+# not own.
+RUN echo "=== system freeze ==="; /usr/local/bin/python -m pip freeze 2>/dev/null | grep -Ei "^(setuptools|msgpack|pip)=" ; \
+    echo "=== venv freeze ==="; /opt/venv/bin/python -m pip freeze 2>/dev/null | grep -Ei "^(setuptools|msgpack|pip)=" ; \
+    echo "=== residual vulnerable copies ==="; find / -xdev \( -name "setuptools-70*" -o -name "msgpack-1.1*" \) -print -exec rm -rf {} + 2>/dev/null ; true
+
+WORKDIR /app
+
+# Copy application code
+COPY . .
+
+# Copy built frontend assets from builder
+COPY --from=builder /build/app/static/dist/ app/static/dist/
+
+# Second sweep: anything the repo layer or the builder dist may have
+# contributed is removed here, after every COPY, before the scan runs.
+RUN find / -xdev \( -name "setuptools-70*" -o -name "msgpack-1.1*" \) -print -exec rm -rf {} + 2>/dev/null ; true
+
+# Create non-root user
+RUN groupadd -r booktale && useradd -r -g booktale booktale && \
+    mkdir -p /app/data /app/logs /app/backups /app/uploads && \
+    chown -R booktale:booktale /app
+
+# Set environment defaults
+ENV STORAGE_BACKEND=db \
+    FLASK_HOST=0.0.0.0 \
+    FLASK_PORT=5000 \
+    FLASK_DEBUG=False \
+    PYTHONUNBUFFERED=1
+
+EXPOSE 5000
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=5s --retries=3 \
+    CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:5000/healthz')" || exit 1
+
+USER booktale
+
+# Run with gunicorn in production, Flask dev server in dev. The entrypoint
+# (scripts/entrypoint.sh) first rotates + prunes app/logs/ so the age-based
+# retention policy takes effect before the service starts.
+CMD ["sh", "-c", "scripts/entrypoint.sh 'gunicorn -w 4 -b 0.0.0.0:5000 --timeout 120 web_app:app'"]
+
+# Dev / local override: the Flask dev server is used with DEBUG forced
+# OFF (app/config/settings.py) so no Werkzeug reloader runs in production.
+# CMD ["sh", "-c", "scripts/entrypoint.sh 'python web_app.py'"]
+

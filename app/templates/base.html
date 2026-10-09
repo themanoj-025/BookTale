@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="theme-color" content="#7c6af7">
+<meta name="csrf-token" content="{{ csrf_token() }}">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script>
+// Phase 4: attach the CSRF token to every non-GET fetch automatically.
+(function () {
+  var meta = document.querySelector('meta[name="csrf-token"]');
+  if (!meta) return;
+  var token = meta.getAttribute('content');
+  if (!token) return;
+  var origFetch = window.fetch;
+  window.fetch = function (url, opts) {
+    opts = opts || {};
+    opts.method = opts.method || 'GET';
+    if (opts.method.toUpperCase() !== 'GET' && opts.method.toUpperCase() !== 'HEAD') {
+      opts.headers = opts.headers || {};
+      opts.headers['X-CSRFToken'] = token;
+    }
+    return origFetch.call(this, url, opts);
+  };
+})();
+</script>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="manifest" href="/static/manifest.json">
+<link rel="apple-touch-icon" href="/static/icons/booktale-192.svg">
+<title>{% if title %}{{ title }}{% else %}{% block title %}BookTale{% endblock %}{% endif %} — BookTale</title>
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://covers.openlibrary.org">
+<link rel="preconnect" href="https://www.googleapis.com">
+<link rel="dns-prefetch" href="//cdn.jsdelivr.net">
+<link rel="dns-prefetch" href="//fonts.googleapis.com">
+<link rel="dns-prefetch" href="//fonts.gstatic.com">
+<link rel="dns-prefetch" href="//covers.openlibrary.org">
+<link rel="preload" href="/static/fonts/OpenDyslexic-Regular.woff2" as="font" type="font/woff2" crossorigin>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" defer></script>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.css">
+<link rel="stylesheet" href="{{ asset('css/booktale.css') }}">
+{% block styles %}{% endblock %}
+</head>
+<body>
+<a href="#mainContent" class="skip-link">Skip to main content</a>
+
+<div id="toastContainer" class="toast-container"></div>
+
+<!-- Top App Bar (60px) - PROMPT.txt Section A -->
+<header class="top-app-bar" role="banner" aria-label="Site header">
+  <div class="app-bar-left">
+    <a href="/feed" class="app-bar-logo" aria-label="BookTale Home">
+      <i class="bi bi-book-fill"></i>
+    </a>
+  </div>
+  <div class="app-bar-center">
+    <div class="global-search" role="search">
+      <i class="bi bi-search search-icon" aria-hidden="true"></i>
+      <input type="text" placeholder="Search books..." onclick="openSearchOverlay()" readonly
+             aria-label="Search books. Press Ctrl+K to open search" tabindex="0">
+      <kbd>Ctrl+K</kbd>
+    </div>
+  </div>
+  <div class="app-bar-right">
+    <button class="theme-toggle" aria-label="Switch between light, dark, and sepia themes" aria-pressed="false" type="button">
+      <i class="bi bi-moon-stars-fill"></i>
+    </button>
+    <button class="accessibility-toggle" id="accessibilityToggle" aria-label="Toggle accessibility mode (OpenDyslexic font, high contrast, reduced motion)" aria-pressed="false" type="button" title="Accessibility Mode">
+      <i class="bi bi-eye-fill"></i>
+    </button>
+    {% if session.user_id %}
+    <span id="streakBadge" class="streak-badge" style="display:none;" title="Reading streak" aria-label="Reading streak"></span>
+    <a href="/notifications" class="app-bar-icon" aria-label="{% if notif_count > 0 %}{{ notif_count }} unread notifications{% else %}Notifications{% endif %}">
+      <i class="bi bi-bell-fill"></i>
+      {% if notif_count > 0 %}<span class="nav-badge badge rounded-pill bg-danger" aria-live="polite">{{ notif_count }}</span>{% endif %}
+    </a>
+    <a href="/profile/{{session.user_id}}" class="app-bar-avatar" aria-label="Your profile - @{{session.user_id}}">
+      {{ _avatar_html(session.get('user_name','?'), 32)|safe }}
+    </a>
+    {% endif %}
+  </div>
+</header>
+
+<div class="app-layout">
+  <!-- Left Sidebar (240px fixed) - PROMPT.txt Section A -->
+  {% if session.user_id %}
+  <nav class="sidebar" role="navigation" aria-label="Main navigation">
+    <div class="sidebar-nav">
+      <ul role="list">
+        <li><a href="/feed" class="nav-item-a" id="nav-home" aria-current="page"><i class="bi bi-house-fill nav-icon"></i><span class="nav-label">Home</span></a></li>
+        <li><a href="/explore" class="nav-item-a" id="nav-explore"><i class="bi bi-compass-fill nav-icon"></i><span class="nav-label">Explore</span></a></li>
+        <li><a href="/notifications" class="nav-item-a" id="nav-notifications"><i class="bi bi-bell-fill nav-icon"></i>{% if notif_count > 0 %}<span class="nav-badge badge rounded-pill bg-danger">{{ notif_count }}</span>{% endif %}<span class="nav-label">Notifications</span></a></li>
+        <li><a href="/books" class="nav-item-a" id="nav-books"><i class="bi bi-book-fill nav-icon"></i><span class="nav-label">Books</span></a></li>
+        <li><a href="/series" class="nav-item-a" id="nav-series"><i class="bi bi-collection-fill nav-icon"></i><span class="nav-label">Series</span></a></li>
+        <li><a href="/reading-challenge" class="nav-item-a" id="nav-challenge"><i class="bi bi-trophy-fill nav-icon"></i><span class="nav-label">Challenge</span></a></li>
+        <li><a href="/reading-progress" class="nav-item-a" id="nav-progress"><i class="bi bi-bookmark-check-fill nav-icon"></i><span class="nav-label">Progress</span></a></li>
+        <li><a href="/wishlist" class="nav-item-a" id="nav-wishlist"><i class="bi bi-star-fill nav-icon"></i><span class="nav-label">Wishlist</span></a></li>
+        <li><a href="/diary" class="nav-item-a" id="nav-diary"><i class="bi bi-journal-text nav-icon"></i><span class="nav-label">Diary</span></a></li>
+        <li><a href="/profile/{{session.user_id}}" class="nav-item-a" id="nav-profile"><i class="bi bi-person-fill nav-icon"></i><span class="nav-label">Profile</span></a></li>
+        {% if session.role == 'admin' %}
+        <li><a href="/admin/users" class="nav-item-a" id="nav-users"><i class="bi bi-people-fill nav-icon"></i><span class="nav-label">Users</span></a></li>
+        <li><a href="/reports" class="nav-item-a" id="nav-reports"><i class="bi bi-bar-chart-fill nav-icon"></i><span class="nav-label">Reports</span></a></li>
+        <li><a href="/admin/settings" class="nav-item-a" id="nav-admin-settings"><i class="bi bi-gear-fill nav-icon"></i><span class="nav-label">Settings</span></a></li>
+        <li><a href="/admin/audit" class="nav-item-a" id="nav-audit"><i class="bi bi-journal-check nav-icon"></i><span class="nav-label">Audit Log</span></a></li>
+        {% endif %}
+        <li><a href="/recommendations" class="nav-item-a" id="nav-recs"><i class="bi bi-stars nav-icon"></i><span class="nav-label">Recommend</span></a></li>
+      </ul>
+    </div>
+    <div class="sidebar-footer">
+      <button class="sidebar-post-btn" onclick="document.getElementById('postContent')?.focus()" aria-label="Create a new post">
+        <i class="bi bi-feather"></i> <span>Post</span>
+      </button>
+      <div class="sidebar-user" role="button" tabindex="0" aria-label="User menu - @{{session.user_id}}"
+           onclick="window.location.href='/profile/{{session.user_id}}'"
+           onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();window.location.href='/profile/{{session.user_id}}'}">
+        {{ _avatar_html(session.get('user_name','?'), 40)|safe }}
+        <div class="sidebar-user-name" style="flex:1;min-width:0;">
+          <div class="fw-bold" style="font-size:.9rem;">{{session.user_name}}</div>
+          <div style="font-size:.8rem;color:var(--text-muted);">@{{session.user_id}}</div>
+        </div>
+        <a href="/logout" style="color:var(--text-muted);font-size:1.1rem;text-decoration:none;" title="Logout" aria-label="Logout">
+          <i class="bi bi-box-arrow-right"></i>
+        </a>
+      </div>
+    </div>
+  </nav>
+  {% endif %}
+
+  <!-- Main Content -->
+  <main class="main-content" id="mainContent" role="main">
+    {% block content %}
+    {{ content|safe }}
+    {% endblock %}
+  </main>
+
+  <!-- Right Sidebar -->
+  {% if session.user_id %}
+  <aside class="right-sidebar" aria-label="Trending and suggestions">
+    <div class="rside-card" id="trendingSidebar">
+      <div class="rside-header"><i class="bi bi-fire text-danger me-1"></i> Trending Books</div>
+      <div id="trendingSidebarContent"><div class="text-center text-muted small py-3" role="status" aria-label="Loading"><div class="spinner-border spinner-border-sm"></div></div></div>
+      <a href="/search" class="rside-show-more">Show more</a>
+    </div>
+    <div class="rside-card">
+      <div class="rside-header"><i class="bi bi-people-fill me-1" style="color:var(--primary);"></i> Who to follow</div>
+      <div id="whoToFollowContent"><div class="text-center text-muted small py-3" role="status" aria-label="Loading"><div class="spinner-border spinner-border-sm"></div></div></div>
+      <a href="/search?entity=users" class="rside-show-more">Show more</a>
+    </div>
+    <footer class="rside-footer" role="contentinfo">
+      <nav aria-label="Quick links">
+        <a href="/books">Books</a>
+        <a href="/feed">Feed</a>
+        <a href="/search">Search</a>
+        <a href="/series">Series</a>
+      </nav>
+      <span>&copy; BookSocial 2026</span>
+    </footer>
+  </aside>
+  {% endif %}
+</div>
+
+<!-- AI Reading Companion (Part 5.1) -->
+<button id="aiCompanionToggle" class="ai-companion-toggle" aria-label="Open AI Reading Companion" title="AI Reading Companion" type="button">
+  <i class="bi bi-stars"></i>
+</button>
+<div id="aiCompanionDrawer" class="ai-companion-drawer" role="dialog" aria-label="AI Reading Companion">
+  <div class="ai-companion-header">
+    <span><i class="bi bi-stars me-1" style="color:var(--color-warning);"></i> AI Reading Companion</span>
+    <button id="aiCompanionClose" aria-label="Close AI Companion" type="button"><i class="bi bi-x-lg"></i></button>
+  </div>
+  <div class="ai-companion-messages" id="aiCompanionMessages">
+    <div class="ai-message bot">Hi! I'm your AI Reading Companion. Ask me about book recommendations, summaries, or discussion questions!</div>
+  </div>
+  <div class="ai-companion-input-area">
+    <textarea id="aiCompanionInput" class="form-control" placeholder="Ask about books..." rows="2" aria-label="Chat message"></textarea>
+    <button id="aiCompanionSend" class="btn btn-primary" aria-label="Send message"><i class="bi bi-send-fill"></i></button>
+  </div>
+  <div class="ai-companion-footer">
+    <button class="btn btn-sm btn-outline" onclick="document.getElementById('aiCompanionInput').value='Recommend a book';(window.booktaleAI||{}).sendMessage&&booktaleAI.sendMessage()">📚 Recommend</button>
+    <button class="btn btn-sm btn-outline" onclick="document.getElementById('aiCompanionInput').value='What should I read next?';(window.booktaleAI||{}).sendMessage&&booktaleAI.sendMessage()">🔮 Next Read</button>
+    <button class="btn btn-sm btn-outline" onclick="document.getElementById('aiCompanionInput').value='Give me discussion questions';(window.booktaleAI||{}).sendMessage&&booktaleAI.sendMessage()">💬 Discuss</button>
+  </div>
+</div>
+
+<!-- Search Overlay -->
+<div class="search-overlay" id="searchOverlay" role="dialog" aria-label="Search books"
+     onclick="if(event.target===this)closeSearchOverlay()">
+<div class="search-box" role="search">
+<input type="text" placeholder="Search books by title, author, or ISBN... (Ctrl+K)"
+       oninput="searchBooks(this.value)" autofocus aria-label="Search query" id="searchOverlayInput">
+<div class="search-results" id="searchResults" role="listbox">
+  <div class="text-center py-4 text-muted small" role="status">Type to search books...</div>
+</div>
+<div class="search-footer"><span>BookSocial Search</span><span><kbd>Esc</kbd> Close</span></div>
+</div></div>
+
+<script src="{{ asset('js/toast.js') }}"></script>
+<script src="{{ asset('js/utils.js') }}"></script>
+<script src="{{ asset('js/theme.js') }}"></script>
+<script src="{{ asset('js/search.js') }}"></script>
+<script src="{{ asset('js/charts.js') }}"></script>
+<script src="{{ asset('js/feed.js') }}"></script>
+<script src="{{ asset('js/notifications.js') }}"></script>
+<script src="{{ asset('js/recommendations.js') }}"></script>
+<script src="{{ asset('js/streak.js') }}"></script>
+<script src="{{ asset('js/analytics.js') }}"></script>
+<script src="{{ asset('js/animations.js') }}"></script>
+<script src="{{ asset('js/api.js') }}"></script>
+<script src="{{ asset('js/ai-companion.js') }}"></script>
+<script src="{{ asset('js/voice.js') }}"></script>
+<script src="{{ asset('js/drag-drop.js') }}"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" defer></script>
+<!-- Socket.IO client served by flask-socketio itself (/socket.io/socket.io.js),
+     so the pinned client version always matches the server. The page JS only
+     uses it when realtime is actually served (dev server / compose e2e stack),
+     and degrades gracefully when the app runs under plain gunicorn. -->
+<script src="/socket.io/socket.io.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded',function(){
+  document.querySelectorAll('.toast-msg').forEach(function(t){setTimeout(function(){t.style.animation='slideOut .3s ease-in forwards';setTimeout(function(){t.remove()},300)},4000)})
+  document.addEventListener('keydown',function(e){if((e.ctrlKey||e.metaKey)&&e.key==='k'){e.preventDefault();openSearchOverlay()}if(e.key==='Escape'){closeSearchOverlay();closeAllModals()}})
+  // Active nav highlighting
+  var path=window.location.pathname;
+  document.querySelectorAll('.nav-item-a').forEach(function(el){
+    var href=el.getAttribute('href');
+    if(href&&path.startsWith(href)&&href!=='/feed'&&href!=='/'&&href!=='/profile/{{session.user_id}}'){el.classList.add('active');el.setAttribute('aria-current','page')}
+    else if(href==='/feed'&&(path==='/'||path==='/feed'||path==='/dashboard')){el.classList.add('active');el.setAttribute('aria-current','page')}
+    else if(href==='/profile/{{session.user_id}}'&&path==='/profile/{{session.user_id}}'){el.classList.add('active');el.setAttribute('aria-current','page')}
+  });
+});
+// Load trending sidebar
+// Note: trending sidebar is now loaded by the JS modules above
+function loadTrendingSidebar(){
+  fetch('/api/analytics/monthly').then(function(r){return r.json()}).then(function(d){
+    var c=document.getElementById('trendingSidebarContent');
+    if(!c)return;
+    if(!d.labels||!d.labels.length){c.innerHTML='<div class="text-center text-muted small py-3">Not enough data yet</div>';return}
+    var colors=['#4f46e5','#059669','#d97706','#dc2626','#0891b2','#7c3aed','#db2777','#ca8a04'];
+    c.innerHTML=d.labels.slice(0,6).map(function(l,i){
+      return '<div class="rside-item"><div class="rside-rank">'+(i+1)+'</div><div class="rside-content"><div class="rside-title" style="color:'+colors[i%colors.length]+';">'+booktaleUtils.escapeHtml(l)+'</div><div class="rside-meta">'+booktaleUtils.escapeHtml(d.values[i])+' issues this month</div></div></div>'
+    }).join('');
+  }).catch(function(){document.getElementById('trendingSidebarContent').innerHTML='<div class="text-center text-muted small py-3">No data</div>'})
+}
+function loadWhoToFollow(){
+  fetch('/api/analytics/activity').then(function(r){return r.json()}).then(function(d){
+    var c=document.getElementById('whoToFollowContent');
+    if(!c)return;
+    if(!d||!d.length){c.innerHTML='<div class="text-center text-muted small py-3">No suggestions yet</div>';return}
+    var users=[];var seen={};
+    d.forEach(function(a){if(!seen[a.action.split(' ')[0]]){seen[a.action.split(' ')[0]]=true;users.push(a.action.split(' ')[0])}});
+    c.innerHTML=users.slice(0,3).map(function(u){
+      return '<div class="rside-item"><div style="width:40px;height:40px;border-radius:50%;background:var(--primary);color:white;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0;">'+booktaleUtils.escapeHtml(u[0])+'</div><div class="rside-content"><div class="rside-title">'+booktaleUtils.escapeHtml(u)+'</div></div><button class="btn btn-outline btn-sm" onclick="window.location.href=\'/profile/'+booktaleUtils.jsStr(u)+'\'">Follow</button></div>'
+    }).join('');
+  }).catch(function(){document.getElementById('whoToFollowContent').innerHTML='<div class="text-center text-muted small py-3">No suggestions</div>'})
+}
+setTimeout(loadTrendingSidebar,500);
+setTimeout(loadWhoToFollow,700);
+
+// Register Service Worker for offline support
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('/static/sw.js',{scope:'/'}).then(function(reg){
+    console.log('[PWA] SW registered for scope:',reg.scope);
+    reg.onupdatefound=function(){
+      var installing=reg.installing;
+      installing.onstatechange=function(){
+        if(installing.state==='installed'&&navigator.serviceWorker.controller){
+          console.log('[PWA] New version available');
+          if(window.showToast)showToast('Updated version available. Reload to apply.','info');
+        }
+      };
+    };
+  }).catch(function(err){console.warn('[PWA] SW registration failed:',err)});
+}
+</script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

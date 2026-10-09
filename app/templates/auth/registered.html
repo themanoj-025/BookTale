@@ -1,0 +1,18 @@
+{% extends "auth_base.html" %}
+{% block auth_content %}
+{% if email %}
+<div class="text-center">
+  <div style="font-size:4rem;margin-bottom:1rem;">📧</div>
+  <h2>Check Your Email</h2>
+  <p class="auth-subtitle">We sent a verification link to <strong>{{ email }}</strong></p>
+  <p style="font-size:.8rem;color:var(--text-muted);">Please verify your email to access all features.</p>
+</div>
+{% else %}
+<div class="text-center">
+  <div style="font-size:4rem;margin-bottom:1rem;">🎉</div>
+  <h2>Welcome, {{ name }}!</h2>
+  <p class="auth-subtitle">Your account has been created successfully.</p>
+</div>
+{% endif %}
+<a href="/login" class="btn btn-primary"><i class="bi bi-shield-lock-fill me-2"></i> Sign In</a>
+{% endblock %}

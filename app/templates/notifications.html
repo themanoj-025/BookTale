@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+{% from "macros.html" import notification_item %}
+{% block title %}Notifications — BookTale{% endblock %}
+{% block content %}
+<div class="animate-in">
+    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+        <h4 class="fw-bold mb-0"><i class="bi bi-bell-fill me-2 text-warning"></i>Notifications</h4>
+        <div class="d-flex gap-2">
+            <button class="btn btn-outline btn-sm" onclick="markAllRead()"><i class="bi bi-check-all"></i> Mark All Read</button>
+        </div>
+    </div>
+
+    <div class="stats-bar mb-3">
+        <div class="stat-item"><div class="num">{{ total }}</div><div class="desc">Total</div></div>
+        <div class="stat-item"><div class="num text-warning">{{ unread }}</div><div class="desc">Unread</div></div>
+        <div class="stat-item"><div class="num text-success">{{ read_count }}</div><div class="desc">Read</div></div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-lg-8">
+            <div class="glass-card p-3">
+                <div class="d-flex gap-2 border-bottom pb-2 mb-3" role="tablist" aria-label="Filter notifications">
+                    <button class="btn btn-sm btn-primary" role="tab" aria-selected="true" onclick="filterNotifs('all',this)">All</button>
+                    <button class="btn btn-sm btn-outline" role="tab" aria-selected="false" onclick="filterNotifs('follow',this)"><i class="bi bi-person-plus-fill"></i> Follows</button>
+                    <button class="btn btn-sm btn-outline" role="tab" aria-selected="false" onclick="filterNotifs('challenge',this)"><i class="bi bi-trophy-fill"></i> Challenge</button>
+                    <button class="btn btn-sm btn-outline" role="tab" aria-selected="false" onclick="filterNotifs('like',this)"><i class="bi bi-heart-fill"></i> Likes</button>
+                </div>
+                <ol class="notifications-list" aria-label="Notifications" id="notifList">
+                    {% if total == 0 %}
+                    <div class="text-center py-5">
+                        <div style="font-size:3rem;margin-bottom:.5rem;">🔔</div>
+                        <h5>No notifications yet</h5>
+                        <p class="text-muted small">When you get follows, likes, or comments, they will appear here.</p>
+                    </div>
+                    {% else %}
+                    {% for label, items in groups %}
+                    {% if items %}
+                    <li class="day-separator"><time>{{ label }}</time></li>
+                    {% for n in items %}
+                    {{ notification_item(n, notif_icons, n.get('read') is sameas false, time_ago) }}
+                    {% endfor %}
+                    {% endif %}
+                    {% endfor %}
+                    {% endif %}
+                </ol>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="glass-card p-3 mb-3">
+                <div class="section-title"><i class="bi bi-pie-chart-fill"></i> By Type</div>
+                {% if by_type %}
+                {% for t, c in by_type %}
+                <div class="d-flex justify-content-between mb-1"><span><i class="bi bi-{{ notif_icons.get(t, 'bell-fill') }} me-2"></i>{{ t|capitalize }}</span><span class="fw-bold">{{ c }}</span></div>
+                {% endfor %}
+                {% else %}
+                <div class="text-muted small text-center">No data</div>
+                {% endif %}
+            </div>
+            <div class="glass-card p-3">
+                <div class="section-title"><i class="bi bi-bell-slash-fill"></i> Notifications Settings</div>
+                <p class="text-muted small">Manage what notifications you receive in <a href="/settings">Settings</a></p>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+function markNotifRead(nid, btn) {
+    fetch("/api/notifications/" + nid + "/read", {method:"POST"})
+        .then(function(r){return r.json()})
+        .then(function(d){
+            if(d.success){
+                var item = btn.closest(".notification-item");
+                if(item) item.classList.remove("unread");
+                btn.innerHTML = '<i class="bi bi-check-all" style="opacity:.3;"></i>';
+            }
+        }).catch(function(){});
+}
+function markAllRead() {
+    fetch("/api/notifications/read-all", {method:"POST"})
+        .then(function(r){return r.json()})
+        .then(function(d){
+            if(d.success){
+                document.querySelectorAll(".notification-item.unread").forEach(function(el){el.classList.remove("unread")});
+                document.querySelectorAll(".notif-mark-read").forEach(function(b){b.innerHTML="<i class=\\'bi bi-check-all\\' style=\\'opacity:.3;\\'></i>"});
+                showToast("All marked as read","success");
+            }
+        }).catch(function(){});
+}
+function filterNotifs(type, btn) {
+    document.querySelectorAll("[role=tab]").forEach(function(t){t.className="btn btn-sm btn-outline";t.setAttribute("aria-selected","false")});
+    btn.className="btn btn-sm btn-primary";btn.setAttribute("aria-selected","true");
+    var items = document.querySelectorAll(".notification-item");
+    if(type === "all"){items.forEach(function(i){i.style.display="flex"})}
+    else{items.forEach(function(i){i.style.display="flex";var icon=i.querySelector(".notif-icon i");if(icon){
+        var ic=icon.className;if(ic.indexOf(type)===-1)i.style.display="none"}})}
+}
+</script>
+<style>
+.notification-item{display:flex;align-items:flex-start;gap:.8rem;padding:.8rem .5rem;border-radius:8px;transition:background .2s;border-bottom:1px solid var(--border);position:relative}
+.notification-item:last-child{border-bottom:none}
+.notification-item.unread{background:var(--primary-light);border-left:3px solid var(--primary);border-radius:8px 0 0 8px}
+.notif-icon{width:36px;height:36px;border-radius:50%;background:#f0f0f8;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--primary);font-size:.9rem}
+.notif-body{flex:1;min-width:0}
+.notif-text{font-size:.85rem;color:var(--text);line-height:1.4}
+.notif-time{font-size:.7rem;color:var(--text-muted);margin-top:.2rem;display:block}
+.notif-mark-read{background:none;border:none;color:var(--primary);cursor:pointer;padding:.2rem;font-size:.9rem;flex-shrink:0}
+.day-separator{list-style:none;font-size:.7rem;font-weight:700;text-transform:uppercase;color:var(--text-muted);padding:.5rem 0;letter-spacing:.5px}
+</style>
+{% endblock %}

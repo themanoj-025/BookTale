@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% from "macros.html" import book_card, empty_state %}
+{% block title %}Books — BookTale{% endblock %}
+{% block content %}
+<div class="animate-in">
+    <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
+        <h4 class="fw-bold mb-0"><i class="bi bi-book-fill me-2 text-primary"></i>Books</h4>
+        <div class="view-toggle" role="group" aria-label="View mode">
+            <button id="gridViewBtn" class="btn btn-sm btn-primary" onclick="switchView('grid')" aria-label="Grid view" aria-pressed="true"><i class="bi bi-grid-3x3-gap-fill"></i></button>
+            <button id="listViewBtn" class="btn btn-sm btn-outline" onclick="switchView('list')" aria-label="List view" aria-pressed="false"><i class="bi bi-list"></i></button>
+        </div>
+    </div>
+
+    <form class="d-flex gap-2 mb-2 flex-wrap" role="search" method="GET">
+        <input type="text" name="q" class="form-control" style="flex:1;min-width:150px;" placeholder="Search by title or author..." value="{{ q }}" aria-label="Search by title or author">
+        <select name="cat" class="form-select" style="width:130px;" aria-label="Filter by category">
+            <option value="">All Categories</option>
+            {% for c in categories %}
+            <option value="{{ c }}" {{ 'selected' if c == cat_filter else '' }}>{{ c }}</option>
+            {% endfor %}
+        </select>
+        <button class="btn btn-primary" type="submit" aria-label="Search"><i class="bi bi-search"></i></button>
+        <a href="/books" class="btn btn-outline" aria-label="Clear filters"><i class="bi bi-x-lg"></i></a>
+    </form>
+
+    <div class="stats-inline mb-3 small text-muted" role="status" aria-label="Search results">
+        <span class="fw-bold">{{ total }} Found</span> &middot; <span style="color:var(--color-success);font-weight:600;">{{ available }} Available</span> &middot; <span style="color:var(--color-warning);">{{ checked_out }} Checked Out</span> &middot; {{ cats }} Categories
+    </div>
+
+    <div id="booksContainer">
+        {% if books %}
+        <div class="book-grid">
+            {% for b in books %}
+            {{ book_card(b) }}
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="col-12">
+            {{ empty_state('📚', 'No books found', 'Try adjusting your search or filter.') }}
+        </div>
+        {% endif %}
+    </div>
+</div>
+<script>
+function switchView(mode) {
+    var gridBtn = document.getElementById("gridViewBtn");
+    var listBtn = document.getElementById("listViewBtn");
+    if (!gridBtn || !listBtn) return;
+    gridBtn.className = mode === "grid" ? "btn btn-sm btn-primary" : "btn btn-sm btn-outline";
+    listBtn.className = mode === "list" ? "btn btn-sm btn-primary" : "btn btn-sm btn-outline";
+    gridBtn.setAttribute("aria-pressed", mode === "grid" ? "true" : "false");
+    listBtn.setAttribute("aria-pressed", mode === "list" ? "true" : "false");
+    // Books render in grid mode via the book_card macro; the toggle keeps the
+    // button state in sync (list markup is available through book_card's mode).
+}
+</script>
+{% endblock %}

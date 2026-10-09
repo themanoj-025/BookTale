@@ -1,0 +1,84 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+# ...but NOT static/dist: built assets + manifest are committed so a fresh
+# clone serves hashed URLs without running npm first.
+!app/static/dist/
+build/
+*.egg
+.eggs/
+
+# Virtual environment
+venv/
+env/
+.venv/
+ENV/
+
+# Environment & secrets (NEVER COMMIT)
+.env
+.env.*
+!.env.example
+
+# IDE
+.vscode/*
+!.vscode/settings.json
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
+logs/
+
+# Project data (user-generated)
+data/
+backups/
+
+# Generated ML benchmark outputs (ml_pkg/comparison.py)
+data/generated/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Testing
+.coverage
+htmlcov/
+.pytest_cache/
+
+# Frontend build (node_modules never committed; static/dist IS committed so
+# a fresh clone runs without a build step — see the !app/static/dist/ negation above)
+node_modules/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Backup / temp
+*.bak.gemini/
+
+# Root-level AI tool config only — docs/agents/ copies are tracked.
+/.cursorrules
+
+CLAUDE.md
+
+# Runtime balance log
+radar_balance.txt
+
+# ── Portfolio-standard ignores (sweep 2026-09) ──────────────
+*.db
+*.db-shm
+*.db-wal
+.coverage.*
+coverage.xml
+
+# ML artifacts (scripts + dataset + images) - gitignored, see MODERNIZATION_AUDIT.md
+app/services/recommendations/ml/
+
+# ── docs/ (repository documentation) ────────────────────────────────
+# The audit/modernization docs under docs/ are force-added and tracked
+# (see MODERNIZATION_AUDIT.md / docs/ML_ARTIFACTS_GITIGNORE_EXCEPTION.md).
+# Do not add a blanket `docs/` ignore here; only tool-output noise is ignored.
+
+# KEEP: AI provenance & transparency files — these must remain

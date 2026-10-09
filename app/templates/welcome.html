@@ -1,0 +1,67 @@
+<!DOCTYPE html><html lang="en" data-theme="light">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="description" content="Welcome to BookTale — your reading community awaits.">
+<title>{{ title }} &mdash; LibraryMS + BookSocial</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--primary:#4f46e5;--primary-dark:#4338ca;--primary-light:#eef2ff;--primary-glow:rgba(79,70,229,.25);--bg:#f8fafc;--bg-card:rgba(255,255,255,.85);--text:#0f172a;--text-muted:#64748b;--text-dim:#94a3b8;--border:rgba(226,232,240,.8);--success:#10b981;--warning:#f59e0b;--danger:#ef4444;--info:#3b82f6;--glass-bg:rgba(255,255,255,.7);--glass-border:rgba(255,255,255,.3);--glass-shadow:0 8px 32px rgba(0,0,0,.06);--radius:16px;--radius-sm:10px;--font:'Inter','Segoe UI',system-ui,-apple-system,sans-serif;--ease:cubic-bezier(.4,0,.2,1);--ease-spring:cubic-bezier(.34,1.56,.64,1)}
+[data-theme="dark"]{--bg:#0b1121;--bg-card:rgba(30,41,59,.85);--text:#f1f5f9;--text-muted:#94a3b8;--text-dim:#64748b;--border:rgba(51,65,85,.6);--glass-bg:rgba(30,41,59,.6);--glass-border:rgba(51,65,85,.3);--primary-light:#1e1b4b}
+html{scroll-behavior:smooth}*{transition:background-color .3s,color .3s,border-color .3s,box-shadow .3s,transform .3s,opacity .3s}
+body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:100vh;opacity:0;animation:bodyIn .4s forwards}
+::selection{background:var(--primary);color:white}
+@keyframes bodyIn{to{opacity:1}}@keyframes fadeInUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.page-wrapper{animation:pageEnter .5s ease both}
+@keyframes pageEnter{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.glass-card{background:var(--glass-bg);backdrop-filter:blur(16px);border:1px solid var(--glass-border);border-radius:var(--radius);box-shadow:var(--glass-shadow);transition:all .35s var(--ease)}
+.glass-card:hover{box-shadow:var(--glass-shadow),0 0 0 1px var(--primary-glow),0 12px 40px rgba(79,70,229,.08);transform:translateY(-3px)}
+.btn{border-radius:var(--radius-sm);font-weight:600;padding:.5rem 1.2rem;transition:all .25s var(--ease);border:none;position:relative;overflow:hidden}
+.btn-primary{background:linear-gradient(135deg,#4f46e5,#7c3aed);color:white}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 25px rgba(79,70,229,.4);color:white}
+.btn-outline{background:transparent;border:2px solid var(--border);color:var(--text)}
+.btn-outline:hover{border-color:var(--primary);color:var(--primary);background:var(--primary-light)}
+.btn-sm{padding:.35rem 1rem;font-size:.8rem}
+.btn-lg{padding:.7rem 1.8rem;font-size:1rem}
+.welcome-step{text-align:center;padding:2rem 1rem;transition:all .3s ease}
+.welcome-step:hover{transform:translateY(-4px)}
+.welcome-step .step-num{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#4f46e5,#7c3aed);color:white;display:flex;align-items:center;justify-content:center;font-weight:700;margin:0 auto .8rem;font-size:1.1rem}
+.welcome-step h6{font-weight:700}
+.welcome-step p{font-size:.85rem;color:var(--text-muted);max-width:300px;margin:0 auto}
+</style>
+<script>
+function toggleTheme(){const h=document.documentElement,n=h.getAttribute('data-theme')==='dark'?'light':'dark';h.setAttribute('data-theme',n);localStorage.setItem('theme',n)}
+document.addEventListener('DOMContentLoaded',()=>{const s=localStorage.getItem('theme');if(s)document.documentElement.setAttribute('data-theme',s)})
+</script>
+</head>
+<body>
+<div class="page-wrapper">
+<div class="container py-4">
+  <div class="glass-card p-5 text-center mb-4" style="background:linear-gradient(135deg,#4f46e520,#7c3aed20);">
+    <div style="font-size:3rem;margin-bottom:.5rem;">📚</div>
+    <h2 class="fw-bold mb-2">{% if user %}{{ greeting }}{% else %}Welcome to BookSocial!{% endif %}</h2>
+    <p class="text-muted mb-0" style="max-width:500px;margin:0 auto;">Your reading community awaits. Connect with other readers, share book recommendations, and track your reading journey.</p>
+  </div>
+
+  <div class="row g-4 mb-4">
+    <div class="col-md-4"><div class="glass-card p-3 welcome-step h-100"><div class="step-num">1</div><h6>Create Your Profile</h6><p>Add a bio, location, favorite genres, and profile picture to tell others about your reading taste.</p><a href="{{ profile_link }}" class="btn btn-sm btn-outline mt-2"><i class="bi bi-person-fill"></i> My Profile</a></div></div>
+    <div class="col-md-4"><div class="glass-card p-3 welcome-step h-100"><div class="step-num">2</div><h6>Explore the Feed</h6><p>See what others are reading, discover trending posts, and join conversations about books.</p><a href="{{ feed_link }}" class="btn btn-sm btn-outline mt-2"><i class="bi bi-rss-fill"></i> Open Feed</a></div></div>
+    <div class="col-md-4"><div class="glass-card p-3 welcome-step h-100"><div class="step-num">3</div><h6>Build Your Shelves</h6><p>Create custom bookshelves, add books to Want to Read/Reading/Read, and write reviews.</p><a href="{{ profile_link }}" class="btn btn-sm btn-outline mt-2"><i class="bi bi-bookmark-fill"></i> My Shelves</a></div></div>
+  </div>
+
+  <div class="row g-3">
+    <div class="col-md-3"><div class="glass-card p-3 text-center h-100"><div style="font-size:1.8rem;font-weight:700;color:var(--primary);">{{ posts_count }}</div><small class="text-muted">Community Posts</small></div></div>
+    <div class="col-md-3"><div class="glass-card p-3 text-center h-100"><div style="font-size:1.8rem;font-weight:700;color:var(--success);">{{ reviews_count }}</div><small class="text-muted">Book Reviews</small></div></div>
+    <div class="col-md-3"><div class="glass-card p-3 text-center h-100"><div style="font-size:1.8rem;font-weight:700;color:var(--warning);">{{ following_count }}</div><small class="text-muted">Following</small></div></div>
+    <div class="col-md-3"><div class="glass-card p-3 text-center h-100"><div style="font-size:1.8rem;font-weight:700;color:var(--info);">{{ follower_count }}</div><small class="text-muted">Followers</small></div></div>
+  </div>
+
+  <div class="text-center mt-4">
+    <a href="{{ feed_link }}" class="btn btn-primary btn-lg"><i class="bi bi-rss-fill me-2"></i>Go to Feed</a>
+    <a href="/search" class="btn btn-outline btn-lg ms-2"><i class="bi bi-search me-2"></i>Discover Books</a>
+    <a href="/" class="btn btn-outline btn-lg ms-2"><i class="bi bi-house me-2"></i>Home</a>
+  </div>
+</div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body></html>

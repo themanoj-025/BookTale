@@ -1,0 +1,59 @@
+{% extends "auth_base.html" %}
+{% block auth_content %}
+<h2>Create Your Account</h2>
+<p class="auth-subtitle">Join BookTale and start your reading journey</p>
+<div class="role-selector" role="radiogroup" aria-label="Account type">
+  <label class="role-option selected">
+    <input type="radio" name="role" value="user" checked>
+    <span class="role-icon">📖</span>Reader
+    <span class="role-desc">Browse, review, and connect</span>
+  </label>
+</div>
+{% if errors %}
+<div class="alert alert-danger" role="alert" aria-live="assertive">
+  <i class="bi bi-exclamation-triangle-fill me-1"></i>
+  <ul class="mb-0" style="padding-left:1.1rem;">
+    {% for e in errors %}<li>{{ e }}</li>{% endfor %}
+  </ul>
+</div>
+{% endif %}
+{% if error %}
+<div class="alert alert-danger" role="alert" aria-live="assertive">
+  <i class="bi bi-exclamation-triangle-fill me-1"></i> {{ error }}
+</div>
+{% endif %}
+<form method="POST" role="form" aria-label="Registration form">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <div class="mb-3">
+    <label class="form-label" for="regName">Full Name</label>
+    <input type="text" name="name" id="regName" class="form-control" placeholder="e.g. Jane Doe" required>
+  </div>
+  <div class="mb-3">
+    <label class="form-label" for="regEmail">Email <span class="text-muted" style="font-weight:400;">(optional)</span></label>
+    <input type="email" name="email" id="regEmail" class="form-control" placeholder="jane@example.com">
+  </div>
+  <div class="mb-3">
+    <label class="form-label" for="regUid">User ID</label>
+    <input type="text" name="user_id" id="regUid" class="form-control" placeholder="e.g. MEM-0001" pattern="MEM-\d{4}" title="Format: MEM-XXXX (e.g. MEM-0001)" required>
+    <small class="text-muted" style="font-size:.7rem;">Format: MEM-XXXX (e.g. <code>MEM-0001</code>)</small>
+  </div>
+  <div class="mb-3">
+    <label class="form-label" for="regPw">Password</label>
+    <div class="password-wrapper">
+      <input type="password" name="password" id="regPw" class="form-control" placeholder="Create a strong password" required minlength="12" autocomplete="new-password">
+      <button type="button" class="password-toggle" onclick="togglePasswordVisibility(this)" aria-label="Toggle password visibility" aria-pressed="false" tabindex="-1"><i class="bi bi-eye-fill"></i></button>
+    </div>
+    <div class="password-strength-bar" aria-hidden="true"><div class="segment"></div><div class="segment"></div><div class="segment"></div><div class="segment"></div></div>
+    <div class="password-strength-text"></div>
+  </div>
+  <div class="mb-3">
+    <label class="form-label" for="regPw2">Confirm Password</label>
+    <div class="password-wrapper">
+      <input type="password" name="confirm_password" id="regPw2" class="form-control" placeholder="Repeat your password" required minlength="12" autocomplete="new-password">
+      <button type="button" class="password-toggle" onclick="togglePasswordVisibility(this)" aria-label="Toggle password visibility" aria-pressed="false" tabindex="-1"><i class="bi bi-eye-fill"></i></button>
+    </div>
+  </div>
+  <button type="submit" class="btn btn-primary py-2"><i class="bi bi-person-plus-fill me-2"></i>Create Account</button>
+</form>
+<div class="auth-footer">Already have an account? <a href="/login">Sign in</a></div>
+{% endblock %}
