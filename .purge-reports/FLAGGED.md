@@ -1,0 +1,84 @@
+# FLAGGED CANDIDATES: Book-Tale
+
+These items require human review before any destructive action would be permissible.
+
+| ID | Path / Candidate | Tier | Score | Category | Human Review Question |
+|---|---|---|---|---|---|
+| CAND-0002 | `migrations/__init__.py` | T3 | 30 | Cat A | Retain due to Database Migration? |
+| CAND-0077 | `app/api/api_spec.py` | T2 | 68 | Cat D | Is `app/api/api_spec.py` loaded dynamically or needed externally? |
+| CAND-0078 | `app/routes/api_routes.py` | T2 | 68 | Cat D | Is `app/routes/api_routes.py` loaded dynamically or needed externally? |
+| CAND-0079 | `app/routes/auth_routes.py` | T2 | 68 | Cat D | Is `app/routes/auth_routes.py` loaded dynamically or needed externally? |
+| CAND-0080 | `app/routes/challenge_routes.py` | T2 | 68 | Cat D | Is `app/routes/challenge_routes.py` loaded dynamically or needed externally? |
+| CAND-0081 | `app/routes/diary_routes.py` | T2 | 68 | Cat D | Is `app/routes/diary_routes.py` loaded dynamically or needed externally? |
+| CAND-0082 | `app/routes/progress_routes.py` | T2 | 68 | Cat D | Is `app/routes/progress_routes.py` loaded dynamically or needed externally? |
+| CAND-0083 | `app/routes/review_routes.py` | T2 | 68 | Cat D | Is `app/routes/review_routes.py` loaded dynamically or needed externally? |
+| CAND-0084 | `app/routes/series_routes.py` | T2 | 68 | Cat D | Is `app/routes/series_routes.py` loaded dynamically or needed externally? |
+| CAND-0085 | `app/routes/settings_pages.py` | T2 | 68 | Cat D | Is `app/routes/settings_pages.py` loaded dynamically or needed externally? |
+| CAND-0086 | `app/routes/social_api.py` | T2 | 68 | Cat D | Is `app/routes/social_api.py` loaded dynamically or needed externally? |
+| CAND-0087 | `app/routes/social_pages/author_page.py` | T2 | 68 | Cat D | Is `app/routes/social_pages/author_page.py` loaded dynamically or needed externally? |
+| CAND-0088 | `app/routes/social_pages/feed_page.py` | T2 | 68 | Cat D | Is `app/routes/social_pages/feed_page.py` loaded dynamically or needed externally? |
+| CAND-0089 | `app/routes/social_pages/profile_edit_page.py` | T2 | 68 | Cat D | Is `app/routes/social_pages/profile_edit_page.py` loaded dynamically or needed externally? |
+| CAND-0090 | `app/routes/social_shared.py` | T2 | 68 | Cat D | Is `app/routes/social_shared.py` loaded dynamically or needed externally? |
+| CAND-0091 | `app/routes/web_app_helpers.py` | T2 | 68 | Cat D | Is `app/routes/web_app_helpers.py` loaded dynamically or needed externally? |
+| CAND-0092 | `app/routes/wishlist_routes.py` | T2 | 68 | Cat D | Is `app/routes/wishlist_routes.py` loaded dynamically or needed externally? |
+| CAND-0093 | `app/services/books/library_reports.py` | T2 | 68 | Cat D | Is `app/services/books/library_reports.py` loaded dynamically or needed externally? |
+| CAND-0094 | `app/services/recommendations/ml_models/ml_pkg/data_loading.py` | T2 | 68 | Cat D | Is `app/services/recommendations/ml_models/ml_pkg/data_loading.py` loaded dynamically or needed externally? |
+| CAND-0095 | `app/services/recommendations/ml_models/ml_pkg/evaluation.py` | T2 | 68 | Cat D | Is `app/services/recommendations/ml_models/ml_pkg/evaluation.py` loaded dynamically or needed externally? |
+| CAND-0096 | `app/services/recommendations/ml_models/ml_pkg/visualization.py` | T2 | 68 | Cat D | Is `app/services/recommendations/ml_models/ml_pkg/visualization.py` loaded dynamically or needed externally? |
+| CAND-0097 | `app/static/dist/booktale-IHBH4SX5.min.css` | T2 | 68 | Cat D | Is `app/static/dist/booktale-IHBH4SX5.min.css` loaded dynamically or needed externally? |
+| CAND-0098 | `app/static/dist/booktale-XYBPX3A3.min.css` | T2 | 68 | Cat D | Is `app/static/dist/booktale-XYBPX3A3.min.css` loaded dynamically or needed externally? |
+| CAND-0099 | `app/static/dist/js/ai-companion-PAECF2UV.min.js` | T2 | 68 | Cat D | Is `app/static/dist/js/ai-companion-PAECF2UV.min.js` loaded dynamically or needed externally? |
+| CAND-0100 | `app/static/dist/js/analytics-3NCPZBY6.min.js` | T2 | 68 | Cat D | Is `app/static/dist/js/analytics-3NCPZBY6.min.js` loaded dynamically or needed externally? |
+| CAND-0101 | `app/static/dist/js/animations-VD6XIXRN.min.js` | T2 | 68 | Cat D | Is `app/static/dist/js/animations-VD6XIXRN.min.js` loaded dynamically or needed externally? |
+| CAND-0102 | `app/static/dist/js/api-BLYU4KKP.min.js` | T2 | 68 | Cat D | Is `app/static/dist/js/api-BLYU4KKP.min.js` loaded dynamically or needed externally? |
+| CAND-0103 | `app/static/dist/js/charts-RVBL5RPC.min.js` | T2 | 68 | Cat D | Is `app/static/dist/js/charts-RVBL5RPC.min.js` loaded dynamically or needed externally? |
+| CAND-0104 | `app/static/dist/js/drag-drop-I4RNIOSB.min.js` | T2 | 68 | Cat D | Is `app/static/dist/js/drag-drop-I4RNIOSB.min.js` loaded dynamically or needed externally? |
+| CAND-0105 | `app/static/dist/js/feed-NN45HX5N.min.js` | T2 | 68 | Cat D | Is `app/static/dist/js/feed-NN45HX5N.min.js` loaded dynamically or needed externally? |
+| CAND-0106 | `app/static/dist/js/notifications-QYH4UYY6.min.js` | T2 | 68 | Cat D | Is `app/static/dist/js/notifications-QYH4UYY6.min.js` loaded dynamically or needed externally? |
+| CAND-0107 | `app/static/dist/js/recommendations-JGV7YU2U.min.js` | T2 | 68 | Cat D | Is `app/static/dist/js/recommendations-JGV7YU2U.min.js` loaded dynamically or needed externally? |
+| CAND-0108 | `app/static/dist/js/search-RJAJ5EB2.min.js` | T2 | 68 | Cat D | Is `app/static/dist/js/search-RJAJ5EB2.min.js` loaded dynamically or needed externally? |
+| CAND-0109 | `app/static/dist/js/streak-32E37PCB.min.js` | T2 | 68 | Cat D | Is `app/static/dist/js/streak-32E37PCB.min.js` loaded dynamically or needed externally? |
+| CAND-0110 | `app/static/dist/js/theme-UX3GCEAK.min.js` | T2 | 68 | Cat D | Is `app/static/dist/js/theme-UX3GCEAK.min.js` loaded dynamically or needed externally? |
+| CAND-0111 | `app/static/dist/js/toast-XD7UKNB5.min.js` | T2 | 68 | Cat D | Is `app/static/dist/js/toast-XD7UKNB5.min.js` loaded dynamically or needed externally? |
+| CAND-0112 | `app/static/dist/js/utils-6Z6J6ZU3.min.js` | T2 | 68 | Cat D | Is `app/static/dist/js/utils-6Z6J6ZU3.min.js` loaded dynamically or needed externally? |
+| CAND-0113 | `app/static/dist/js/voice-CIYQALB4.min.js` | T2 | 68 | Cat D | Is `app/static/dist/js/voice-CIYQALB4.min.js` loaded dynamically or needed externally? |
+| CAND-0114 | `app/static/js/ai-companion.js` | T2 | 68 | Cat D | Is `app/static/js/ai-companion.js` loaded dynamically or needed externally? |
+| CAND-0115 | `app/static/js/drag-drop.js` | T2 | 68 | Cat D | Is `app/static/js/drag-drop.js` loaded dynamically or needed externally? |
+| CAND-0116 | `app/templates/auth/forgot_password.html` | T2 | 68 | Cat D | Is `app/templates/auth/forgot_password.html` loaded dynamically or needed externally? |
+| CAND-0117 | `app/templates/auth_base.html` | T2 | 68 | Cat D | Is `app/templates/auth_base.html` loaded dynamically or needed externally? |
+| CAND-0118 | `app/templates/error_base.html` | T2 | 68 | Cat D | Is `app/templates/error_base.html` loaded dynamically or needed externally? |
+| CAND-0119 | `app/templates/errors/error_page.html` | T2 | 68 | Cat D | Is `app/templates/errors/error_page.html` loaded dynamically or needed externally? |
+| CAND-0120 | `tests/test_circuit_breaker.py` | T2 | 68 | Cat D | Is `tests/test_circuit_breaker.py` loaded dynamically or needed externally? |
+| CAND-0121 | `tests/test_config.py` | T2 | 68 | Cat D | Is `tests/test_config.py` loaded dynamically or needed externally? |
+| CAND-0122 | `tests/test_db_wiring_part2.py` | T2 | 68 | Cat D | Is `tests/test_db_wiring_part2.py` loaded dynamically or needed externally? |
+| CAND-0123 | `tests/test_exceptions.py` | T2 | 68 | Cat D | Is `tests/test_exceptions.py` loaded dynamically or needed externally? |
+| CAND-0124 | `tests/test_library_part2.py` | T2 | 68 | Cat D | Is `tests/test_library_part2.py` loaded dynamically or needed externally? |
+| CAND-0125 | `tests/test_models.py` | T2 | 68 | Cat D | Is `tests/test_models.py` loaded dynamically or needed externally? |
+| CAND-0126 | `tests/test_realtime.py` | T2 | 68 | Cat D | Is `tests/test_realtime.py` loaded dynamically or needed externally? |
+| CAND-0127 | `tests/test_repositories.py` | T2 | 68 | Cat D | Is `tests/test_repositories.py` loaded dynamically or needed externally? |
+| CAND-0128 | `tests/test_routes_admin.py` | T2 | 68 | Cat D | Is `tests/test_routes_admin.py` loaded dynamically or needed externally? |
+| CAND-0129 | `tests/test_routes_club.py` | T2 | 68 | Cat D | Is `tests/test_routes_club.py` loaded dynamically or needed externally? |
+| CAND-0130 | `tests/test_routes_dashboard.py` | T2 | 68 | Cat D | Is `tests/test_routes_dashboard.py` loaded dynamically or needed externally? |
+| CAND-0131 | `tests/test_routes_diary.py` | T2 | 68 | Cat D | Is `tests/test_routes_diary.py` loaded dynamically or needed externally? |
+| CAND-0132 | `tests/test_routes_explore.py` | T2 | 68 | Cat D | Is `tests/test_routes_explore.py` loaded dynamically or needed externally? |
+| CAND-0133 | `tests/test_routes_progress.py` | T2 | 68 | Cat D | Is `tests/test_routes_progress.py` loaded dynamically or needed externally? |
+| CAND-0134 | `tests/test_routes_reading.py` | T2 | 68 | Cat D | Is `tests/test_routes_reading.py` loaded dynamically or needed externally? |
+| CAND-0135 | `tests/test_routes_review.py` | T2 | 68 | Cat D | Is `tests/test_routes_review.py` loaded dynamically or needed externally? |
+| CAND-0136 | `tests/test_routes_settings.py` | T2 | 68 | Cat D | Is `tests/test_routes_settings.py` loaded dynamically or needed externally? |
+| CAND-0137 | `tests/test_routes_social.py` | T2 | 68 | Cat D | Is `tests/test_routes_social.py` loaded dynamically or needed externally? |
+| CAND-0138 | `tests/test_routes_wishlist.py` | T2 | 68 | Cat D | Is `tests/test_routes_wishlist.py` loaded dynamically or needed externally? |
+| CAND-0139 | `tests/test_services_auth.py` | T2 | 68 | Cat D | Is `tests/test_services_auth.py` loaded dynamically or needed externally? |
+| CAND-0140 | `tests/test_services_communities.py` | T2 | 68 | Cat D | Is `tests/test_services_communities.py` loaded dynamically or needed externally? |
+| CAND-0141 | `tests/test_services_diary.py` | T2 | 68 | Cat D | Is `tests/test_services_diary.py` loaded dynamically or needed externally? |
+| CAND-0142 | `tests/test_services_email.py` | T2 | 68 | Cat D | Is `tests/test_services_email.py` loaded dynamically or needed externally? |
+| CAND-0143 | `tests/test_services_gamification.py` | T2 | 68 | Cat D | Is `tests/test_services_gamification.py` loaded dynamically or needed externally? |
+| CAND-0144 | `tests/test_services_lists.py` | T2 | 68 | Cat D | Is `tests/test_services_lists.py` loaded dynamically or needed externally? |
+| CAND-0145 | `tests/test_services_notifications.py` | T2 | 68 | Cat D | Is `tests/test_services_notifications.py` loaded dynamically or needed externally? |
+| CAND-0146 | `tests/test_services_reading_challenge.py` | T2 | 68 | Cat D | Is `tests/test_services_reading_challenge.py` loaded dynamically or needed externally? |
+| CAND-0147 | `tests/test_services_reading_progress.py` | T2 | 68 | Cat D | Is `tests/test_services_reading_progress.py` loaded dynamically or needed externally? |
+| CAND-0148 | `tests/test_services_reviews.py` | T2 | 68 | Cat D | Is `tests/test_services_reviews.py` loaded dynamically or needed externally? |
+| CAND-0149 | `tests/test_services_series.py` | T2 | 68 | Cat D | Is `tests/test_services_series.py` loaded dynamically or needed externally? |
+| CAND-0150 | `tests/test_services_social.py` | T2 | 68 | Cat D | Is `tests/test_services_social.py` loaded dynamically or needed externally? |
+| CAND-0151 | `tests/test_services_wishlist.py` | T2 | 68 | Cat D | Is `tests/test_services_wishlist.py` loaded dynamically or needed externally? |
+| CAND-0152 | `tests/test_utils.py` | T2 | 68 | Cat D | Is `tests/test_utils.py` loaded dynamically or needed externally? |
+| CAND-0153 | `tests/test_utils_validation.py` | T2 | 68 | Cat D | Is `tests/test_utils_validation.py` loaded dynamically or needed externally? |
