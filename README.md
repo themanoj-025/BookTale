@@ -1,224 +1,240 @@
-# 📚 Book-Tale
-
 <p align="center">
-  <img src="https://img.shields.io/badge/Python-3.10%2B-3776AB?logo=python&logoColor=white" alt="Python" />
-  <img src="https://img.shields.io/badge/Flask-000000?logo=flask" alt="Flask" />
-  <img src="https://img.shields.io/badge/SQLAlchemy-2.x-d71f00?logo=sqlalchemy&logoColor=white" alt="SQLAlchemy" />
-  <img src="https://img.shields.io/github/license/themanoj-025/BookTale" alt="License" />
-  <img src="https://img.shields.io/github/actions/workflow/status/themanoj-025/BookTale/ci.yml?label=CI" alt="CI" />
+  <img src="https://img.shields.io/badge/Book--Tale-Library%20Management-blue?style=for-the-badge" alt="Book-Tale Logo" />
 </p>
 
 <h1 align="center">Book-Tale</h1>
 
 <p align="center">
-  <strong>A full-featured library management system — catalog, lending, reservations, fines, reading challenges, a social feed, realtime notifications, and book recommendations</strong>, built with Flask + SQLAlchemy + a bundled esbuild frontend.
+  <strong>Comprehensive library management system with catalog browsing, transactional lending, reading challenges, social feeds, and ML-powered book recommendations.</strong>
 </p>
 
-> **Honesty first:** this README describes what the code actually does today, verified against a green test suite. Where something is planned but not built, it says so explicitly — see **What's real vs. aspirational** below.
-
-## 📋 Table of Contents
-
-- [Status](#status)
-- [✨ Features](#-features)
-- [🏗️ Architecture](#️-architecture)
-- [🧰 Tech stack](#-tech-stack)
-- [🚀 Getting started](#-getting-started)
-- [🔌 API surface](#-api-surface)
-- [🤖 AI / Recommendations](#-ai--recommendations)
-- [📁 Project structure](#-project-structure)
-- [📚 Documentation](#-documentation)
-- [🧭 Roadmap / what's next](#-roadmap--whats-next)
-- [🤝 Contributing](#-contributing)
-- [📬 Support](#-support)
-- [License](#license)
+<p align="center">
+  <a href="https://github.com/themanoj-025/BookTale/actions"><img src="https://img.shields.io/github/actions/workflow/status/themanoj-025/BookTale/ci.yml?style=flat-square&label=CI" alt="CI Status" /></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-green?style=flat-square" alt="License MIT" /></a>
+  <a href="https://github.com/themanoj-025/BookTale/stargazers"><img src="https://img.shields.io/github/stars/themanoj-025/BookTale?style=social" alt="GitHub Stars" /></a>
+  <a href="https://github.com/themanoj-025/BookTale/issues"><img src="https://img.shields.io/github/issues/themanoj-025/BookTale?style=flat-square" alt="GitHub Issues" /></a>
+  <a href="https://github.com/themanoj-025/BookTale/pulls"><img src="https://img.shields.io/badge/PRs-welcome-brightgreen?style=flat-square" alt="PRs Welcome" /></a>
+</p>
 
 ---
 
-## Status
+## Overview
 
-| Area         | State                                                                  |
-| ------------ | ---------------------------------------------------------------------- |
-| Tests        | **202 passing** (`pytest tests/`; 2 skipped — Redis-dependent)         |
-| Routes       | **132** registered on the Flask app                                    |
-| Seed catalog | **11,127 books** (`app/services/recommendations/ml/Dataset/books.csv`) |
-| Storage      | SQLAlchemy ORM (SQLite dev / PostgreSQL prod), Alembic migrations      |
-| Frontend     | Jinja2 templates + esbuild-bundled JS (content-hashed assets)          |
-| CI           | `.github/workflows/ci.yml` (lint, tests, security scans)               |
+Book-Tale provides an end-to-end library operations platform supporting both an interactive web dashboard and a command-line interface. Built on Flask, SQLAlchemy, and Flask-SocketIO, it handles catalog discovery, reservations, concurrency-safe lending, overdue fines calculation, and community reading challenges.
 
-## ✨ Features
+The platform integrates a machine learning recommendation pipeline capable of scoring personalized book suggestions across a curated catalog of 11,000+ titles.
 
-### Core library operations
+---
 
-- Book catalog with **search and filtering** (category, availability, author, publisher, ISBN, date added, sort) and category/author browsing
-- **Issue / return / reserve** flows wrapped in DB transactions (concurrency-safe — no oversell of the last copy, tested with 20 racing threads)
-- **Borrow limits**, membership expiry, **fine calculation** for late returns
-- **Overdue tracking** and per-user borrowing history
-- **Reports & statistics** (issuance, returns, fines, active users)
+## Table of Contents
 
-### Lending & fines
+- [Key Features](#key-features)
+- [Architecture](#architecture)
+- [Tech Stack](#tech-stack)
+- [Project Structure](#project-structure)
+- [Prerequisites](#prerequisites)
+- [Installation & Quick Start](#installation--quick-start)
+- [Configuration](#configuration)
+- [Testing](#testing)
+- [ML Recommendation Pipeline](#ml-recommendation-pipeline)
+- [Roadmap](#roadmap)
+- [Contributing](#contributing)
+- [Security](#security)
+- [License](#license)
+- [Support](#support)
 
-- User self-service: borrow, return, and reserve books; receipt generation with QR codes
-- Fine calculation based on per-day late rates, with membership expiry notices
+---
 
-### Social & community
+## Key Features
 
-- Social feed: posts from classmates, faculty, and library staff
-- Realtime notifications via WebSockets when books are due back, reserved, or returned
+- **Concurrency-Safe Lending Operations**: Book issue, return, and reservation flows run inside ACID database transactions to prevent overselling inventory under concurrent requests.
+- **Automated Fine & Overdue Tracking**: Computes late-return fees based on configurable daily rates and manages borrowing quota restrictions.
+- **ML Book Recommendations**: Hybrid content and collaborative filtering models surface personalized book recommendations based on user reading history and genre similarity.
+- **Real-Time Community & Social Feeds**: Flask-SocketIO powers instant notifications for reservation availability, due date warnings, and peer reading challenges.
+- **Dual Interface Modes**: Supports both a Jinja2 web interface (with esbuild asset bundling) and a terminal-based CLI interface.
 
-### AI / Recommendations
+---
 
-- Book recommendations powered by a bundled ML pipeline (see [AI / Recommendations](#-ai--recommendations))
-- Reading challenges: goal setting, progress tracking, and leaderboards
-
-<!-- 📸 Screenshot placeholder: Add a screenshot of the catalog search and a book detail page. -->
-
-## 🏗️ Architecture
+## Architecture
 
 ```text
-book-tale/
-├── app/
-│   ├── api/                # Flask route handlers
-│   ├── core/               # Business logic & services
-│   ├── db/                 # SQLAlchemy models + Alembic migrations
-│   ├── services/           # ML pipelines (recommendations)
-│   ├── static/             # Bundled JS assets (esbuild)
-│   └── templates/          # Jinja2 UI
-├── tests/                  # pytest suite (202 passing)
-├── docs/                   # Project documentation
-└── .github/workflows/      # CI (lint, tests, security)
+               ┌───────────────────────────────┐
+               │    Clients: Web UI / CLI      │
+               └───────────────┬───────────────┘
+                               │
+                               ▼
+               ┌───────────────────────────────┐
+               │    Flask Application Layer    │
+               │  (REST Endpoints & SocketIO)  │
+               └───────────────┬───────────────┘
+                               │
+        ┌──────────────────────┼──────────────────────┐
+        ▼                      ▼                      ▼
+┌───────────────┐      ┌───────────────┐      ┌───────────────┐
+│ Core Services │      │  SQLAlchemy   │      │ Recommendation│
+│ (Lending,     │      │   ORM Layer   │      │  ML Pipeline  │
+│ Fines, Feed)  │      │(SQLite/Postgre│      │(scikit-learn) │
+└───────────────┘      └───────┬───────┘      └───────────────┘
+                               ▼
+                       Alembic Migrations
 ```
 
-The Flask app exposes all routes behind DB transactions; the ML recommendation service is a dependency injected into the catalog API.
+---
 
-## 🧰 Tech stack
+## Tech Stack
 
-| Category         | Technology                                              |
-| ---------------- | ------------------------------------------------------- |
-| Language         | Python 3.10+                                            |
-| Web framework    | Flask 3.1.3+                                            |
-| ORM              | SQLAlchemy 2.x                                          |
-| Database (dev)   | SQLite                                                  |
-| Database (prod)  | PostgreSQL                                              |
-| Migrations       | Alembic                                               |
-| Frontend         | Jinja2 templates + esbuild-bundled JS (content-hashed)  |
-| ML               | Bundled recommendation pipeline (scikit-learn + pandas) |
-| Tests            | pytest + pytest-cov                                     |
-| CI               | GitHub Actions (lint, tests, security scans)            |
+| Component | Technology |
+| :--- | :--- |
+| **Backend Framework** | Flask 3.x, Flask-SocketIO |
+| **Database & ORM** | SQLAlchemy 2.x, SQLite (development), PostgreSQL (production) |
+| **Schema Migrations** | Alembic |
+| **Machine Learning** | scikit-learn, pandas, numpy |
+| **Frontend** | Jinja2 templates, esbuild bundled JavaScript |
+| **Quality & CI** | Pytest, Ruff, GitHub Actions CI |
 
-## 🚀 Getting started
+---
 
-### Prerequisites
-
-- Python 3.10 or newer
-- PostgreSQL 14+ (or use the bundled SQLite for development)
-
-### Install & run
-
-```bash
-# 1. Clone the repository
-git clone https://github.com/themanoj-025/BookTale.git
-cd BookTale
-
-# 2. Create and activate a virtual environment
-python -m venv .venv
-source .venv/bin/activate  # Windows: .venv\Scripts\activate
-
-# 3. Install dependencies
-pip install -r requirements.txt
-
-# 4. Set up the database (SQLite for dev, PostgreSQL for prod)
-#    with Alembic migrations applied:
-alembic upgrade heads
-
-# 5. Seed the catalog (optional)
-python -m app.services.seed_catalog
-
-# 6. Run the dev server
-flask run --reload
-```
-
-### Environment variables
-
-| Variable              | Default | Required | Description              |
-| --------------------- | ------- | -------- | ------------------------ |
-| `FLASK_ENV`           | `development` | No       | Flask environment        |
-| `DATABASE_URL`        | `sqlite:///booktale.db` | Yes (prod) | Database connection    |
-| `SECRET_KEY`          | —       | Yes      | Flask secret key         |
-| `RECOMMENDATIONS_MODEL` | —     | No       | Path to the ML model file |
-
-## 🔌 API surface
-
-The Flask app wires the following route groups. Each route calls a service function in `app/core/` inside a DB transaction.
-
-| Group            | Endpoints                                                   |
-| ---------------- | ----------------------------------------------------------- |
-| Catalog          | `GET /books`, `GET /books/<id>`, `POST /books`, `GET /authors`, `GET /categories` |
-| Lending          | `POST /issue`, `POST /return`, `POST /reserve`, `POST /borrow/<id>` |
-| Users & fines    | `GET /users`, `GET /fines`, `GET /reports/issuance`         |
-| Social & feed    | `GET /feed`, `POST /feed/<id>/like`                         |
-| Recommendations  | `GET /recommendations` (ML pipeline, see below)             |
-
-> [!NOTE] Realtime features (notifications, socket events) are independent of the REST surface; they require the Redis/WebSocket layer.
-
-## 🤖 AI / Recommendations
-
-The recommendation subsystem is a separate pipeline in `app/services/recommendations/`:
-
-- **Training**: `python -m app.services.recommendations.train` — trains a collaborative + content-based hybrid on the seed catalog
-- **Inference**: `GET /recommendations` returns top-N books for a user, with a reason code (e.g., `similar_genre`, `popular_trend`)
-- **Dataset**: `app/services/recommendations/ml/Dataset/books.csv` (11,127 books) is the seed catalog; the model weights are gitignored
-
-> [!TIP] To add a recommendation model: implement the interface in `app/services/recommendations/interface.py`, register it in `config.py`, and the `/recommendations` route picks it up automatically.
-
-## 📁 Project structure
+## Project Structure
 
 ```text
 Book-Tale/
 ├── app/
-│   ├── api/                    # Flask route handlers
-│   ├── core/                   # Business logic & services
-│   ├── db/                     # SQLAlchemy models + Alembic
-│   ├── services/               # ML pipelines (recommendations)
-│   ├── static/                 # Bundled JS (esbuild)
-│   └── templates/              # Jinja2 UI
-├── tests/                      # pytest suite
-├── docs/                       # Project documentation
-├── data/                       # Seed datasets (gitignored)
-├── requirements.txt
-└── .github/workflows/ci.yml
+│   ├── api/                    # REST route controllers
+│   ├── config/                 # Pydantic and settings modules
+│   ├── core/                   # Lending, catalog, and fine business logic
+│   ├── db/                     # SQLAlchemy models and database sessions
+│   ├── routes/                 # Blueprint definitions and web handlers
+│   ├── services/               # Recommendation engine and catalog seeders
+│   ├── static/                 # Styles, scripts, and bundled web assets
+│   └── templates/              # Jinja2 HTML templates
+├── migrations/                 # Alembic database migration revisions
+├── tests/                      # Pytest unit and concurrency test suite
+├── docs/                       # Architecture decisions and API documentation
+├── main.py                     # CLI application entry point
+├── web_app.py                  # Web application entry point (Flask + SocketIO)
+├── Dockerfile                  # Container build configuration
+├── docker-compose.yml          # Containerized development orchestration
+├── pyproject.toml              # Build backend and test settings
+├── requirements.txt            # Python dependencies
+└── README.md                   # Project documentation
 ```
 
-## 📚 Documentation
+---
 
-See the [docs/](docs/) directory for:
+## Prerequisites
 
-- API documentation (Swagger UI at `/docs`)
-- Architecture decision records
-- Deployment runbooks
+- **Python**: `>= 3.10`
+- **Node.js**: `>= 18.0` (required only if rebuilding frontend assets with esbuild)
+- **Database**: SQLite (built-in default) or PostgreSQL 14+ for production
 
-## 🧭 Roadmap / what's next
+---
 
-> [!CAUTION] Items marked with a checkbox are built and verified. Items without a checkbox are planned — not built.
+## Installation & Quick Start
 
-- [x] Core library operations (catalog, issue, return, reserve, fines)
-- [x] Social feed + realtime notifications
-- [x] Book recommendations pipeline
-- [ ] **Discounted pricing & coupons** — tracked in the issue tracker; not built yet
+### 1. Clone & Set Up Environment
 
-Items are kept current in the live issue tracker and project board — hardcoded lists go stale quickly.
+```bash
+# Clone repository
+git clone https://github.com/themanoj-025/BookTale.git
+cd BookTale
 
-## 🤝 Contributing
+# Create virtual environment
+python -m venv .venv
+# Linux/macOS: source .venv/bin/activate
+# Windows: .venv\Scripts\Activate.ps1
 
-Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md).
+# Install requirements
+pip install -r requirements.txt
+```
 
-## 📬 Support
+### 2. Database Migration
 
-- 🐛 [Report a bug](https://github.com/themanoj-025/BookTale/issues)
-- 💡 [Request a feature](https://github.com/themanoj-025/BookTale/issues)
-- 📧 Email the maintainer via the issue tracker
+```bash
+# Apply database migrations to head
+alembic upgrade head
+```
+
+### 3. Run the Application
+
+**Run Web Interface**:
+```bash
+python web_app.py
+```
+*Open http://localhost:5000 in your browser.*
+
+**Run CLI Interface**:
+```bash
+python main.py
+```
+
+---
+
+## Configuration
+
+Settings can be specified in `.env` (or via environment variables):
+
+| Variable | Default | Required | Purpose |
+| :--- | :--- | :--- | :--- |
+| `DATABASE_URL` | `sqlite:///booktale.db` | No | Connection string for database |
+| `SECRET_KEY` | `dev-secret-key-change-me` | Yes (prod) | Session and cryptographic signing key |
+| `FLASK_HOST` | `127.0.0.1` | No | Server listen address |
+| `FLASK_PORT` | `5000` | No | Server listen port |
+| `FLASK_DEBUG` | `False` | No | Enables hot reload and debug output |
+
+---
+
+## Testing
+
+```bash
+# Run unit and integration tests
+pytest tests/ -v
+
+# Run with test coverage
+pytest --cov=app tests/
+```
+
+---
+
+## ML Recommendation Pipeline
+
+The recommendation subsystem is located in `app/services/recommendations/`:
+- **Catalog Dataset**: Features a seed dataset of 11,000+ titles (`books.csv`).
+- **Model Training**: `python -m app.services.recommendations.train` generates model artifacts for nearest-neighbor similarity and genre affinity scoring.
+- **Inference**: Endpoints match reader history against candidate titles to return ranked recommendations.
+
+---
+
+## Roadmap
+
+- [x] Full catalog management with availability tracking
+- [x] Concurrency-safe issue/return/reserve operations
+- [x] Overdue fine calculation and quota enforcement
+- [x] Recommendation pipeline baseline models
+- [x] Realtime activity notifications via WebSockets
+- [ ] Automated email digests for overdue books <!-- TODO: Track via GitHub issue -->
+- [ ] Integration with barcode/RFID scanner hardware <!-- TODO: Track via GitHub issue -->
+
+---
+
+## Contributing
+
+Contributions are welcome! Please consult [CONTRIBUTING.md](CONTRIBUTING.md) for pull request guidelines and coding standards.
+
+---
+
+## Security
+
+Please report vulnerabilities responsibly as outlined in [SECURITY.md](SECURITY.md).
+
+---
 
 ## License
 
-MIT License — see [LICENSE](LICENSE).
+This project is licensed under the [MIT License](LICENSE).
 
-> [!IMPORTANT] The license in this README matches the `license` field in `pyproject.toml` and the contents of the `LICENSE` file. No conflicts were found.
+---
+
+## Support
+
+- 🐛 **Issue Tracker**: [GitHub Issues](https://github.com/themanoj-025/BookTale/issues)
+- 💬 **Discussions & Feedback**: [GitHub Pull Requests](https://github.com/themanoj-025/BookTale/pulls)
