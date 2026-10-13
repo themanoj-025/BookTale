@@ -41,6 +41,7 @@ from app.services.recommendations.ml_models.ml_pkg.models import (
     xgboost_model,
 )
 from app.services.recommendations.ml_models.ml_pkg.evaluation import (
+    content_based_filtering,
     evaluate_clustering,
     evaluate_recommendation,
 )
