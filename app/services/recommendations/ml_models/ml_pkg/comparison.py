@@ -9,21 +9,9 @@ import numpy as np
 from app.services.recommendations.ml_models.ml_pkg.data_loading import (
     DATA_PATH,
     OUTPUT_DIR,
-    N_CLUSTERS,
-    N_NEIGHBORS,
-    RANDOM_STATE,
-    TEST_SIZE,
-    XGB_AVAILABLE,
 )
 from app.services.recommendations.ml_models.ml_pkg.data_loading import (
-    N_CLUSTERS,
-    N_NEIGHBORS,
-    RANDOM_STATE,
-    TEST_SIZE,
-    XGB_AVAILABLE,
     ALGORITHM_COLORS,
-    DATA_PATH,
-    OUTPUT_DIR,
     get_numerical_features,
     get_tfidf_features,
     load_and_preprocess_data,
@@ -42,8 +30,6 @@ from app.services.recommendations.ml_models.ml_pkg.models import (
 )
 from app.services.recommendations.ml_models.ml_pkg.evaluation import (
     content_based_filtering,
-    evaluate_clustering,
-    evaluate_recommendation,
 )
 from app.services.recommendations.ml_models.ml_pkg.visualization import (
     save_bar_comparison,

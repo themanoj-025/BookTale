@@ -117,4 +117,3 @@ CMD ["sh", "-c", "scripts/entrypoint.sh 'gunicorn -w 4 -b 0.0.0.0:5000 --timeout
 # Dev / local override: the Flask dev server is used with DEBUG forced
 # OFF (app/config/settings.py) so no Werkzeug reloader runs in production.
 # CMD ["sh", "-c", "scripts/entrypoint.sh 'python web_app.py'"]
-

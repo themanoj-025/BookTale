@@ -14,10 +14,8 @@ Exit code 0 on success; non-zero on os-level failures (logged, not raised).
 """
 
 import logging
-import os
-import shutil
 import sys
-from datetime import UTC, datetime, timedelta
+from datetime import UTC, datetime
 from pathlib import Path
 
 from app.config.settings import Config

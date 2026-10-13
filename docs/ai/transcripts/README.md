@@ -6,9 +6,9 @@ records without cluttering the repo with one-off exports.
 
 ## Contents
 
-| Item | Purpose |
-|------|---------|
-| `README.md` | This policy file |
+| Item                        | Purpose                                                 |
+| --------------------------- | ------------------------------------------------------- |
+| `README.md`                 | This policy file                                        |
 | `*.json` / `*.md` / `*.txt` | Sanitized conversation exports, organized by date/label |
 
 ## Sanitization rules
