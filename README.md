@@ -92,18 +92,18 @@ The Flask app exposes all routes behind DB transactions; the ML recommendation s
 
 ## 🧰 Tech stack
 
-| Category         | Technology                                              |
-| ---------------- | ------------------------------------------------------- |
-| Language         | Python 3.10+                                            |
-| Web framework    | Flask 3.1.3+                                            |
-| ORM              | SQLAlchemy 2.x                                          |
-| Database (dev)   | SQLite                                                  |
-| Database (prod)  | PostgreSQL                                              |
-| Migrations       | Alembic                                               |
-| Frontend         | Jinja2 templates + esbuild-bundled JS (content-hashed)  |
-| ML               | Bundled recommendation pipeline (scikit-learn + pandas) |
-| Tests            | pytest + pytest-cov                                     |
-| CI               | GitHub Actions (lint, tests, security scans)            |
+| Category        | Technology                                              |
+| --------------- | ------------------------------------------------------- |
+| Language        | Python 3.10+                                            |
+| Web framework   | Flask 3.1.3+                                            |
+| ORM             | SQLAlchemy 2.x                                          |
+| Database (dev)  | SQLite                                                  |
+| Database (prod) | PostgreSQL                                              |
+| Migrations      | Alembic                                                 |
+| Frontend        | Jinja2 templates + esbuild-bundled JS (content-hashed)  |
+| ML              | Bundled recommendation pipeline (scikit-learn + pandas) |
+| Tests           | pytest + pytest-cov                                     |
+| CI              | GitHub Actions (lint, tests, security scans)            |
 
 ## 🚀 Getting started
 
@@ -139,24 +139,24 @@ flask run --reload
 
 ### Environment variables
 
-| Variable              | Default | Required | Description              |
-| --------------------- | ------- | -------- | ------------------------ |
-| `FLASK_ENV`           | `development` | No       | Flask environment        |
-| `DATABASE_URL`        | `sqlite:///booktale.db` | Yes (prod) | Database connection    |
-| `SECRET_KEY`          | —       | Yes      | Flask secret key         |
-| `RECOMMENDATIONS_MODEL` | —     | No       | Path to the ML model file |
+| Variable                | Default                 | Required   | Description               |
+| ----------------------- | ----------------------- | ---------- | ------------------------- |
+| `FLASK_ENV`             | `development`           | No         | Flask environment         |
+| `DATABASE_URL`          | `sqlite:///booktale.db` | Yes (prod) | Database connection       |
+| `SECRET_KEY`            | —                       | Yes        | Flask secret key          |
+| `RECOMMENDATIONS_MODEL` | —                       | No         | Path to the ML model file |
 
 ## 🔌 API surface
 
 The Flask app wires the following route groups. Each route calls a service function in `app/core/` inside a DB transaction.
 
-| Group            | Endpoints                                                   |
-| ---------------- | ----------------------------------------------------------- |
-| Catalog          | `GET /books`, `GET /books/<id>`, `POST /books`, `GET /authors`, `GET /categories` |
-| Lending          | `POST /issue`, `POST /return`, `POST /reserve`, `POST /borrow/<id>` |
-| Users & fines    | `GET /users`, `GET /fines`, `GET /reports/issuance`         |
-| Social & feed    | `GET /feed`, `POST /feed/<id>/like`                         |
-| Recommendations  | `GET /recommendations` (ML pipeline, see below)             |
+| Group           | Endpoints                                                                         |
+| --------------- | --------------------------------------------------------------------------------- |
+| Catalog         | `GET /books`, `GET /books/<id>`, `POST /books`, `GET /authors`, `GET /categories` |
+| Lending         | `POST /issue`, `POST /return`, `POST /reserve`, `POST /borrow/<id>`               |
+| Users & fines   | `GET /users`, `GET /fines`, `GET /reports/issuance`                               |
+| Social & feed   | `GET /feed`, `POST /feed/<id>/like`                                               |
+| Recommendations | `GET /recommendations` (ML pipeline, see below)                                   |
 
 > [!NOTE] Realtime features (notifications, socket events) are independent of the REST surface; they require the Redis/WebSocket layer.
 

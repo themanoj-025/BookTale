@@ -46,13 +46,13 @@ python main.py
 
 ## Folder map
 
-| Path | Purpose |
-|------|---------|
-| `app/` | Flask API, ML package, services |
-| `web_app.py` | Streamlit dashboard (entry) |
-| `main.py` | CLI/entry point |
-| `tests/` | pytest suite (route, model, service, integration) |
-| `.github/workflows/` | CI (ruff, mypy, pytest, gitleaks, trivy) |
+| Path                 | Purpose                                           |
+| -------------------- | ------------------------------------------------- |
+| `app/`               | Flask API, ML package, services                   |
+| `web_app.py`         | Streamlit dashboard (entry)                       |
+| `main.py`            | CLI/entry point                                   |
+| `tests/`             | pytest suite (route, model, service, integration) |
+| `.github/workflows/` | CI (ruff, mypy, pytest, gitleaks, trivy)          |
 
 ## Do / don't
 
