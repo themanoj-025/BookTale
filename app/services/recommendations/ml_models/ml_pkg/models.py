@@ -19,6 +19,7 @@ from sklearn.neighbors import NearestNeighbors
 from sklearn.neural_network import MLPRegressor
 
 from app.services.recommendations.ml_models.ml_pkg.data_loading import (
+    ALGORITHM_COLORS,
     N_CLUSTERS,
     N_NEIGHBORS,
     RANDOM_STATE,
@@ -38,7 +39,7 @@ def knn_model(X: np.ndarray) -> ModelResult:
     """KNN-based recommendation using nearest neighbors."""
     logger.info("  🔄 KNN (k-Nearest Neighbors)...")
     start = time.time()
-    result = ModelResult("KNN", ALGORITHM_COLORS["TODO"])
+    result = ModelResult("KNN", ALGORITHM_COLORS["KNN"])
 
     knn = NearestNeighbors(n_neighbors=N_NEIGHBORS, metric="cosine", n_jobs=-1)
     knn.fit(X)
@@ -62,7 +63,7 @@ def kmeans_model(X: np.ndarray, df: pd.DataFrame) -> ModelResult:
     """K-Means clustering with multiple initializations."""
     logger.info("  🔄 K-Means Clustering...")
     start = time.time()
-    result = ModelResult("K-Means", ALGORITHM_COLORS["TODO"])
+    result = ModelResult("K-Means", ALGORITHM_COLORS["K-Means"])
 
     # Find optimal k using elbow method
     inertias = []
@@ -107,7 +108,7 @@ def dbscan_model(X: np.ndarray, df: pd.DataFrame) -> ModelResult:
     """DBSCAN density-based clustering with auto eps tuning."""
     logger.info("  🔄 DBSCAN...")
     start = time.time()
-    result = ModelResult("DBSCAN", ALGORITHM_COLORS["TODO"])
+    result = ModelResult("DBSCAN", ALGORITHM_COLORS["DBSCAN"])
 
     # Auto-tune eps based on k-distance
     nn = NearestNeighbors(n_neighbors=min(10, X.shape[0] - 1), n_jobs=-1)
@@ -146,7 +147,7 @@ def pca_kmeans_model(X: np.ndarray, df: pd.DataFrame) -> ModelResult:
     """PCA dimensionality reduction followed by K-Means."""
     logger.info("  🔄 PCA + K-Means...")
     start = time.time()
-    result = ModelResult("PCA+K-Means", ALGORITHM_COLORS["TODO"])
+    result = ModelResult("PCA+K-Means", ALGORITHM_COLORS["PCA+K-Means"])
 
     # Find optimal components
     n_components = min(50, X.shape[1], X.shape[0] - 1)
@@ -190,7 +191,7 @@ def tsne_kmeans_model(X: np.ndarray, df: pd.DataFrame) -> ModelResult:
     """t-SNE dimensionality reduction followed by K-Means."""
     logger.info("  🔄 t-SNE + K-Means...")
     start = time.time()
-    result = ModelResult("t-SNE+K-Means", ALGORITHM_COLORS["TODO"])
+    result = ModelResult("t-SNE+K-Means", ALGORITHM_COLORS["t-SNE+K-Means"])
 
     # First reduce with PCA to speed up t-SNE
     n_components = min(50, X.shape[1])
@@ -227,7 +228,7 @@ def svd_model(X: np.ndarray, df: pd.DataFrame) -> ModelResult:
     """Truncated SVD for matrix factorization and recommendation."""
     logger.info("  🔄 SVD Matrix Factorization...")
     start = time.time()
-    result = ModelResult("SVD", ALGORITHM_COLORS["TODO"])
+    result = ModelResult("SVD", ALGORITHM_COLORS["SVD"])
 
     n_components = min(20, X.shape[1], X.shape[0] - 1)
     svd = TruncatedSVD(n_components=n_components, random_state=RANDOM_STATE)
@@ -259,7 +260,7 @@ def xgboost_model(df: pd.DataFrame, X: np.ndarray) -> ModelResult:
     """XGBoost regression for rating prediction."""
     logger.info("  🔄 XGBoost Regression...")
     start = time.time()
-    result = ModelResult("XGBoost", ALGORITHM_COLORS["TODO"])
+    result = ModelResult("XGBoost", ALGORITHM_COLORS["XGBoost"])
 
     if not XGB_AVAILABLE:
         logger.info("⚠️ (XGBoost not installed, skipping)")
@@ -307,7 +308,7 @@ def hybrid_model(X: np.ndarray, X_tfidf: np.ndarray, df: pd.DataFrame) -> ModelR
     """Hybrid: combines content-based similarity with collaborative clustering."""
     logger.info("  🔄 Hybrid Model (Content + Collaborative)...")
     start = time.time()
-    result = ModelResult("Hybrid", ALGORITHM_COLORS["TODO"])
+    result = ModelResult("Hybrid", ALGORITHM_COLORS["Hybrid"])
 
     # Content-based similarity
     content_sim = cosine_similarity(X_tfidf) if X_tfidf.shape[1] > 1 else cosine_similarity(X)
@@ -346,7 +347,7 @@ def neural_network_model(X: np.ndarray, df: pd.DataFrame) -> ModelResult:
     """Simple MLP neural network for rating prediction."""
     logger.info("  🔄 Neural Network (MLP)...")
     start = time.time()
-    result = ModelResult("Neural Net", ALGORITHM_COLORS["TODO"])
+    result = ModelResult("Neural Net", ALGORITHM_COLORS["Neural Net"])
 
     y = df["average_rating"].values
     X_train, X_test, y_train, y_test = train_test_split(
@@ -398,7 +399,7 @@ def agglomerative_model(X: np.ndarray, df: pd.DataFrame) -> ModelResult:
     """Hierarchical agglomerative clustering."""
     logger.info("  🔄 Agglomerative Clustering...")
     start = time.time()
-    result = ModelResult("Agglomerative", ALGORITHM_COLORS["TODO"])
+    result = ModelResult("Agglomerative", ALGORITHM_COLORS["Agglomerative"])
 
     # Use MiniBatch for large datasets
     if X.shape[0] > 10000:

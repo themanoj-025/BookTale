@@ -30,7 +30,7 @@
 - [🧭 Roadmap / what's next](#-roadmap--whats-next)
 - [🤝 Contributing](#-contributing)
 - [📬 Support](#-support)
-- [License](#️-license)
+- [License](#license)
 
 ---
 
@@ -172,7 +172,7 @@ The recommendation subsystem is a separate pipeline in `app/services/recommendat
 
 ## 📁 Project structure
 
-```
+```text
 Book-Tale/
 ├── app/
 │   ├── api/                    # Flask route handlers
