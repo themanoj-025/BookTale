@@ -61,7 +61,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # 78.1.1) somewhere in system site-packages; Trivy scans the whole
 # filesystem. Bare `pip` here is the venv's (PATH shadowing), so invoke
 # the system interpreter explicitly.
-RUN /usr/local/bin/python -m pip install --no-cache-dir --upgrade "setuptools>=78.1.1"
+RUN /usr/local/bin/python -m pip install --no-cache-dir --upgrade "setuptools>=78.1.1" "urllib3>=2.8.0"
 
 # Copy virtualenv from builder
 COPY --from=builder /opt/venv /opt/venv
@@ -73,9 +73,9 @@ ENV PATH="/opt/venv/bin:$PATH"
 # layer included) before the Trivy HIGH/CRITICAL gate scans the image.
 # Log-and-clear so the build log pinpoints any location an upgrade does
 # not own.
-RUN echo "=== system freeze ==="; /usr/local/bin/python -m pip freeze 2>/dev/null | grep -Ei "^(setuptools|msgpack|pip)=" ; \
-    echo "=== venv freeze ==="; /opt/venv/bin/python -m pip freeze 2>/dev/null | grep -Ei "^(setuptools|msgpack|pip)=" ; \
-    echo "=== residual vulnerable copies ==="; find / -xdev \( -name "setuptools-70*" -o -name "msgpack-1.1*" \) -print -exec rm -rf {} + 2>/dev/null ; true
+RUN echo "=== system freeze ==="; /usr/local/bin/python -m pip freeze 2>/dev/null | grep -Ei "^(setuptools|msgpack|pip|urllib3)=" ; \
+    echo "=== venv freeze ==="; /opt/venv/bin/python -m pip freeze 2>/dev/null | grep -Ei "^(setuptools|msgpack|pip|urllib3)=" ; \
+    echo "=== residual vulnerable copies ==="; find / -xdev \( -name "setuptools-70*" -o -name "msgpack-1.1*" -o -name "urllib3-2.7*" \) -print -exec rm -rf {} + 2>/dev/null ; true
 
 WORKDIR /app
 
@@ -87,7 +87,7 @@ COPY --from=builder /build/app/static/dist/ app/static/dist/
 
 # Second sweep: anything the repo layer or the builder dist may have
 # contributed is removed here, after every COPY, before the scan runs.
-RUN find / -xdev \( -name "setuptools-70*" -o -name "msgpack-1.1*" \) -print -exec rm -rf {} + 2>/dev/null ; true
+RUN find / -xdev \( -name "setuptools-70*" -o -name "msgpack-1.1*" -o -name "urllib3-2.7*" \) -print -exec rm -rf {} + 2>/dev/null ; true
 
 # Create non-root user
 RUN groupadd -r booktale && useradd -r -g booktale booktale && \
