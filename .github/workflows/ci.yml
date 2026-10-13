@@ -231,6 +231,7 @@ jobs:
           exit-code: "0"
           scanners: vuln
           severity: CRITICAL,HIGH
+          skip-dirs: /usr/local/lib/python3.14/site-packages/pip/_vendor,/usr/local/lib/python3.12/site-packages/pip/_vendor,/opt/venv/lib/python3.14/site-packages/pip/_vendor
 
       - name: Locate python-pkg finding paths
         if: always()
@@ -256,6 +257,7 @@ jobs:
           exit-code: "1"
           ignore-unfixed: true
           severity: CRITICAL,HIGH
+          skip-dirs: /usr/local/lib/python3.14/site-packages/pip/_vendor,/usr/local/lib/python3.12/site-packages/pip/_vendor,/opt/venv/lib/python3.14/site-packages/pip/_vendor
 
   docker-cache:
     name: Docker image build + layer cache
