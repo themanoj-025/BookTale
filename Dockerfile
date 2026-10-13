@@ -30,7 +30,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Transitive deps can resolve below the Trivy HIGH-severity floors on
 # newer Pythons (e.g. fakeredis pulling msgpack 1.1.x, GHSA-6v7p-g79w-8964
 # fixed in 1.2.1); force the fixed floors after resolution.
-RUN pip install --no-cache-dir --upgrade "setuptools>=78.1.1" "msgpack>=1.2.1"
+RUN pip install --no-cache-dir --upgrade "setuptools>=78.1.1" "msgpack>=1.2.1" "urllib3>=2.8.0"
 
 # Install Node.js for frontend build
 RUN apt-get update && apt-get install -y --no-install-recommends curl && \
