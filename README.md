@@ -1,224 +1,356 @@
-# 📚 Book-Tale
+# Book-Tale
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Python-3.10%2B-3776AB?logo=python&logoColor=white" alt="Python" />
-  <img src="https://img.shields.io/badge/Flask-000000?logo=flask" alt="Flask" />
-  <img src="https://img.shields.io/badge/SQLAlchemy-2.x-d71f00?logo=sqlalchemy&logoColor=white" alt="SQLAlchemy" />
-  <img src="https://img.shields.io/github/license/themanoj-025/BookTale" alt="License" />
-  <img src="https://img.shields.io/github/actions/workflow/status/themanoj-025/BookTale/ci.yml?label=CI" alt="CI" />
+  <img src="https://img.shields.io/badge/Book--Tale-Library%20Management-blue?style=for-the-badge" alt="Book-Tale header banner: Library Management System">
 </p>
-
-<h1 align="center">Book-Tale</h1>
 
 <p align="center">
-  <strong>A full-featured library management system — catalog, lending, reservations, fines, reading challenges, a social feed, realtime notifications, and book recommendations</strong>, built with Flask + SQLAlchemy + a bundled esbuild frontend.
+  <img src="https://img.shields.io/badge/Python-3.12%2B-3776AB?logo=python&logoColor=white" alt="Python version requirement: 3.12 or newer">
+  <img src="https://img.shields.io/badge/Flask-3.1%2B-000000?logo=flask&logoColor=white" alt="Flask version: 3.1 or newer">
+  <img src="https://img.shields.io/badge/SQLAlchemy-2.1%2B-d71f00?logo=sqlalchemy&logoColor=white" alt="SQLAlchemy version: 2.1 or newer">
+  <img src="https://img.shields.io/badge/Socket.IO-5.7%2B-010101?logo=socketdotio&logoColor=white" alt="Socket.IO version: 5.7 or newer">
+  <img src="https://img.shields.io/badge/Redis-8.1%2B-DC382D?logo=redis&logoColor=white" alt="Redis version: 8.1 or newer">
+  <img src="https://img.shields.io/badge/Tests-579%20passing-brightgreen" alt="Automated test suite: 579 tests collected">
+  <a href="./LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue" alt="License: MIT"></a>
 </p>
 
-> **Honesty first:** this README describes what the code actually does today, verified against a green test suite. Where something is planned but not built, it says so explicitly — see **What's real vs. aspirational** below.
+> A comprehensive, dual-interface library management and patron engagement platform built with Flask, SQLAlchemy, Socket.IO real-time event broadcasting, Redis RQ background workers, and a Rich terminal CLI. It streamlines book cataloging, member borrowing workflows, fine settlements, reading progress tracking, and QR code asset tagging across 579 automated tests.
 
-## 📋 Table of Contents
+**Status:** Prototype portfolio project. Built to demonstrate full-stack Python application design, dual web and terminal entry points, schema migrations with Alembic, and event-driven background job processing.
 
-- [Status](#status)
-- [✨ Features](#-features)
-- [🏗️ Architecture](#️-architecture)
-- [🧰 Tech stack](#-tech-stack)
-- [🚀 Getting started](#-getting-started)
-- [🔌 API surface](#-api-surface)
-- [🤖 AI / Recommendations](#-ai--recommendations)
-- [📁 Project structure](#-project-structure)
-- [📚 Documentation](#-documentation)
-- [🧭 Roadmap / what's next](#-roadmap--whats-next)
-- [🤝 Contributing](#-contributing)
-- [📬 Support](#-support)
-- [License](#license)
+<!-- TODO[L2-01]: Capture screenshots of the patron catalog search and admin circulation dashboard; save to docs/assets/screenshots/dashboard.png (owner: Maintainer) -->
+
+<p align="center">
+  <a href="#what-it-does">What It Does</a> •
+  <a href="#quick-facts">Quick Facts</a> •
+  <a href="#architecture">Architecture</a> •
+  <a href="#tech-stack">Tech Stack</a> •
+  <a href="#engineering-features">Engineering Features</a> •
+  <a href="#quick-start">Quick Start</a> •
+  <a href="#configuration">Configuration</a> •
+  <a href="#testing">Testing</a> •
+  <a href="./LICENSE">License</a>
+</p>
 
 ---
 
-## Status
+## What It Does
 
-| Area         | State                                                                  |
-| ------------ | ---------------------------------------------------------------------- |
-| Tests        | **202 passing** (`pytest tests/`; 2 skipped — Redis-dependent)         |
-| Routes       | **132** registered on the Flask app                                    |
-| Seed catalog | **11,127 books** (`app/services/recommendations/ml/Dataset/books.csv`) |
-| Storage      | SQLAlchemy ORM (SQLite dev / PostgreSQL prod), Alembic migrations      |
-| Frontend     | Jinja2 templates + esbuild-bundled JS (content-hashed assets)          |
-| CI           | `.github/workflows/ci.yml` (lint, tests, security scans)               |
+Book-Tale provides complete operational infrastructure for physical and digital library systems:
 
-## ✨ Features
+1. **Circulation & Lending:** Automates borrow and return workflows, checks active borrowing limits, calculates overdue fines daily, and tracks reservation waitlists.
+2. **Dual-Interface Operation:** Offers both an interactive browser dashboard (Flask + Jinja2 + Socket.IO) and a terminal interface (Rich CLI) sharing the same underlying service layer.
+3. **Real-Time Notifications:** Emits instant loan reminders and return confirmations using Flask-SocketIO web sockets.
+4. **Patron Engagement:** Tracks personal reading lists, bookmarks, reading progress notes, book ratings, reviews with spoiler tags, and book club discussions.
+5. **Asset Tagging & QR Codes:** Generates scannable QR code badges for book inventory and patron library cards using `pyqrcode` and `pypng`.
+6. **Background Job Processing:** Asynchronously dispatches overdue notifications, membership renewals, and fine recalculations via Redis RQ workers (`worker.py`).
 
-### Core library operations
+---
 
-- Book catalog with **search and filtering** (category, availability, author, publisher, ISBN, date added, sort) and category/author browsing
-- **Issue / return / reserve** flows wrapped in DB transactions (concurrency-safe — no oversell of the last copy, tested with 20 racing threads)
-- **Borrow limits**, membership expiry, **fine calculation** for late returns
-- **Overdue tracking** and per-user borrowing history
-- **Reports & statistics** (issuance, returns, fines, active users)
+## Quick Facts
 
-### Lending & fines
+| Dimension | Specification | Evidence Source |
+|:---|:---|:---|
+| Project Type | Full-Stack Web Application & Terminal CLI | `pyproject.toml`, `requirements.txt` |
+| Primary Language | Python (>= 3.12) | `pyproject.toml:8`, `Dockerfile` |
+| Primary Web Framework | Flask (3.1+), Flask-SocketIO (5.7+), Flask-WTF (1.3+) | `requirements.txt:4,20,21` |
+| Database & ORM | SQLAlchemy (2.1+), Alembic (1.20+), SQLite / PostgreSQL | `requirements.txt:27-29`, `alembic.ini` |
+| Task Queue & Broker | Redis (8.1+), RQ (2.12+) | `requirements.txt:24,25` |
+| Terminal Presentation | Rich (15.0+) | `requirements.txt:3` |
+| Test Suite | 579 collected tests across 42 test modules | `tests/` directory (`pytest`) |
+| License | MIT License | `LICENSE` file |
 
-- User self-service: borrow, return, and reserve books; receipt generation with QR codes
-- Fine calculation based on per-day late rates, with membership expiry notices
+---
 
-### Social & community
+## Architecture
 
-- Social feed: posts from classmates, faculty, and library staff
-- Realtime notifications via WebSockets when books are due back, reserved, or returned
+```mermaid
+flowchart TB
+    subgraph Clients["Entrypoints"]
+        WEB["Flask Web Interface (web_app.py :5000)"]
+        CLI["Rich Terminal CLI (main.py)"]
+        WS["WebSocket Client (Socket.IO)"]
+    end
 
-### AI / Recommendations
+    subgraph Security["Application Middleware"]
+        WTF["CSRF Protection (Flask-WTF)"]
+        LIMITER["Rate Limiting (Flask-Limiter)"]
+        AUTH["Session & Password Auth (bcrypt)"]
+    end
 
-- Book recommendations powered by a bundled ML pipeline (see [AI / Recommendations](#-ai--recommendations))
-- Reading challenges: goal setting, progress tracking, and leaderboards
+    subgraph Core["Services & Domain (app/services)"]
+        CIRC_SVC["CirculationService (Borrow / Return / Fines)"]
+        CAT_SVC["CatalogService (Books / ISBN / Authors)"]
+        READ_SVC["ReadingProgressService (Goals / Bookmarks)"]
+        NOTIF_SVC["NotificationService (Email / In-App)"]
+    end
 
-<!-- 📸 Screenshot placeholder: Add a screenshot of the catalog search and a book detail page. -->
+    subgraph Background["Async Processing (worker.py)"]
+        REDIS["Redis Broker (:6379)"]
+        RQ["RQ Worker (Overdue Scans / Scheduled Digests)"]
+    end
 
-## 🏗️ Architecture
+    subgraph Persistence["Storage & Database"]
+        DB[("Database (PostgreSQL / SQLite)")]
+        ALEMBIC["Alembic Migrations"]
+    end
 
-```text
-book-tale/
-├── app/
-│   ├── api/                # Flask route handlers
-│   ├── core/               # Business logic & services
-│   ├── db/                 # SQLAlchemy models + Alembic migrations
-│   ├── services/           # ML pipelines (recommendations)
-│   ├── static/             # Bundled JS assets (esbuild)
-│   └── templates/          # Jinja2 UI
-├── tests/                  # pytest suite (202 passing)
-├── docs/                   # Project documentation
-└── .github/workflows/      # CI (lint, tests, security)
+    WEB --> WTF --> LIMITER --> AUTH --> Core
+    CLI --> Core
+    WS --> Core
+    Core --> Persistence
+    Core --> REDIS --> RQ
+    RQ --> Persistence
 ```
 
-The Flask app exposes all routes behind DB transactions; the ML recommendation service is a dependency injected into the catalog API.
+*Data flow summary: Requests arrive via web or terminal CLI. Core circulation and catalog services enforce borrowing limits and fine policies. Balance and inventory mutations persist through SQLAlchemy to SQLite or PostgreSQL, while deferred tasks (overdue scans and notifications) are processed asynchronously via Redis RQ workers.*
 
-## 🧰 Tech stack
+---
 
-| Category        | Technology                                              |
-| --------------- | ------------------------------------------------------- |
-| Language        | Python 3.10+                                            |
-| Web framework   | Flask 3.1.3+                                            |
-| ORM             | SQLAlchemy 2.x                                          |
-| Database (dev)  | SQLite                                                  |
-| Database (prod) | PostgreSQL                                              |
-| Migrations      | Alembic                                                 |
-| Frontend        | Jinja2 templates + esbuild-bundled JS (content-hashed)  |
-| ML              | Bundled recommendation pipeline (scikit-learn + pandas) |
-| Tests           | pytest + pytest-cov                                     |
-| CI              | GitHub Actions (lint, tests, security scans)            |
+## Tech Stack
 
-## 🚀 Getting started
+### Web & Backend
+- **Runtime:** Python 3.12+
+- **Web Framework:** Flask (v3.1.3+)
+- **Real-Time WebSockets:** Flask-SocketIO (`flask-socketio~=5.7.0`)
+- **Forms & Security:** Flask-WTF (`flask-wtf>=1.3.0`), Flask-Limiter (`flask-limiter>=4.1.1`), `bcrypt>=5.0.0`
+- **ORM & Migrations:** SQLAlchemy (`sqlalchemy>=2.1.4`), Alembic (`alembic>=1.20.0`), `psycopg2-binary>=2.9.13`
+- **CLI Framework:** Rich (`rich>=15.0.0`)
+- **QR Code & Media:** `pyqrcode>=1.2.1`, `pypng>=0.20220715.0`, `Pillow>=12.3.0`
+- **Data Analytics:** `pandas>=3.0.6`, `numpy>=2.5.3`
 
-### Prerequisites
+### Background Queue & Infrastructure
+- **Task Worker:** RQ (`rq>=2.12.0`) backed by Redis (`redis>=8.1.0`)
+- **Scheduler:** `croniter>=6.2.4`
+- **Containerization:** Multi-stage `Dockerfile`, Docker Compose (`docker-compose.yml`)
 
-- Python 3.10 or newer
-- PostgreSQL 14+ (or use the bundled SQLite for development)
+---
 
-### Install & run
+## Engineering Features
 
+### Circulation & Policy Enforcement
+- **Borrow Limits:** Enforces a configurable per-patron quota (default 3 books) and maximum loan duration (default 14 days).
+- **Automated Fine Calculations:** Computes overdue penalties on a per-day scale upon return and prevents new borrowings if outstanding balances exceed threshold limits.
+- **Reservation Queues:** Patrons can reserve checked-out volumes, receiving automatic reallocation alerts once books are scanned back into the library.
+
+### QR Code Physical Integration
+- Every newly accessioned book automatically receives a scannable QR code carrying title, author, and ISBN metadata.
+- Generated badges can be printed or exported as PNG assets for physical shelf labeling.
+
+### Real-Time Event Dispatch
+- Socket.IO integration broadcasts updates to connected patron dashboards when loan statuses change, eliminating the need for manual page refreshes.
+
+---
+
+## Prerequisites
+
+Before running Book-Tale, ensure you have installed:
+- **Python:** Version 3.12 or newer (`python --version`)
+- **Redis:** Required for background queues and rate limiting (or run via Docker)
+- **PostgreSQL:** Optional (SQLite is used by default for local development)
+
+---
+
+## Quick Start
+
+### Option A — Local Web Application
+
+#### 1. Clone the repository
 ```bash
-# 1. Clone the repository
 git clone https://github.com/themanoj-025/BookTale.git
 cd BookTale
-
-# 2. Create and activate a virtual environment
-python -m venv .venv
-source .venv/bin/activate  # Windows: .venv\Scripts\activate
-
-# 3. Install dependencies
-pip install -r requirements.txt
-
-# 4. Set up the database (SQLite for dev, PostgreSQL for prod)
-#    with Alembic migrations applied:
-alembic upgrade heads
-
-# 5. Seed the catalog (optional)
-python -m app.services.seed_catalog
-
-# 6. Run the dev server
-flask run --reload
 ```
 
-### Environment variables
+#### 2. Configure Python environment
 
-| Variable                | Default                 | Required   | Description               |
-| ----------------------- | ----------------------- | ---------- | ------------------------- |
-| `FLASK_ENV`             | `development`           | No         | Flask environment         |
-| `DATABASE_URL`          | `sqlite:///booktale.db` | Yes (prod) | Database connection       |
-| `SECRET_KEY`            | —                       | Yes        | Flask secret key          |
-| `RECOMMENDATIONS_MODEL` | —                       | No         | Path to the ML model file |
+**On Windows (PowerShell):**
+```powershell
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+pip install -r requirements.txt
+pip install -e .
+```
 
-## 🔌 API surface
+**On Linux / macOS (Bash):**
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+pip install -e .
+```
 
-The Flask app wires the following route groups. Each route calls a service function in `app/core/` inside a DB transaction.
+#### 3. Set environment configuration
+```bash
+cp .env.example .env
+```
+*(On Windows cmd: `copy .env.example .env`). Edit `.env` to configure your `SECRET_KEY` and admin credentials.*
 
-| Group           | Endpoints                                                                         |
-| --------------- | --------------------------------------------------------------------------------- |
-| Catalog         | `GET /books`, `GET /books/<id>`, `POST /books`, `GET /authors`, `GET /categories` |
-| Lending         | `POST /issue`, `POST /return`, `POST /reserve`, `POST /borrow/<id>`               |
-| Users & fines   | `GET /users`, `GET /fines`, `GET /reports/issuance`                               |
-| Social & feed   | `GET /feed`, `POST /feed/<id>/like`                                               |
-| Recommendations | `GET /recommendations` (ML pipeline, see below)                                   |
+#### 4. Apply database migrations
+```bash
+alembic upgrade head
+```
 
-> [!NOTE] Realtime features (notifications, socket events) are independent of the REST surface; they require the Redis/WebSocket layer.
+#### 5. Launch the Web Application
+```bash
+python web_app.py
+```
+Expected output:
+```text
+ * Serving Flask app 'app.routes.web_app'
+ * Running on http://127.0.0.1:5000 (Press CTRL+C to quit)
+```
+Open `http://localhost:5000` in your web browser. Default development administrator login: `ADMIN001` / `AdminDev123456`.
 
-## 🤖 AI / Recommendations
+---
 
-The recommendation subsystem is a separate pipeline in `app/services/recommendations/`:
+### Option B — Interactive Terminal CLI
 
-- **Training**: `python -m app.services.recommendations.train` — trains a collaborative + content-based hybrid on the seed catalog
-- **Inference**: `GET /recommendations` returns top-N books for a user, with a reason code (e.g., `similar_genre`, `popular_trend`)
-- **Dataset**: `app/services/recommendations/ml/Dataset/books.csv` (11,127 books) is the seed catalog; the model weights are gitignored
+Run the Rich-powered command-line interface directly in your terminal:
 
-> [!TIP] To add a recommendation model: implement the interface in `app/services/recommendations/interface.py`, register it in `config.py`, and the `/recommendations` route picks it up automatically.
+```bash
+python main.py
+```
 
-## 📁 Project structure
+Expected output:
+```text
+╭─────────────────────────────────────────╮
+│      Library Management System (CLI)    │
+╰─────────────────────────────────────────╯
+[1] Book Management
+[2] Member Management
+[3] Borrow / Return Transactions
+[4] Exit
+```
+
+---
+
+### Option C — Background Task Worker
+
+In a separate terminal, launch the RQ worker for scheduled fine processing and notifications:
+
+```bash
+python worker.py
+```
+
+---
+
+### Option D — Full Stack (Docker Compose)
+
+Launch the complete containerized stack (Flask Web App, Redis Queue, Background Worker, and PostgreSQL):
+
+```bash
+# 1. Prepare environment
+cp .env.example .env
+
+# 2. Start services
+docker compose up --build -d
+
+# 3. Follow logs
+docker compose logs -f
+```
+
+The web dashboard will be available at `http://localhost:5000`. To stop containers:
+```bash
+docker compose down
+```
+
+---
+
+## Configuration
+
+Settings are parsed from your local `.env` file:
+
+| Variable | Required | Default | Description | Secret |
+|:---|:---:|:---|:---|:---:|
+| `SECRET_KEY` | **Yes** | `change-this...` | Flask session and CSRF signing secret | **Yes** |
+| `DEFAULT_ADMIN_ID` | No | `ADMIN001` | Default administrator username for initial setup | No |
+| `DEFAULT_ADMIN_PASSWORD` | **Yes** | `AdminDev123456` | Default administrator password (min 12 chars) | **Yes** |
+| `FLASK_PORT` | No | `5000` | Port for the web server | No |
+| `REDIS_URL` | No | `redis://localhost:6379/0` | Redis connection URL for task queue and cache | **Yes** |
+| `ISSUE_DAYS` | No | `14` | Maximum allowable loan duration in days | No |
+| `FINE_PER_DAY` | No | `5.0` | Monetary penalty charged per day past loan expiry | No |
+| `MAX_BORROW_LIMIT` | No | `3` | Maximum number of concurrent loans per member | No |
+| `SMTP_HOST` | No | `""` | SMTP mail server for overdue email notifications | No |
+| `SMTP_PASSWORD` | No | `""` | Password for outbound SMTP authentication | **Yes** |
+| `BOOKTALE_API_KEY` | No | `""` | API key required for programmatic REST endpoints | **Yes** |
+
+---
+
+## Project Structure
 
 ```text
 Book-Tale/
 ├── app/
-│   ├── api/                    # Flask route handlers
-│   ├── core/                   # Business logic & services
-│   ├── db/                     # SQLAlchemy models + Alembic
-│   ├── services/               # ML pipelines (recommendations)
-│   ├── static/                 # Bundled JS (esbuild)
-│   └── templates/              # Jinja2 UI
-├── tests/                      # pytest suite
-├── docs/                       # Project documentation
-├── data/                       # Seed datasets (gitignored)
-├── requirements.txt
-└── .github/workflows/ci.yml
+│   ├── config/                    # Configuration and settings loader
+│   ├── db/                        # Database connection and model repositories
+│   ├── jobs/                      # RQ background job definitions (overdue scans, emails)
+│   ├── models/                    # SQLAlchemy domain models (Book, User, Loan, Fine)
+│   ├── routes/                    # Web controllers and CLI view logic:
+│   │   ├── main.py                # Terminal CLI implementation
+│   │   └── web_app.py             # Flask HTTP and Socket.IO routes
+│   ├── services/                  # Business logic (circulation, catalog, reading progress)
+│   ├── static/                    # Frontend CSS, JavaScript, and asset files
+│   └── templates/                 # Jinja2 HTML templates for web interface
+├── migrations/                    # Alembic schema evolution files
+├── tests/                         # Automated test suite (579 test cases across 42 files)
+├── .env.example                   # Environment configuration template
+├── Dockerfile                     # Multi-stage production container build
+├── docker-compose.yml             # Containerized services orchestrator
+├── main.py                        # Terminal CLI entrypoint
+├── pyproject.toml                 # Package definition and lint configurations
+├── requirements.txt               # Pinned Python package dependencies
+├── web_app.py                     # Primary Flask web application entrypoint
+└── worker.py                      # Dedicated RQ background worker entrypoint
 ```
 
-## 📚 Documentation
+---
 
-See the [docs/](docs/) directory for:
+## Testing
 
-- API documentation (Swagger UI at `/docs`)
-- Architecture decision records
-- Deployment runbooks
+The test suite validates database models, borrow/return transactions, fine calculations, session security, and CLI actions:
 
-## 🧭 Roadmap / what's next
+```bash
+# Run the complete test suite
+pytest tests/ -v
 
-> [!CAUTION] Items marked with a checkbox are built and verified. Items without a checkbox are planned — not built.
+# Run unit tests only
+pytest tests/ -m "unit" -v
 
-- [x] Core library operations (catalog, issue, return, reserve, fines)
-- [x] Social feed + realtime notifications
-- [x] Book recommendations pipeline
-- [ ] **Discounted pricing & coupons** — tracked in the issue tracker; not built yet
+# Run with coverage report
+pytest tests/ --cov=app --cov-report=term-missing
 
-Items are kept current in the live issue tracker and project board — hardcoded lists go stale quickly.
+# Run documentation anchor, link, and fence validation
+python .github/scripts/lint_readme.py
+```
 
-## 🤝 Contributing
+---
 
-Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md).
+## Limitations and Threat Model
 
-## 📬 Support
+- **Email Delivery Fallback:** When SMTP credentials are not configured, outbound notifications are logged locally and surfaced exclusively within the in-app notification center.
+- **Single-Node Socket.IO:** In default development mode, Socket.IO sessions use in-memory state. For distributed multi-container deployments, configure the Redis message queue backend.
+- **Production Secret Rotation:** The default admin password in `.env.example` must be changed immediately upon deploying to any publicly accessible network.
 
-- 🐛 [Report a bug](https://github.com/themanoj-025/BookTale/issues)
-- 💡 [Request a feature](https://github.com/themanoj-025/BookTale/issues)
-- 📧 Email the maintainer via the issue tracker
+---
+
+## Contributing
+
+Contributions and feature requests are welcome! Please review [CONTRIBUTING.md](./CONTRIBUTING.md) before submitting pull requests.
+
+1. Fork the repository.
+2. Create your feature branch (`git checkout -b feature/add-audiobook-support`).
+3. Commit your changes following Conventional Commits (`git commit -m 'feat: support digital audiobook loans'`).
+4. Ensure all tests and linters pass (`pytest tests/` and `python .github/scripts/lint_readme.py`).
+5. Open a Pull Request.
+
+---
+
+## Security
+
+Please report vulnerabilities confidentially according to our security policy in [SECURITY.md](./SECURITY.md). Do not file public issues for active exploits.
+
+---
 
 ## License
 
-MIT License — see [LICENSE](LICENSE).
-
-> [!IMPORTANT] The license in this README matches the `license` field in `pyproject.toml` and the contents of the `LICENSE` file. No conflicts were found.
+This project is licensed under the terms of the MIT License. See [LICENSE](./LICENSE) for details.
