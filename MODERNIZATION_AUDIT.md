@@ -7,14 +7,14 @@ was captured against a fresh Python 3.12 environment built from this repo's mani
 
 ## Baseline (Phase 0)
 
-| gate | result |
-|---|---|
-| dependency install | PASS |
-| pytest run 1 | PASS |
+| gate                     | result      |
+| ------------------------ | ----------- |
+| dependency install       | PASS        |
+| pytest run 1             | PASS        |
 | pytest run 2 (flakiness) | FAIL (rc=1) |
-| ruff lint | PASS |
-| mypy | FAIL (rc=1) |
-| app import/boot smoke | FAIL |
+| ruff lint                | PASS        |
+| mypy                     | FAIL (rc=1) |
+| app import/boot smoke    | FAIL        |
 
 - Docker build/start gates: **NOT VERIFIED** (no docker daemon in the audit environment).
 

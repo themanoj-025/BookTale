@@ -12,11 +12,11 @@ from sklearn.metrics import calinski_harabasz_score, davies_bouldin_score, silho
 from sklearn.metrics.pairwise import cosine_similarity
 
 from app.services.recommendations.ml_models.ml_pkg.data_loading import (
+    ALGORITHM_COLORS,
     N_CLUSTERS,
     RANDOM_STATE,
     TOP_N_RECS,
 )
-from app.services.recommendations.ml_models.ml_pkg.data_loading import ALGORITHM_COLORS
 
 logger = logging.getLogger(__name__)
 

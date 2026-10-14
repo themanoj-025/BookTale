@@ -17,7 +17,7 @@ dataset or triggering an offline/caching path.
 - `app/services/recommendations/ml_images/*.jpg` — model reference
   thumbnails referenced by the CLI report generator.
 
-They are *data*, not trained artifacts: no `.pkl`, `.joblib`, `.h5`,
+They are _data_, not trained artifacts: no `.pkl`, `.joblib`, `.h5`,
 `.onnx` or other serialized weights live in `app/services/recommendations/`.
 
 ## What is intentionally gitignored instead
@@ -34,8 +34,8 @@ They are *data*, not trained artifacts: no `.pkl`, `.joblib`, `.h5`,
 `.gitignore` therefore contains a documented exception so that nothing
 accidentally re-adds the legacy tree:
 
-* ML artifacts (raw scripts + dataset + images) — gitignored, see
-  **MODERNIZATION_AUDIT.md**. *(added 2026-09-29)*
+- ML artifacts (raw scripts + dataset + images) — gitignored, see
+  **MODERNIZATION_AUDIT.md**. _(added 2026-09-29)_
 
 The `ml Datasets/` and `ml Images/` directories below are the only
 `app/services/recommendations/` files committed today; everything else in

@@ -10,11 +10,11 @@ documentation by hand.
 
 ## Tools & Models Used
 
-| Tool | Provider / Model | Interface | Approx. dates used |
-|---|---|---|---|
-| **Claude / Opus** | Anthropic | CLI agent + web chat | 2025-11 → 2026-09 |
-| **Cursor** | Anthropic (via IDE) | IDE agent | 2026-03 → 2026-09 |
-| **GitHub Copilot** | GitHub | IDE completion | 2025-11 → 2026-09 |
+| Tool               | Provider / Model    | Interface            | Approx. dates used |
+| ------------------ | ------------------- | -------------------- | ------------------ |
+| **Claude / Opus**  | Anthropic           | CLI agent + web chat | 2025-11 → 2026-09  |
+| **Cursor**         | Anthropic (via IDE) | IDE agent            | 2026-03 → 2026-09  |
+| **GitHub Copilot** | GitHub              | IDE completion       | 2025-11 → 2026-09  |
 
 ## Scope — What AI Did vs. What Humans Did
 

@@ -49,16 +49,16 @@ Book-Tale provides complete operational infrastructure for physical and digital 
 
 ## Quick Facts
 
-| Dimension | Specification | Evidence Source |
-|:---|:---|:---|
-| Project Type | Full-Stack Web Application & Terminal CLI | `pyproject.toml`, `requirements.txt` |
-| Primary Language | Python (>= 3.12) | `pyproject.toml:8`, `Dockerfile` |
-| Primary Web Framework | Flask (3.1+), Flask-SocketIO (5.7+), Flask-WTF (1.3+) | `requirements.txt:4,20,21` |
-| Database & ORM | SQLAlchemy (2.1+), Alembic (1.20+), SQLite / PostgreSQL | `requirements.txt:27-29`, `alembic.ini` |
-| Task Queue & Broker | Redis (8.1+), RQ (2.12+) | `requirements.txt:24,25` |
-| Terminal Presentation | Rich (15.0+) | `requirements.txt:3` |
-| Test Suite | 579 collected tests across 42 test modules | `tests/` directory (`pytest`) |
-| License | MIT License | `LICENSE` file |
+| Dimension             | Specification                                           | Evidence Source                         |
+| :-------------------- | :------------------------------------------------------ | :-------------------------------------- |
+| Project Type          | Full-Stack Web Application & Terminal CLI               | `pyproject.toml`, `requirements.txt`    |
+| Primary Language      | Python (>= 3.12)                                        | `pyproject.toml:8`, `Dockerfile`        |
+| Primary Web Framework | Flask (3.1+), Flask-SocketIO (5.7+), Flask-WTF (1.3+)   | `requirements.txt:4,20,21`              |
+| Database & ORM        | SQLAlchemy (2.1+), Alembic (1.20+), SQLite / PostgreSQL | `requirements.txt:27-29`, `alembic.ini` |
+| Task Queue & Broker   | Redis (8.1+), RQ (2.12+)                                | `requirements.txt:24,25`                |
+| Terminal Presentation | Rich (15.0+)                                            | `requirements.txt:3`                    |
+| Test Suite            | 579 collected tests across 42 test modules              | `tests/` directory (`pytest`)           |
+| License               | MIT License                                             | `LICENSE` file                          |
 
 ---
 
@@ -103,13 +103,14 @@ flowchart TB
     RQ --> Persistence
 ```
 
-*Data flow summary: Requests arrive via web or terminal CLI. Core circulation and catalog services enforce borrowing limits and fine policies. Balance and inventory mutations persist through SQLAlchemy to SQLite or PostgreSQL, while deferred tasks (overdue scans and notifications) are processed asynchronously via Redis RQ workers.*
+_Data flow summary: Requests arrive via web or terminal CLI. Core circulation and catalog services enforce borrowing limits and fine policies. Balance and inventory mutations persist through SQLAlchemy to SQLite or PostgreSQL, while deferred tasks (overdue scans and notifications) are processed asynchronously via Redis RQ workers._
 
 ---
 
 ## Tech Stack
 
 ### Web & Backend
+
 - **Runtime:** Python 3.12+
 - **Web Framework:** Flask (v3.1.3+)
 - **Real-Time WebSockets:** Flask-SocketIO (`flask-socketio~=5.7.0`)
@@ -120,6 +121,7 @@ flowchart TB
 - **Data Analytics:** `pandas>=3.0.6`, `numpy>=2.5.3`
 
 ### Background Queue & Infrastructure
+
 - **Task Worker:** RQ (`rq>=2.12.0`) backed by Redis (`redis>=8.1.0`)
 - **Scheduler:** `croniter>=6.2.4`
 - **Containerization:** Multi-stage `Dockerfile`, Docker Compose (`docker-compose.yml`)
@@ -129,15 +131,18 @@ flowchart TB
 ## Engineering Features
 
 ### Circulation & Policy Enforcement
+
 - **Borrow Limits:** Enforces a configurable per-patron quota (default 3 books) and maximum loan duration (default 14 days).
 - **Automated Fine Calculations:** Computes overdue penalties on a per-day scale upon return and prevents new borrowings if outstanding balances exceed threshold limits.
 - **Reservation Queues:** Patrons can reserve checked-out volumes, receiving automatic reallocation alerts once books are scanned back into the library.
 
 ### QR Code Physical Integration
+
 - Every newly accessioned book automatically receives a scannable QR code carrying title, author, and ISBN metadata.
 - Generated badges can be printed or exported as PNG assets for physical shelf labeling.
 
 ### Real-Time Event Dispatch
+
 - Socket.IO integration broadcasts updates to connected patron dashboards when loan statuses change, eliminating the need for manual page refreshes.
 
 ---
@@ -145,6 +150,7 @@ flowchart TB
 ## Prerequisites
 
 Before running Book-Tale, ensure you have installed:
+
 - **Python:** Version 3.12 or newer (`python --version`)
 - **Redis:** Required for background queues and rate limiting (or run via Docker)
 - **PostgreSQL:** Optional (SQLite is used by default for local development)
@@ -156,6 +162,7 @@ Before running Book-Tale, ensure you have installed:
 ### Option A — Local Web Application
 
 #### 1. Clone the repository
+
 ```bash
 git clone https://github.com/themanoj-025/BookTale.git
 cd BookTale
@@ -164,6 +171,7 @@ cd BookTale
 #### 2. Configure Python environment
 
 **On Windows (PowerShell):**
+
 ```powershell
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
@@ -172,6 +180,7 @@ pip install -e .
 ```
 
 **On Linux / macOS (Bash):**
+
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
@@ -180,25 +189,32 @@ pip install -e .
 ```
 
 #### 3. Set environment configuration
+
 ```bash
 cp .env.example .env
 ```
-*(On Windows cmd: `copy .env.example .env`). Edit `.env` to configure your `SECRET_KEY` and admin credentials.*
+
+_(On Windows cmd: `copy .env.example .env`). Edit `.env` to configure your `SECRET_KEY` and admin credentials._
 
 #### 4. Apply database migrations
+
 ```bash
 alembic upgrade head
 ```
 
 #### 5. Launch the Web Application
+
 ```bash
 python web_app.py
 ```
+
 Expected output:
+
 ```text
  * Serving Flask app 'app.routes.web_app'
  * Running on http://127.0.0.1:5000 (Press CTRL+C to quit)
 ```
+
 Open `http://localhost:5000` in your web browser. Default development administrator login: `ADMIN001` / `AdminDev123456`.
 
 ---
@@ -212,6 +228,7 @@ python main.py
 ```
 
 Expected output:
+
 ```text
 ╭─────────────────────────────────────────╮
 │      Library Management System (CLI)    │
@@ -250,6 +267,7 @@ docker compose logs -f
 ```
 
 The web dashboard will be available at `http://localhost:5000`. To stop containers:
+
 ```bash
 docker compose down
 ```
@@ -260,19 +278,19 @@ docker compose down
 
 Settings are parsed from your local `.env` file:
 
-| Variable | Required | Default | Description | Secret |
-|:---|:---:|:---|:---|:---:|
-| `SECRET_KEY` | **Yes** | `change-this...` | Flask session and CSRF signing secret | **Yes** |
-| `DEFAULT_ADMIN_ID` | No | `ADMIN001` | Default administrator username for initial setup | No |
-| `DEFAULT_ADMIN_PASSWORD` | **Yes** | `AdminDev123456` | Default administrator password (min 12 chars) | **Yes** |
-| `FLASK_PORT` | No | `5000` | Port for the web server | No |
-| `REDIS_URL` | No | `redis://localhost:6379/0` | Redis connection URL for task queue and cache | **Yes** |
-| `ISSUE_DAYS` | No | `14` | Maximum allowable loan duration in days | No |
-| `FINE_PER_DAY` | No | `5.0` | Monetary penalty charged per day past loan expiry | No |
-| `MAX_BORROW_LIMIT` | No | `3` | Maximum number of concurrent loans per member | No |
-| `SMTP_HOST` | No | `""` | SMTP mail server for overdue email notifications | No |
-| `SMTP_PASSWORD` | No | `""` | Password for outbound SMTP authentication | **Yes** |
-| `BOOKTALE_API_KEY` | No | `""` | API key required for programmatic REST endpoints | **Yes** |
+| Variable                 | Required | Default                    | Description                                       | Secret  |
+| :----------------------- | :------: | :------------------------- | :------------------------------------------------ | :-----: |
+| `SECRET_KEY`             | **Yes**  | `change-this...`           | Flask session and CSRF signing secret             | **Yes** |
+| `DEFAULT_ADMIN_ID`       |    No    | `ADMIN001`                 | Default administrator username for initial setup  |   No    |
+| `DEFAULT_ADMIN_PASSWORD` | **Yes**  | `AdminDev123456`           | Default administrator password (min 12 chars)     | **Yes** |
+| `FLASK_PORT`             |    No    | `5000`                     | Port for the web server                           |   No    |
+| `REDIS_URL`              |    No    | `redis://localhost:6379/0` | Redis connection URL for task queue and cache     | **Yes** |
+| `ISSUE_DAYS`             |    No    | `14`                       | Maximum allowable loan duration in days           |   No    |
+| `FINE_PER_DAY`           |    No    | `5.0`                      | Monetary penalty charged per day past loan expiry |   No    |
+| `MAX_BORROW_LIMIT`       |    No    | `3`                        | Maximum number of concurrent loans per member     |   No    |
+| `SMTP_HOST`              |    No    | `""`                       | SMTP mail server for overdue email notifications  |   No    |
+| `SMTP_PASSWORD`          |    No    | `""`                       | Password for outbound SMTP authentication         | **Yes** |
+| `BOOKTALE_API_KEY`       |    No    | `""`                       | API key required for programmatic REST endpoints  | **Yes** |
 
 ---
 
