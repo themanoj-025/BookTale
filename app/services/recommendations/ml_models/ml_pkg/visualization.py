@@ -17,7 +17,6 @@ from app.services.recommendations.ml_models.ml_pkg.data_loading import (
 )
 from app.services.recommendations.ml_models.ml_pkg.evaluation import ModelResult
 
-
 logger = logging.getLogger(__name__)
 
 

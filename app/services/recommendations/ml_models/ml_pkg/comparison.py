@@ -7,14 +7,15 @@ import logging
 import numpy as np
 
 from app.services.recommendations.ml_models.ml_pkg.data_loading import (
+    ALGORITHM_COLORS,
     DATA_PATH,
     OUTPUT_DIR,
-)
-from app.services.recommendations.ml_models.ml_pkg.data_loading import (
-    ALGORITHM_COLORS,
     get_numerical_features,
     get_tfidf_features,
     load_and_preprocess_data,
+)
+from app.services.recommendations.ml_models.ml_pkg.evaluation import (
+    content_based_filtering,
 )
 from app.services.recommendations.ml_models.ml_pkg.models import (
     agglomerative_model,
@@ -27,9 +28,6 @@ from app.services.recommendations.ml_models.ml_pkg.models import (
     svd_model,
     tsne_kmeans_model,
     xgboost_model,
-)
-from app.services.recommendations.ml_models.ml_pkg.evaluation import (
-    content_based_filtering,
 )
 from app.services.recommendations.ml_models.ml_pkg.visualization import (
     save_bar_comparison,

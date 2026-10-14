@@ -8,15 +8,15 @@ conversation transcripts.
 
 ## Contents
 
-| File | Purpose |
-|------|---------|
-| `README.md` | This directory index |
-| `AI_DISCLOSURE.md` | What AI tools were used and what they did |
-| `ai-provenance.json` | Structured machine-readable provenance (schema 1.0) |
-| `PROVENANCE.md` | Human-readable milestone ledger with commit hashes |
-| `PROMPTS.md` | Sanitized prompt archive (date-labelled) |
-| `transcripts/README.md` | Transcript directory policy |
-| `transcripts/` | Sanitized conversation exports (see `transcripts/README.md`) |
+| File                    | Purpose                                                      |
+| ----------------------- | ------------------------------------------------------------ |
+| `README.md`             | This directory index                                         |
+| `AI_DISCLOSURE.md`      | What AI tools were used and what they did                    |
+| `ai-provenance.json`    | Structured machine-readable provenance (schema 1.0)          |
+| `PROVENANCE.md`         | Human-readable milestone ledger with commit hashes           |
+| `PROMPTS.md`            | Sanitized prompt archive (date-labelled)                     |
+| `transcripts/README.md` | Transcript directory policy                                  |
+| `transcripts/`          | Sanitized conversation exports (see `transcripts/README.md`) |
 
 ---
 
