@@ -1,92 +1,169 @@
-# Python
+# ==============================================================================
+# Book-Tale - Security & Production .gitignore
+# ==============================================================================
+
+# ------------------------------------------------------------------------------
+# 1. SECRETS & ENVIRONMENT VARIABLES (CRITICAL)
+# ------------------------------------------------------------------------------
+.env
+.env.*
+*.env
+.env.local
+.env.development
+.env.test
+.env.staging
+.env.production
+!.env.example
+!.env.template
+!.env.sample
+
+# Private keys, certificates & credentials
+*.pem
+*.key
+*.keystore
+*.jks
+*.p12
+*.pfx
+*.pkcs12
+*.cer
+*.crt
+*.der
+*.id_rsa
+id_rsa*
+id_ed25519*
+id_ecdsa*
+id_dsa*
+
+# Cloud & service credentials
+credentials.json
+client_secret*.json
+service-account*.json
+service_account*.json
+serviceAccountKey*.json
+google-services.json
+GoogleService-Info.plist
+.aws/
+.azure/
+.gcp/
+gcloud/
+.act-secrets
+*.publishsettings
+
+# Authentication tokens & configs
+.netrc
+.pypirc
+.npmrc
+*token*.json
+token.pickle
+auth*.json
+
+# ------------------------------------------------------------------------------
+# 2. PYTHON RUNTIME, BUILDS & VIRTUAL ENVIRONMENTS
+# ------------------------------------------------------------------------------
 __pycache__/
 *.py[cod]
-*.egg-info/
-dist/
-# ...but NOT static/dist: built assets + manifest are committed so a fresh
-# clone serves hashed URLs without running npm first.
-!app/static/dist/
-build/
+*$py.class
+*.so
+.Python
 *.egg
 .eggs/
+*.egg-info/
+dist/
+build/
 
-# Virtual environment
+# Static dist is committed so a fresh clone serves hashed URLs without running npm first:
+!app/static/dist/
+
+# Virtual environments
 venv/
 env/
 .venv/
 ENV/
+env.bak/
+venv.bak/
 
-# Environment & secrets (NEVER COMMIT)
-.env
-.env.*
-!.env.example
-
-# IDE
-.vscode/*
-!.vscode/settings.json
-.idea/
-*.swp
-*.swo
-
-# Logs
-*.log
-logs/
-
-# Project data (user-generated)
-data/
-backups/
-
-# Generated ML benchmark outputs (ml_pkg/comparison.py)
-data/generated/
-
-# OS
-.DS_Store
-Thumbs.db
-
-# Testing
-.coverage
-htmlcov/
+# ------------------------------------------------------------------------------
+# 3. TESTING & CODE QUALITY
+# ------------------------------------------------------------------------------
+.cache/
 .pytest_cache/
-
-# Frontend build (node_modules never committed; static/dist IS committed so
-# a fresh clone runs without a build step — see the !app/static/dist/ negation above)
-node_modules/
-
-# Jupyter
-.ipynb_checkpoints/
-
-# Backup / temp
-*.bak.gemini/
-
-# Root-level AI tool config only — docs/agents/ copies are tracked.
-/.cursorrules
-
-CLAUDE.md
-
-# Runtime balance log
+.ruff_cache/
+.mypy_cache/
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
 radar_balance.txt
 
-# ── Portfolio-standard ignores (sweep 2026-09) ──────────────
+# ------------------------------------------------------------------------------
+# 4. LOGS, DATA & DATABASE STORAGE
+# ------------------------------------------------------------------------------
+*.log
+logs/
+*.sqlite
+*.sqlite3
 *.db
-*.db-shm
+*.db-journal
 *.db-wal
-.coverage.*
-coverage.xml
+*.db-shm
+*.dump
+*.stackdump
+
+# Project runtime data
+data/
+backups/
+data/generated/
 
 # ML artifacts (scripts + dataset + images) - gitignored, see MODERNIZATION_AUDIT.md
 app/services/recommendations/ml/
 
-# ── docs/ (repository documentation) ────────────────────────────────
-# The audit/modernization docs under docs/ are force-added and tracked
-# (see MODERNIZATION_AUDIT.md / docs/ML_ARTIFACTS_GITIGNORE_EXCEPTION.md).
-# Do not add a blanket `docs/` ignore here; only tool-output noise is ignored.
+# ------------------------------------------------------------------------------
+# 5. FRONTEND & NODE
+# ------------------------------------------------------------------------------
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
 
-# =====================================================================
-# KEEP: AI provenance & transparency files — these must remain
-# visible to any repository viewer. Do not add rules above this block
-# that would shadow a directory these files live in without also
-# adding a negation here. Verified with `git check-ignore -v`.
-# =====================================================================
+# ------------------------------------------------------------------------------
+# 6. IDE & EDITORS
+# ------------------------------------------------------------------------------
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.vscode/*.local.*
+.vscode/mcp.json
+.idea/
+*.swp
+*.swo
+*~
+*.sublime-project
+*.sublime-workspace
+.ipynb_checkpoints/
+*.bak.gemini/
+
+# ------------------------------------------------------------------------------
+# 7. OS FILES & TEMPORARIES
+# ------------------------------------------------------------------------------
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+$RECYCLE.BIN/
+*.tmp
+*.temp
+*.bak
+
+# ==============================================================================
+# KEEP: AI provenance & transparency files — must remain visible
+# ==============================================================================
 !AI_DISCLOSURE.md
 !AI_USAGE.md
 !PROMPTS.md
