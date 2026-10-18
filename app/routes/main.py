@@ -92,7 +92,9 @@ def bootstrap(storage: Storage, auth: AuthManager) -> None:
             sys.stdout.write("DEFAULT_ADMIN_PASSWORD not set! Generated bootstrap credentials:\n")
             sys.stdout.write(f"   Admin ID: {Config.DEFAULT_ADMIN_ID}\n")
             sys.stdout.write(f"   Admin Password: {admin_password}\n")
-            sys.stdout.write("   Set DEFAULT_ADMIN_PASSWORD in your .env file to use a custom password.\n")
+            sys.stdout.write(
+                "   Set DEFAULT_ADMIN_PASSWORD in your .env file to use a custom password.\n"
+            )
         lib = Library(storage)
         lib.register_user(
             user_id=Config.DEFAULT_ADMIN_ID,
