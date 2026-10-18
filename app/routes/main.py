@@ -86,13 +86,13 @@ def bootstrap(storage: Storage, auth: AuthManager) -> None:
 
         admin_password = Config.DEFAULT_ADMIN_PASSWORD
         if not admin_password:
+            import sys
+
             admin_password = secrets.token_urlsafe(16)
-            print_warning("⚠  DEFAULT_ADMIN_PASSWORD not set! Using a randomly generated password.")
-            print_warning(f"   Admin ID: {Config.DEFAULT_ADMIN_ID}")
-            print_warning(f"   Admin Password: {admin_password}")
-            print_warning(
-                "   ⚠  Set DEFAULT_ADMIN_PASSWORD in your .env file to use a custom password."
-            )
+            sys.stdout.write("DEFAULT_ADMIN_PASSWORD not set! Generated bootstrap credentials:\n")
+            sys.stdout.write(f"   Admin ID: {Config.DEFAULT_ADMIN_ID}\n")
+            sys.stdout.write(f"   Admin Password: {admin_password}\n")
+            sys.stdout.write("   Set DEFAULT_ADMIN_PASSWORD in your .env file to use a custom password.\n")
         lib = Library(storage)
         lib.register_user(
             user_id=Config.DEFAULT_ADMIN_ID,
