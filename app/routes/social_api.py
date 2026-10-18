@@ -103,8 +103,16 @@ def register_social_api_routes(app, _rate_limit) -> None:
         if not file.filename:
             return jsonify({"success": False, "error": "No file selected"})
         utype = request.form.get("type", "post")
-        ext = os.path.splitext(file.filename)[1].lower()
-        if ext not in Config.ALLOWED_EXTENSIONS:
+        ALLOWED_EXT_MAP = {
+            ".png": ".png",
+            ".jpg": ".jpg",
+            ".jpeg": ".jpeg",
+            ".gif": ".gif",
+            ".webp": ".webp",
+        }
+        raw_ext = os.path.splitext(file.filename)[1].lower()
+        safe_ext = ALLOWED_EXT_MAP.get(raw_ext)
+        if safe_ext is None or safe_ext not in Config.ALLOWED_EXTENSIONS:
             return jsonify({"success": False, "error": "File type not allowed"})
         file.seek(0, os.SEEK_END)
         size = file.tell()
@@ -112,16 +120,16 @@ def register_social_api_routes(app, _rate_limit) -> None:
         if size > Config.MAX_UPLOAD_SIZE:
             return jsonify({"success": False, "error": "File too large. Max 5MB."})
 
-        ok, data, out_ext = _verify_and_reencode_image(file)
+        ok, data, reencoded_ext = _verify_and_reencode_image(file)
         if not ok:
             log(
                 f"Upload rejected (not a valid image): {file.filename} ({utype})",
                 uid,
             )
             return jsonify({"success": False, "error": "File is not a valid image"})
-        if out_ext is None:
-            out_ext = ext
-        safe_name = f"{uid}_{uuid.uuid4().hex[:12]}{out_ext}"
+        final_ext = ALLOWED_EXT_MAP.get(reencoded_ext, safe_ext)
+        clean_uid = str(uid).replace("/", "").replace("\\", "")
+        safe_name = f"{clean_uid}_{uuid.uuid4().hex[:12]}{final_ext}"
         subdir = "avatars" if utype == "avatar" else "post_images"
         save_dir = os.path.join(Config.UPLOADS_DIR, subdir)
         os.makedirs(save_dir, exist_ok=True)
@@ -139,8 +147,9 @@ def register_social_api_routes(app, _rate_limit) -> None:
     def serve_upload(filename) -> Response:
         from flask import send_from_directory
 
-        full_path = os.path.join(Config.UPLOADS_DIR, filename)
-        if not os.path.exists(full_path):
+        base_dir = os.path.abspath(Config.UPLOADS_DIR)
+        full_path = os.path.abspath(os.path.join(base_dir, filename))
+        if not full_path.startswith(base_dir + os.sep) or not os.path.exists(full_path):
             return jsonify({"error": "File not found"}), 404
         return send_from_directory(Config.UPLOADS_DIR, filename)
 
