@@ -25,7 +25,7 @@ croniter==6.2.4
     #   rq
 deprecated==1.3.1
     # via limits
-fakeredis==2.39.0
+fakeredis==2.40.0
     # via -r requirements.txt
 flask==3.1.3
     # via
@@ -42,8 +42,6 @@ flask-socketio==5.7.0
     # via -r requirements.txt
 flask-wtf==1.3.0
     # via -r requirements.txt
-greenlet==3.5.5
-    # via sqlalchemy
 h11==0.16.0
     # via wsproto
 idna==3.19
@@ -75,7 +73,7 @@ markupsafe==3.0.3
     #   wtforms
 mdurl==0.1.2
     # via markdown-it-py
-numpy==2.5.3
+numpy==2.5.4
     # via
     #   -r requirements.txt
     #   pandas
@@ -149,7 +147,9 @@ typing-extensions==4.16.0
     #   limits
     #   sqlalchemy
 urllib3==2.8.0
-    # via requests
+    # via
+    #   -r requirements.txt
+    #   requests
 werkzeug==3.1.8
     # via
     #   flask
