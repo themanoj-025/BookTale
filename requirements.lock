@@ -1,4 +1,4 @@
-alembic==1.20.0
+alembic==1.20.1
     # via -r requirements.txt
 bcrypt==5.0.0
     # via -r requirements.txt
@@ -17,6 +17,10 @@ click==8.4.2
     #   flask
     #   flask-socketio
     #   rq
+colorama==0.4.6
+    # via
+    #   click
+    #   pytest
 coverage==7.15.4
     # via pytest-cov
 croniter==6.2.4
@@ -83,7 +87,7 @@ packaging==26.3
     # via
     #   limits
     #   pytest
-pandas==3.0.6
+pandas==3.1.0
     # via -r requirements.txt
 pillow==12.3.0
     # via -r requirements.txt
@@ -136,7 +140,7 @@ six==1.17.0
     # via python-dateutil
 sortedcontainers==2.4.0
     # via fakeredis
-sqlalchemy==2.1.4
+sqlalchemy==2.1.6
     # via
     #   -r requirements.txt
     #   alembic
@@ -146,6 +150,8 @@ typing-extensions==4.16.0
     #   flask-limiter
     #   limits
     #   sqlalchemy
+tzdata==2026.6
+    # via pandas
 urllib3==2.8.0
     # via
     #   -r requirements.txt
