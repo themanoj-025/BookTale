@@ -17,10 +17,6 @@ click==8.4.2
     #   flask
     #   flask-socketio
     #   rq
-colorama==0.4.6
-    # via
-    #   click
-    #   pytest
 coverage==7.15.4
     # via pytest-cov
 croniter==6.2.4
@@ -89,7 +85,7 @@ packaging==26.3
     #   pytest
 pandas==3.1.0
     # via -r requirements.txt
-pillow==12.3.0
+pillow==13.0.0
     # via -r requirements.txt
 pluggy==1.6.0
     # via
@@ -150,8 +146,6 @@ typing-extensions==4.16.0
     #   flask-limiter
     #   limits
     #   sqlalchemy
-tzdata==2026.6
-    # via pandas
 urllib3==2.8.0
     # via
     #   -r requirements.txt
