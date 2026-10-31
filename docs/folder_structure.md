@@ -72,7 +72,7 @@ docs/
 | Old path                                        | New path  | Reason                                                                                                                                                                  | Mechanism                        |
 | ----------------------------------------------- | --------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------- |
 | `docs/assets/agents/AGENTS_FIX.md`              | _removed_ | Leftover v7.0 prompt scaffolding (same file duplicated in 16 sibling repos); archived copy had zero consumers                                                           | `git rm`                         |
-| `docs/assets/agents/AGENTS.md` + `.cursorrules` | _removed_ | Archived universal master-prompt template (generic, zero project content, zero consumers); the repo's real agent instructions live in `.github/copilot-instructions.md` | `git rm` (2026-08-15 docs audit) |
+| `docs/assets/agents/` + `.cursorrules` | _removed_ | Archived universal master-prompt template (generic, zero project content, zero consumers); the repo's real agent instructions live in `.github/copilot-instructions.md` | `git rm` (2026-08-15 docs audit) |
 | `requirements.txt` (dup block)                  | deduped   | `pandas/numpy/Pillow` pinned twice identically; removed redundant block (resolved set unchanged)                                                                        | edit                             |
 
 Reference updates: `.dockerignore` (dropped `AGENTS_FIX.md` exclusion).
