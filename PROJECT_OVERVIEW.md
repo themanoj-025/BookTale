@@ -1,4 +1,4 @@
----
+﻿---
 repo_name: "Book-Tale"
 project_name: "BookTale"
 canonical_url: "https://github.com/themanoj-025/BookTale.git"
@@ -868,7 +868,6 @@ Production deployment is achieved via Gunicorn WSGI behind an Nginx reverse prox
 | [`.github/ISSUE_TEMPLATE/bug_report.md`](.github/ISSUE_TEMPLATE/bug_report.md)                                                           | `.md`      | 46            | 965          | GitHub automation or CI/CD workflow             |
 | [`.github/ISSUE_TEMPLATE/feature_request.md`](.github/ISSUE_TEMPLATE/feature_request.md)                                                 | `.md`      | 38            | 940          | GitHub automation or CI/CD workflow             |
 | [`.github/PULL_REQUEST_TEMPLATE.md`](.github/PULL_REQUEST_TEMPLATE.md)                                                                   | `.md`      | 49            | 1504         | GitHub automation or CI/CD workflow             |
-| [`.github/copilot-instructions.md`](.github/copilot-instructions.md)                                                                     | `.md`      | 21            | 649          | GitHub automation or CI/CD workflow             |
 | [`.github/dependabot.yml`](.github/dependabot.yml)                                                                                       | `.yml`     | 45            | 891          | GitHub automation or CI/CD workflow             |
 | [`.github/labeler.yml`](.github/labeler.yml)                                                                                             | `.yml`     | 21            | 602          | GitHub automation or CI/CD workflow             |
 | [`.github/scripts/check_lockfile.py`](.github/scripts/check_lockfile.py)                                                                 | `.py`      | 214           | 7174         | GitHub automation or CI/CD workflow             |
@@ -895,8 +894,6 @@ Production deployment is achieved via Gunicorn WSGI behind an Nginx reverse prox
 | [`.pre-commit-config.yaml`](.pre-commit-config.yaml)                                                                                     | `.yaml`    | 41            | 1819         | Configuration or build asset                    |
 | [`.trivyignore`](.trivyignore)                                                                                                           | `no-ext`   | 13            | 651          | Configuration or build asset                    |
 | [`.vscode/settings.json`](.vscode/settings.json)                                                                                         | `.json`    | 17            | 465          | Configuration or build asset                    |
-| [`AGENTS.md`](AGENTS.md)                                                                                                                 | `.md`      | 79            | 2386         | Documentation asset                             |
-| [`AI_DISCLOSURE.md`](AI_DISCLOSURE.md)                                                                                                   | `.md`      | 66            | 2751         | Documentation asset                             |
 | [`CHANGELOG.md`](CHANGELOG.md)                                                                                                           | `.md`      | 44            | 1382         | Documentation asset                             |
 | [`CONTRIBUTING.md`](CONTRIBUTING.md)                                                                                                     | `.md`      | 14            | 530          | Documentation asset                             |
 | [`Dockerfile`](Dockerfile)                                                                                                               | `no-ext`   | 119           | 5933         | Configuration or build asset                    |
@@ -905,7 +902,6 @@ Production deployment is achieved via Gunicorn WSGI behind an Nginx reverse prox
 | [`Makefile`](Makefile)                                                                                                                   | `no-ext`   | 41            | 1457         | Configuration or build asset                    |
 | [`README.md`](README.md)                                                                                                                 | `.md`      | 374           | 15758        | Documentation asset                             |
 | [`SECURITY.md`](SECURITY.md)                                                                                                             | `.md`      | 25            | 984          | Documentation asset                             |
-| [`ai-provenance.json`](ai-provenance.json)                                                                                               | `.json`    | 69            | 1832         | Configuration or build asset                    |
 | [`alembic.ini`](alembic.ini)                                                                                                             | `.ini`     | 42            | 763          | Configuration or build asset                    |
 | [`apex_lib.bat`](apex_lib.bat)                                                                                                           | `.bat`     | 110           | 3999         | Configuration or build asset                    |
 | [`apex_lib_install.bat`](apex_lib_install.bat)                                                                                           | `.bat`     | 95            | 2757         | Configuration or build asset                    |
