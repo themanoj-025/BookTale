@@ -160,7 +160,11 @@ pnpm-debug.log*
 *.sublime-project
 *.sublime-workspace
 .ipynb_checkpoints/
-*.bak.gemini/
+.gemini/
+.claude/
+.cursor/
+.windsurf/
+.agents/
 
 # ------------------------------------------------------------------------------
 # 7. OS FILES & TEMPORARIES
@@ -178,26 +182,5 @@ $RECYCLE.BIN/
 *.temp
 *.bak
 
-# ==============================================================================
-# KEEP: AI provenance & transparency files — must remain visible
-# ==============================================================================
-!AI_DISCLOSURE.md
-!AI_USAGE.md
-!PROMPTS.md
-!AGENTS.md
-!CLAUDE.md
-!GEMINI.md
-!.cursorrules
-!.github/copilot-instructions.md
-!.claude/commands/
-!.claude/commands/**
-!.claude/agents/
-!.claude/agents/**
-!.claude/settings.json
-!docs/ai/
-!docs/ai/**
-!.ai/
-!.ai/**
-!ai-provenance.json
 !.gitmessage
 !CITATION.cff
