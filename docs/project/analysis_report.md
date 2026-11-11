@@ -7,7 +7,7 @@ This report is the written inventory required by Phase 1–2 of the repository
 modernization pass (v5.0). It lists every top-level entry, its purpose, its
 classification, and its intra-package dependencies. Nothing here changes
 behavior — it is the evidence base for the restructuring documented in
-[`docs/migration/migration_summary.md`](../migration/migration_summary.md).
+`docs/migration/migration_summary.md`.
 
 ---
 
