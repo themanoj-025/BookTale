@@ -17,13 +17,9 @@ click==8.4.2
     #   flask
     #   flask-socketio
     #   rq
-colorama==0.4.6
-    # via
-    #   click
-    #   pytest
 coverage==7.15.4
     # via pytest-cov
-croniter==6.2.4
+croniter==7.0.0
     # via
     #   -r requirements.txt
     #   rq
@@ -77,7 +73,7 @@ markupsafe==3.0.3
     #   wtforms
 mdurl==0.1.2
     # via markdown-it-py
-numpy==2.5.4
+numpy==2.5.5
     # via
     #   -r requirements.txt
     #   pandas
@@ -140,7 +136,7 @@ six==1.17.0
     # via python-dateutil
 sortedcontainers==2.4.0
     # via fakeredis
-sqlalchemy==2.1.8
+sqlalchemy==2.1.9
     # via
     #   -r requirements.txt
     #   alembic
@@ -150,8 +146,6 @@ typing-extensions==4.16.0
     #   flask-limiter
     #   limits
     #   sqlalchemy
-tzdata==2026.6
-    # via pandas
 urllib3==2.8.0
     # via
     #   -r requirements.txt

@@ -89,11 +89,10 @@ def bootstrap(storage: Storage, auth: AuthManager) -> None:
             import sys
 
             admin_password = secrets.token_urlsafe(16)
-            sys.stdout.write("DEFAULT_ADMIN_PASSWORD not set! Generated bootstrap credentials:\n")
+            sys.stdout.write("DEFAULT_ADMIN_PASSWORD not set! Generated bootstrap admin account.\n")
             sys.stdout.write(f"   Admin ID: {Config.DEFAULT_ADMIN_ID}\n")
-            sys.stdout.write(f"   Admin Password: {admin_password}\n")
             sys.stdout.write(
-                "   Set DEFAULT_ADMIN_PASSWORD in your .env file to use a custom password.\n"
+                "   Set DEFAULT_ADMIN_PASSWORD in your .env file to configure a known admin password.\n"
             )
         lib = Library(storage)
         lib.register_user(
@@ -105,9 +104,7 @@ def bootstrap(storage: Storage, auth: AuthManager) -> None:
             password_hash=hash_password(admin_password),
             actor="Bootstrap",
         )
-        print_success(
-            f"Default admin created. ID: {Config.DEFAULT_ADMIN_ID} | Password: {admin_password}"
-        )
+        print_success(f"Default admin created. ID: {Config.DEFAULT_ADMIN_ID}")
         print_warning("Change the default password after first login!")
 
 
