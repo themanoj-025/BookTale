@@ -1,4 +1,4 @@
-# Rules — Book-Tale: Coding Standards & AI-Agent Operating Rules
+# Rules — Book-Tale: Coding Standards & Engineering Operating Rules
 
 | Field        | Value            |
 | ------------ | ---------------- |
@@ -58,7 +58,7 @@ tests/         # unit + security suites
 - MUST have tests: lending concurrency, privilege escalation, CSRF, rate limits, upload magic bytes, audit trail, token lifecycle.
 - See [Testing.md](../technical/Testing.md).
 
-## 5. AI Agent Operating Rules
+## 5. Engineering Operating Rules
 
 - Always read Tracker.md and ImplementationPlan.md before starting a task.
 - Never mark a task 🟢 Done without tests passing.
