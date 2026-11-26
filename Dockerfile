@@ -52,9 +52,11 @@ RUN node scripts/build_frontend.mjs
 # ══════════════════════════════════════════════════════════════════════════════
 FROM python:3.12-slim AS runtime
 
-# Runtime deps
+# Runtime deps. libzstd1 is installed explicitly so apt upgrades the copy
+# inherited from the base image: python:3.12-slim ships 1.5.7+dfsg-1,
+# which Trivy flags as CVE-2026-124851 (HIGH, fixed in 1.5.7+dfsg-1+deb13u1).
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    libpq5 && \
+    libpq5 libzstd1 && \
     rm -rf /var/lib/apt/lists/*
 
 # The base image ships setuptools 70.x (CVE-2025-47273, fixed in
