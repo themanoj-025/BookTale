@@ -237,6 +237,8 @@ jobs:
           path: .
           format: spdx-json
           output-file: release/sbom.spdx.json
+          # The publish step uploads release/* (SBOM included) itself.
+          upload-release-assets: false
 
       - name: Assemble release assets
         run: |
