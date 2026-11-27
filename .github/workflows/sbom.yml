@@ -25,6 +25,9 @@ jobs:
           path: .
           format: spdx-json
           output-file: sbom.spdx.json
+          # release.yml attaches this SBOM to the GitHub Release; doing it
+          # here needs contents:write, which this workflow does not grant.
+          upload-release-assets: false
       - name: Upload SBOM
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
